@@ -1213,6 +1213,14 @@ const TG = (() => {
                 const app = window.Telegram.WebApp;
                 app.ready();
                 app.expand();
+                // Полноэкранный режим (Mini Apps 2.0, Bot API 8.0+): прячет
+                // шапку Telegram с именем бота, отдаёт весь экран. На старых
+                // клиентах метода нет — тихо пропускаем.
+                try {
+                    if (typeof app.requestFullscreen === "function" && !app.isFullscreen) {
+                        app.requestFullscreen();
+                    }
+                } catch (e) {}
                 if (minVersion(app)) {
                     try { app.setHeaderColor("#171225"); } catch (e) {}
                     try { app.setBackgroundColor("#171225"); } catch (e) {}
