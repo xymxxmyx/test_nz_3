@@ -792,14 +792,26 @@ let currentScreen = "welcome-screen";
     const PHONE_STAGE_H = 940;
     function stageRect() {
         const iw = window.innerWidth, ih = window.innerHeight;
+        // Фулскрин Telegram: плавающие кнопки («Закрыть», «∨ ⋮») и системные
+        // полосы перекрывают края окна — сцена строится в оставшемся проёме.
+        // На ПК и без Telegram оверлеи нулевые — поведение прежнее.
+        const ov = window.__tgOvl || { top: 0, bottom: 0 };
+        const oT = Math.max(0, Math.round(ov.top || 0));
+        const oB = Math.max(0, Math.round(ov.bottom || 0));
+        const availH = Math.max(ih - oT - oB, 200);
         const w = Math.min(iw, PHONE_STAGE_W);
-        const h = Math.min(ih, PHONE_STAGE_H);
-        return { x: Math.round((iw - w) / 2), y: Math.round((ih - h) / 2), w: w, h: h };
+        const h = Math.min(availH, PHONE_STAGE_H);
+        const slack = Math.max(availH - h, 0) / 2;
+        return { x: Math.round((iw - w) / 2), y: Math.round(oT + slack), w: w, h: h, yb: Math.round(oB + slack) };
     }
     function applyStageVars(st) {
         const root = document.documentElement.style;
         root.setProperty('--app-stage-x', st.x + 'px');
         root.setProperty('--app-stage-y', st.y + 'px');
+        // Раздельные отступы сцены по вертикали: в фулскрине Telegram верх
+        // и низ съедаются по-разному (кнопки сверху, системный бар снизу).
+        root.setProperty('--app-stage-yt', st.y + 'px');
+        root.setProperty('--app-stage-yb', (st.yb != null ? st.yb : st.y) + 'px');
         root.setProperty('--app-stage-w', st.w + 'px');
         root.setProperty('--app-stage-h', st.h + 'px');
     }
@@ -810,8 +822,11 @@ let currentScreen = "welcome-screen";
     // верхняя кромка нижнего канта рамки (3.16% высоты сцены), на телефоне
     // и в низком окне (st.y = 0, сцена доходит до края) — сам край экрана.
     function applyAchClip(st, fb) {
-        const clipDist = st.y <= 0.5 ? 0 : (st.y + st.h * 0.0316);
-        const achClipB = clipDist - (st.y + fb + 16);
+        // Якорь клипа — НИЖНЯЯ кромка сцены (st.yb): в фулскрине Telegram
+        // она выше края окна (снизу системный бар). Раньше нижняя кромка
+        // совпадала с верхней (st.y), потому что сцена была симметричной.
+        const clipDist = st.yb <= 0.5 ? 0 : (st.yb + st.h * 0.0316);
+        const achClipB = clipDist - (st.yb + fb + 16);
         document.documentElement.style.setProperty('--ach-clip-b', achClipB.toFixed(1) + 'px');
     }
 
@@ -1037,6 +1052,7 @@ document.documentElement.style.setProperty('--ui-scale', String(k));
     }
 
     window.__pinFrame = pin;
+    window.__resetPinLast = function () { pinLast = { l: 0, t: 0, w: 0, h: 0 }; };
     // Обои + рамка ещё до первого экрана: интро светится поверх того же фона,
     // что и главное меню, поэтому кроссфейд не «прыгает» на финале.
     window.__bootBackdrop = function () {
@@ -1219,6 +1235,29 @@ const TG = (() => {
                 try {
                     if (typeof app.requestFullscreen === "function" && !app.isFullscreen) {
                         app.requestFullscreen();
+                    }
+                } catch (e) {}
+                // Оверлеи фулскрина: плавающие кнопки Telegram («Закрыть»,
+                // «∨ ⋮») и системные полосы. Сцена строится в оставшемся
+                // проёме — рамка начинается ниже кнопок, а не под ними.
+                try {
+                    const readTgInsets = function () {
+                        const sa = app.safeAreaInset || {};
+                        const csa = app.contentSafeAreaInset || {};
+                        const top = Math.max(0, sa.top || 0) + Math.max(0, csa.top || 0);
+                        const bottom = Math.max(0, sa.bottom || 0) + Math.max(0, csa.bottom || 0);
+                        const prev = window.__tgOvl || { top: 0, bottom: 0 };
+                        if (prev.top === top && prev.bottom === bottom) return;
+                        window.__tgOvl = { top: top, bottom: bottom };
+                        if (window.__resetPinLast) window.__resetPinLast();
+                        if (window.__resetFit) window.__resetFit();
+                        if (window.__schedulePinFrame) window.__schedulePinFrame();
+                    };
+                    readTgInsets();
+                    if (typeof app.onEvent === "function") {
+                        ["contentSafeAreaChanged", "safeAreaChanged", "viewportChanged", "fullscreenChanged"].forEach(function (ev) {
+                            try { app.onEvent(ev, readTgInsets); } catch (e) {}
+                        });
                     }
                 } catch (e) {}
                 if (minVersion(app)) {

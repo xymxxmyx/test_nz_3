@@ -3631,9 +3631,11 @@ body.tg-mini-app {
     user-select: auto;
 }
 body.tg-mini-app .screen.active {
-    max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - var(--frame-t-px, 24px) - var(--topbar-h, 36px) - var(--frame-b-px, 24px) - 14px);
+    /* Высота сцены уже исключает оверлеи фулскрина Telegram
+       (safeAreaInset + contentSafeAreaInset из WebApp API). */
+    max-height: calc(var(--app-stage-h, 100dvh) - var(--frame-t-px, 24px) - var(--topbar-h, 36px) - var(--frame-b-px, 24px) - 14px);
     padding-top: calc(var(--frame-t-px, 24px) + var(--topbar-h, 36px) + 2px);
-    padding-bottom: calc(var(--frame-b-px, 24px) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(var(--frame-b-px, 24px) + max(var(--app-stage-yb, 0px), env(safe-area-inset-bottom, 0px)));
 }
 /* Р В Р в‚¬Р В РЎвЂ“Р В Р’В»Р РЋРІР‚в„– Р В РЎВР В Р’ВµР В Р вЂ¦Р РЋР вЂ№ Р В Р вЂ  Telegram: Р РЋР С“Р В Р’В±Р В РЎвЂўР В РЎвЂќР РЋРЎвЂњ Р РЋР С“Р В РЎвЂўР РЋРІР‚В¦Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р РЋР РЏР В Р’ВµР В РЎВ Р В РЎвЂ”Р В РЎвЂўР В Р’В»Р РЋР РЏ Р В РЎвЂ”Р В РЎвЂў Р В РЎвЂќР РЋР вЂљР В Р’В°Р РЋР РЏР В РЎВ */
 body.tg-mini-app .panel {
@@ -3650,8 +3652,8 @@ body.tg-mini-app .menu-panel {
 body.tg-mini-app {
     padding-left: var(--app-stage-x, 0px);
     padding-right: var(--app-stage-x, 0px);
-    padding-top: var(--app-stage-y, 0px);
-    padding-bottom: var(--app-stage-y, 0px);
+    padding-top: var(--app-stage-yt, 0px);
+    padding-bottom: var(--app-stage-yb, 0px);
 }
 body.tg-mini-app .screen {
     max-width: var(--app-stage-w, 100%);
@@ -3660,7 +3662,7 @@ body.tg-mini-app .screen {
     margin-right: auto;
 }
 body.tg-mini-app .topbar {
-    top: calc(var(--app-stage-y, 0px) + var(--frame-t-px, 24px));
+    top: calc(var(--app-stage-yt, 0px) + var(--frame-t-px, 24px));
     left: calc(var(--app-stage-x, 0px) + var(--frame-l-px, 24px) + 2px);
     right: calc(var(--app-stage-x, 0px) + var(--frame-r-px, 24px) + 2px);
 }
@@ -3672,12 +3674,12 @@ body.tg-mini-app .topbar {
    (15 < 24), РЎРѓР Р…Р С‘Р В·РЎС“ РІР‚вЂќ Р С—Р С•Р Т‘ Р Р…Р С‘Р В¶Р Р…Р ВµР в„– (829 > 817), Р Р†Р С‘Р Т‘Р С‘Р СР С•Р С–Р С• РЎРѓРЎР‚Р ВµР В·Р В° Р Р…Р ВµРЎвЂљ;
    padding-top +60px РІР‚вЂќ РЎв‚¬Р В°Р С—Р С”Р В° Р С‘ РЎРѓР С—Р С‘РЎРѓР С•Р С” Р С•РЎРѓРЎвЂљР В°РЎР‹РЎвЂљРЎРѓРЎРЏ РЎР‚Р С•Р Р†Р Р…Р С• Р Р…Р В° РЎРѓР Р†Р С•Р С‘РЎвЂ¦ Р СР ВµРЎРѓРЎвЂљР В°РЎвЂ¦. */
 body.tg-mini-app #dictionary-screen.active {
-    max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - var(--frame-t-px, 24px) - var(--topbar-h, 36px) - var(--frame-b-px, 24px) - 14px + 120px);
+    max-height: calc(var(--app-stage-h, 100dvh) - var(--frame-t-px, 24px) - var(--topbar-h, 36px) - var(--frame-b-px, 24px) - 14px + 120px);
     padding-top: calc(var(--frame-t-px, 24px) + var(--topbar-h, 36px) + 2px + 60px);
 }
 body.tg-mini-app #bg-inset {
-    top: calc(var(--app-stage-y, 0px) + var(--bg-t-px, 0px));
-    bottom: calc(var(--app-stage-y, 0px) + var(--bg-b-px, 0px));
+    top: calc(var(--app-stage-yt, 0px) + var(--bg-t-px, 0px));
+    bottom: calc(var(--app-stage-yb, 0px) + var(--bg-b-px, 0px));
     left: calc(var(--app-stage-x, 0px) + var(--bg-l-px, 0px));
     right: calc(var(--app-stage-x, 0px) + var(--bg-r-px, 0px));
 }
@@ -3690,8 +3692,8 @@ body.tg-mini-app #boot-screen::before {
     left: var(--bg-l-px, 0px);
 }
 body.tg-mini-app #boot-screen {
-    top: var(--app-stage-y, 0px);
-    bottom: var(--app-stage-y, 0px);
+    top: var(--app-stage-yt, 0px);
+    bottom: var(--app-stage-yb, 0px);
     left: var(--app-stage-x, 0px);
     right: var(--app-stage-x, 0px);
 }
@@ -4068,9 +4070,9 @@ body.tg-light {
 #boot-screen::before {
     content: "";
     position: absolute;
-    top: calc(var(--app-stage-y, 0px) + var(--bg-t-px, 0px));
+    top: calc(var(--app-stage-yt, 0px) + var(--bg-t-px, 0px));
     right: calc(var(--app-stage-x, 0px) + var(--bg-r-px, 0px));
-    bottom: calc(var(--app-stage-y, 0px) + var(--bg-b-px, 0px));
+    bottom: calc(var(--app-stage-yb, 0px) + var(--bg-b-px, 0px));
     left: calc(var(--app-stage-x, 0px) + var(--bg-l-px, 0px));
     z-index: -1;
     border-radius: 4%;
@@ -4346,10 +4348,10 @@ body .menu-panel > .frame-overlay {
 #bg-inset {
     display: none;
     position: fixed;
-    top: calc(var(--app-stage-y, 0px) + var(--bg-t-px, 0px));
+    top: calc(var(--app-stage-yt, 0px) + var(--bg-t-px, 0px));
     left: calc(var(--app-stage-x, 0px) + var(--bg-l-px, 0px));
     right: calc(var(--app-stage-x, 0px) + var(--bg-r-px, 0px));
-    bottom: calc(var(--app-stage-y, 0px) + var(--bg-b-px, 0px));
+    bottom: calc(var(--app-stage-yb, 0px) + var(--bg-b-px, 0px));
     z-index: 0;
     pointer-events: none;
     border-radius: 4%;
@@ -10546,7 +10548,7 @@ body[data-theme="plush"] #ach-toasts {
     left: var(--app-stage-x, 0px);
     right: auto;
     width: var(--app-stage-w, 100%);
-    bottom: calc(var(--app-stage-y, 0px) + var(--frame-b-px, 84px) + 16px);
+    bottom: calc(var(--app-stage-yb, 0px) + var(--frame-b-px, 84px) + 16px);
     max-width: none;
     align-items: center;
     /* Клин плашки ачивок. ВАЖНО: inset() отсчитывается ВНИЗ от нижней
