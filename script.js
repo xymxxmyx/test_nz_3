@@ -1233,7 +1233,10 @@ const TG = (() => {
                 // шапку Telegram с именем бота, отдаёт весь экран. На старых
                 // клиентах метода нет — тихо пропускаем.
                 try {
-                    if (typeof app.requestFullscreen === "function" && !app.isFullscreen) {
+                    // parseFloat(version) >= 8: фулскрин появился в Bot API 8.0.
+                    // Мок SDK в обычных браузерах («6.0») и старые клиенты —
+                    // без вызова, без шума в консоли.
+                    if (typeof app.requestFullscreen === "function" && !app.isFullscreen && parseFloat(app.version) >= 8) {
                         app.requestFullscreen();
                     }
                 } catch (e) {}
