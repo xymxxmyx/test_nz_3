@@ -1,0 +1,1271 @@
+﻿<!DOCTYPE html>
+
+<html lang="ru">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <style>
+    /* Тёмный фон до применения style.css: даже если стили ещё грузятся
+       (или не загрузились вовсе), белой вспышки с «сырой» вёрсткой нет. */
+    html, body { margin: 0; background: #0f0c1b; }
+    </style>
+
+    <title>Nihon &amp; Zeno</title>
+
+    <script>
+
+        // ?tg=0 — полностью отключить Telegram-обвязку (изоляция «подложки»)
+
+        window.__NO_TG__ = window.__NO_TG__ || /[?&#]tg=0([&#]|$)/.test(location.search + location.hash);
+
+        if (!window.__NO_TG__) {
+
+            var ts = document.createElement("script");
+
+            ts.src = "https://telegram.org/js/telegram-web-app.js";
+
+            document.head && document.head.appendChild(ts);
+
+        }
+
+    </script>
+
+    <link rel="stylesheet" href="style.css?v=20261152">
+
+    <script>
+    /* Режим «только рамка» (?frameonly=1): рисуем одно кольцо по экрану,
+       независимо от остального скрипта/кэша. */
+    if (/frameonly|fo=1/.test(location.search)) {
+        document.documentElement.classList.add('frames-only');
+        function drawFrame() {
+            var k = Math.min(1, window.innerWidth / 1100);
+            var bx = window.innerWidth / 0.842, by = window.innerHeight / 0.820;
+            var f = document.getElementById('top-frame');
+            if (!f) {
+                f = document.createElement('div');
+                f.id = 'top-frame';
+                f.className = 'frame-overlay';
+                document.body.appendChild(f);
+            }
+            f.style.cssText = 'position:fixed;pointer-events:none;z-index:100000;box-sizing:content-box;' +
+                'display:block;top:' + Math.round((window.innerHeight - by) / 2) + 'px;left:' + Math.round((window.innerWidth - bx) / 2) + 'px;' +
+                'width:' + Math.round(bx / k) + 'px;height:' + Math.round(by / k) + 'px;' +
+                'transform-origin:top left;transform:scale(' + k + ');' +
+                'background:url("UI/main-frame-v3.webp?v=frame5") no-repeat center / 100% 100%;';
+        }
+        if (document.body) drawFrame();
+        else document.addEventListener('DOMContentLoaded', drawFrame);
+        setInterval(drawFrame, 120);
+        window.addEventListener('resize', drawFrame);
+    }
+    </script>
+
+    <!-- Шрифты: только локальный Nihon Zeno Plush из UI/*.ttf -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+    
+
+    <!-- Кэш стилей: обычный ?v= (бампается при каждой правке). Раньше здесь
+         стояла подмена href с ?rnd= при каждом открытии — браузер сбрасывал
+         уже загруженный style.css и качал его заново, и на это время страница
+         успевала отрисоваться без стилей: белая вспышка с «кривой» вёрсткой. -->
+
+    <!-- Ранний предрасчёт сцены и отступов фона — ДО первой отрисовки.
+         #boot-screen::before (обои BG_PIC интро) и #bg-inset позиционируются
+         переменными --app-stage-* / --bg-*-px; до выполнения script.js у них
+         fallback 0px, и обои успевали отрисоваться растянутыми на весь экран.
+         Формулы зеркалят stageRect()/applyBgInsets() из script.js (стадия
+         420x940, нахлёст ov=20): при старте script.js пересчитает те же
+         значения без прыжка. Хук снимается сам, когда управление забирает
+         script.js (маркер window.__refitScreenFit). -->
+    <script>
+    (function () {
+        var PHONE_W = 420, PHONE_H = 940, OV = 20;
+        function applyEarlyStage() {
+            var iw = window.innerWidth || PHONE_W, ih = window.innerHeight || PHONE_H;
+            var w = Math.min(iw, PHONE_W), h = Math.min(ih, PHONE_H);
+            var root = document.documentElement.style;
+            root.setProperty('--app-stage-x', Math.round((iw - w) / 2) + 'px');
+            root.setProperty('--app-stage-y', Math.round((ih - h) / 2) + 'px');
+            root.setProperty('--app-stage-w', w + 'px');
+            root.setProperty('--app-stage-h', h + 'px');
+            var l = Math.max(3, w * 0.06343 - OV).toFixed(1);
+            var t = Math.max(17, h * 0.02855 - OV).toFixed(1);
+            var b = Math.max(3, h * 0.03236 - OV).toFixed(1);
+            root.setProperty('--bg-l-px', l + 'px');
+            root.setProperty('--bg-r-px', l + 'px');
+            root.setProperty('--bg-t-px', t + 'px');
+            root.setProperty('--bg-b-px', b + 'px');
+        }
+        applyEarlyStage();
+        function onResize() {
+            if (window.__refitScreenFit) { window.removeEventListener('resize', onResize); return; }
+            applyEarlyStage();
+        }
+        window.addEventListener('resize', onResize);
+    })();
+    </script>
+
+</head>
+
+<!-- radio-hidden сразу в разметке: топбар с радио скрыт с первой отрисовки.
+     Раньше класс вешал только хвост script.js, и при загрузке/обновлении
+     радио успевало проскочить до его выполнения. Хвост script.js остаётся
+     владельцем класса (переключение кодовым словом). -->
+<body class="radio-hidden">
+
+    <!-- Подложка внутри рамки: видна только в прозрачной середине рамки, позади контента -->
+    <div id="bg-inset" aria-hidden="true"></div>
+
+    <!-- Загрузочный экран: рекламный видеоролик Intro.mp4. Сначала пробуем
+         WebM с настоящей альфой (непрозрачный логотип без чтения пикселей,
+         работает и по file://), иначе — MP4 с альфа-ключом по яркости на canvas.
+         Ролик исчезает по окончании или по тапу -->
+
+    <div id="boot-screen" aria-hidden="true">
+
+        <video id="boot-video" muted playsinline autoplay preload="auto">
+
+            <source src="VID/Intro_alpha.webm?v=20261593" type='video/webm; codecs="vp9"'>
+
+            <source src="VID/Intro.mp4" type="video/mp4">
+
+        </video>
+
+        <canvas id="boot-canvas" aria-hidden="true"></canvas>
+
+    </div>
+
+
+
+    <!-- Верхняя панель: радио + громкость звуков -->
+    <div class="topbar" id="topbar">
+
+        <div class="topbar-groups" id="topbar-groups">
+
+            <div class="topbar-group">
+
+                <span class="tb-label">♫ RADIO</span>
+                <div class="radio-led" id="radio-led"></div>
+
+                <button class="radio-btn" onclick="playRadio()">▶</button>
+                <button class="radio-btn" onclick="pauseRadio()">■</button>
+                <div class="radio-station-list" id="radio-station"></div>
+
+                <input type="range" class="radio-volume" id="radio-volume" min="0" max="100" value="50" oninput="setRadioVolume(this.value)">
+
+                <span class="radio-vol-num" id="radio-vol-num">50</span>
+
+                <a class="radio-link" href="https://lofiradio.ru/" target="_blank" rel="noopener">LoFi Radio ↗</a>
+                <span class="radio-track" id="radio-track">нажмите ▶</span>
+            </div>
+
+            <div class="tb-sep"></div>
+
+            <div class="topbar-group">
+
+                <span class="tb-label"><img class="tb-ico" src="UI/ICON/NOTA.webp" alt=""> ЗВУК</span>
+                <input type="range" class="vol-slider sfx-slider" id="sfx-volume-quick" min="0" max="100" value="100" oninput="setSfxVolume(this.value)">
+
+                <span class="sfx-vol-num" id="sfx-vol-num-quick">100</span>
+
+            </div>
+
+        </div>
+
+        <button class="topbar-toggle" id="topbar-toggle" onclick="toggleTopbar()">–</button>
+        <audio id="radio-audio" preload="none" volume="0.5">
+
+            <source src="https://live.lofiradio.ru/lofi_mp3_128" type="audio/mpeg">
+
+        </audio>
+
+    </div>
+
+
+    <!-- Сцена FROSTBOUND: снежинки за панелью (только тема Syberia) -->
+    <div id="frost-scene" aria-hidden="true">
+
+<span class="fs-f" style="left:22.8%;top:14.0%;font-size:26.7px;animation-duration:15.9s;animation-delay:-9.7s;opacity:0.8;--fs-w:-62.0px;--fs-s:28.0px">&#10052;</span>
+
+<span class="fs-f" style="left:52.9%;top:19.0%;font-size:21.1px;animation-duration:21.5s;animation-delay:-8.7s;opacity:0.77;--fs-w:65.0px;--fs-s:11.0px">&#10052;</span>
+
+<span class="fs-f" style="left:83.3%;top:26.0%;font-size:26.4px;animation-duration:21.9s;animation-delay:-10.7s;opacity:0.58;--fs-w:-41.0px;--fs-s:9.0px">&#10052;</span>
+
+<span class="fs-f" style="left:45.4%;top:29.0%;font-size:29.5px;animation-duration:24.1s;animation-delay:-11.4s;opacity:0.92;--fs-w:71.0px;--fs-s:21.0px">&#10052;</span>
+
+<span class="fs-f" style="left:12.9%;top:13.0%;font-size:23.8px;animation-duration:10.6s;animation-delay:-7.9s;opacity:0.65;--fs-w:75.0px;--fs-s:27.0px">&#10052;</span>
+
+<span class="fs-f" style="left:80.0%;top:26.0%;font-size:27.2px;animation-duration:18.5s;animation-delay:-6.5s;opacity:0.64;--fs-w:68.0px;--fs-s:28.0px">&#10052;</span>
+
+<span class="fs-f" style="left:95.1%;top:25.0%;font-size:28.7px;animation-duration:12.6s;animation-delay:-13.8s;opacity:0.94;--fs-w:-70.0px;--fs-s:13.0px">&#10052;</span>
+
+<span class="fs-f" style="left:55.1%;top:27.0%;font-size:22.6px;animation-duration:11.0s;animation-delay:-13.7s;opacity:0.95;--fs-w:-44.0px;--fs-s:9.0px">&#10052;</span>
+
+<span class="fs-f" style="left:1.9%;top:17.0%;font-size:24.8px;animation-duration:16.6s;animation-delay:-1.9s;opacity:0.79;--fs-w:-46.0px;--fs-s:21.0px">&#10052;</span>
+
+<span class="fs-f" style="left:88.5%;top:6.0%;font-size:22.5px;animation-duration:13.8s;animation-delay:-0.6s;opacity:0.55;--fs-w:-62.0px;--fs-s:9.0px">&#10052;</span>
+
+<span class="fs-f" style="left:39.2%;top:26.0%;font-size:27.8px;animation-duration:12.5s;animation-delay:-0.7s;opacity:0.9;--fs-w:45.0px;--fs-s:11.0px">&#10052;</span>
+
+<span class="fs-f" style="left:36.2%;top:15.0%;font-size:31.9px;animation-duration:16.2s;animation-delay:-13.9s;opacity:0.82;--fs-w:-63.0px;--fs-s:29.0px">&#10052;</span>
+
+<span class="fs-f" style="left:41.4%;top:12.0%;font-size:29.5px;animation-duration:13.8s;animation-delay:-4.8s;opacity:0.94;--fs-w:58.0px;--fs-s:8.0px">&#10052;</span>
+
+<span class="fs-f" style="left:55.7%;top:11.0%;font-size:18.3px;animation-duration:19.9s;animation-delay:-10.1s;opacity:0.57;--fs-w:53.0px;--fs-s:23.0px">&#10052;</span>
+
+<span class="fs-f" style="left:67.9%;top:18.0%;font-size:29.8px;animation-duration:10.4s;animation-delay:-1.0s;opacity:0.82;--fs-w:38.0px;--fs-s:18.0px">&#10052;</span>
+
+<span class="fs-f" style="left:30.7%;top:24.0%;font-size:23.8px;animation-duration:15.0s;animation-delay:-5.9s;opacity:0.79;--fs-w:75.0px;--fs-s:10.0px">&#10052;</span>
+
+<span class="fs-f" style="left:93.3%;top:13.0%;font-size:28.9px;animation-duration:12.1s;animation-delay:-8.0s;opacity:0.81;--fs-w:37.0px;--fs-s:12.0px">&#10052;</span>
+
+<span class="fs-f" style="left:67.0%;top:2.0%;font-size:19.6px;animation-duration:15.2s;animation-delay:-5.3s;opacity:0.88;--fs-w:77.0px;--fs-s:29.0px">&#10052;</span>
+
+<span class="fs-f" style="left:71.2%;top:24.0%;font-size:21.5px;animation-duration:19.1s;animation-delay:-4.3s;opacity:0.86;--fs-w:-57.0px;--fs-s:12.0px">&#10052;</span>
+
+<span class="fs-f" style="left:80.5%;top:16.0%;font-size:20.9px;animation-duration:14.5s;animation-delay:-12.9s;opacity:0.81;--fs-w:61.0px;--fs-s:17.0px">&#10052;</span>
+
+    </div>
+
+
+
+    <!-- Экран приветствия -->
+    <div id="welcome-screen" class="screen">
+
+        <div class="panel welcome-panel">
+
+            <div class="frame-overlay"></div>
+
+            <img class="welcome-mascot" src="MASKOT/MASKOT_18_cut.webp" alt="Маскот">
+
+            <h2 class="welcome-title">Добро пожаловать !</h2>
+
+            <p class="welcome-sub">Привет ! Я помогу тебе учить иностранные слова — японский, английский и не только. Короткие карточки, уровни, серии занятий и ежедневные цели помогут заниматься каждый день. Как тебя зовут ?</p>
+
+            <input type="text" id="player-name" placeholder="Введите своё имя" maxlength="20">
+
+            <button id="start-btn" onclick="startGame()">Начать</button>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Главное меню -->
+    <div id="main-menu" class="screen hidden">
+
+        <div class="panel menu-panel">
+
+            <div class="frame-overlay"></div>
+
+            <img class="logo-img" src="MASKOT/LOGO.webp" alt="Nihon &amp; Zeno">
+
+            <p class="greeting" id="greeting"></p>
+
+            <div class="menu-level-bar">
+
+                <button class="menu-level-btn" onclick="showProgress()">
+                    <span class="menu-level-badge" id="menu-level-badge"><img class="badge-ico" src="UI/ICON/STAR.webp" alt=""> Ур. 1</span>
+                    <span class="menu-level-track"><span class="menu-level-track-fill" id="menu-level-track-fill"></span></span>
+
+                    <span class="menu-level-xp" id="menu-level-xp">0/100</span>
+
+                </button>
+
+            </div>
+
+            <div class="stats-box">
+
+                <div class="stat">
+
+                    <span class="stat-value" id="stat-learned">0</span>
+
+                    <span class="stat-label">Выучено</span>
+                </div>
+
+                <div class="stat">
+
+                    <span class="stat-value" id="stat-total">0</span>
+
+                    <span class="stat-label">Всего слов</span>
+                </div>
+
+                <div class="stat">
+
+                    <span class="stat-value" id="stat-streak">0</span>
+
+                    <span class="stat-label">Серия</span>
+                </div>
+
+            </div>
+
+            <div class="menu-row">
+
+                <button class="menu-btn" id="btn-new-game" onclick="startFreshGame()" data-lock="quiz"><img class="menu-ic" src="UI/extracted/New Game icon.webp" alt=""> Новая игра</button>
+                <button class="menu-btn continue-btn" id="btn-continue-game" onclick="continueGame()" data-lock="quiz"><img class="menu-ic" src="UI/extracted/Continue icon.webp" alt=""> Продолжить</button>
+            </div>
+
+            <div class="menu-grid">
+
+                <button class="menu-btn" onclick="showDictionary()"><img class="menu-ic" src="UI/extracted/dictionary icon.webp" alt=""> Словарь</button>
+                <button class="menu-btn" onclick="showUserWords()" data-lock="ownWords"><img class="menu-ic" src="UI/extracted/my word icon.webp" alt=""> Мои слова</button>
+                <button class="menu-btn" onclick="showLessonsMenu()"><img class="menu-ic" src="UI/extracted/lessons icon.webp" alt=""> Уроки</button>
+                <button class="menu-btn" onclick="showProgress()"><img class="menu-ic" src="UI/extracted/progress icon.webp" alt=""> Прогресс</button>
+                <!-- <button class="menu-btn" onclick="showProgress()"><img class="menu-ic" src="UI/extracted/progress icon.webp" alt=""> Прогресс</button> -->
+                <button class="menu-btn" onclick="showSettings()"><img class="menu-ic" src="UI/extracted/settings icon.webp" alt=""> Настройки</button>
+            </div>
+
+            <div class="lang-switcher" id="lang-switcher">
+
+                <button class="lang-pick" data-lang="en" id="lang-pick-en" onclick="switchStudyLang('en')"><span class="lang-code">EN</span><span class="lang-sub">Английский</span></button>
+                <button class="lang-pick" data-lang="ja" id="lang-pick-ja" onclick="switchStudyLang('ja')"><span class="lang-code">日本語</span><span class="lang-sub">Японский</span></button>
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Экран выбора режима новой игры -->
+    <div id="mode-screen" class="screen hidden">
+
+        <div class="panel">
+
+            <div class="frame-overlay"></div>
+
+            <div class="logo">Nihon &amp; Zeno</div>
+
+            <h1>Выбор режима</h1>
+            <p class="greeting">Как будем играть ?</p>
+            <div class="mode-grid">
+                <button class="menu-btn mode-pick" onclick="initInputSubMode()" data-lock="input"><img class="menu-ic" src="UI/ICON/KARANDASH.webp" alt=""> Ввод слов</button>
+                <button class="menu-btn mode-pick" onclick="startNewGame('quiz')" data-lock="quiz"><img class="menu-ic" src="UI/ICON/CIFRI.webp" alt=""> 5 к 1</button>
+                <button class="menu-btn mode-pick" onclick="startNewGame('listening')" data-lock="listening"><img class="menu-ic" src="UI/ICON/NAUSH.webp" alt=""> Услышь слово</button>
+                <button class="menu-btn mode-pick" onclick="startNewGame('cards')" data-lock="cards"><img class="menu-ic" src="UI/ICON/KARTINA.webp" alt=""> Собери предложение</button>
+            </div>
+            <button class="menu-btn back-to-menu" onclick="backToMenu()"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> Назад</button>
+        </div>
+
+    </div>
+
+
+
+    <!-- Экран выбора: что вводим — слова или предложения -->
+    <div id="submode-screen" class="screen hidden">
+
+        <div class="panel">
+
+            <div class="frame-overlay"></div>
+
+            <div class="logo">Nihon &amp; Zeno</div>
+
+            <h1>Ввод слов</h1>
+            <p class="greeting">Что вводим ?</p>
+            <div class="menu-row submode-row">
+                <button class="menu-btn mode-pick" onclick="startSubmode('words')"><img class="menu-ic" src="UI/ICON/LIST.webp" alt=""> Слова</button>
+                <button class="menu-btn mode-pick" onclick="startSubmode('sentences')"><img class="menu-ic" src="UI/ICON/CHAT.webp" alt=""> Предложения</button>
+            </div>
+            <button class="menu-btn back-to-menu" onclick="showScreen('mode-screen')"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> Назад</button>
+        </div>
+
+    </div>
+
+
+
+    <!-- Экран выбора уровня сложности -->
+    <div id="level-screen" class="screen hidden">
+
+        <div class="panel">
+
+            <div class="frame-overlay"></div>
+
+            <div class="logo">Nihon &amp; Zeno</div>
+
+            <h1 id="level-title">Уровень слов</h1>
+            <p class="greeting">Какой набор слов берём в игру ?</p>
+            <p class="mode-desc" id="level-desc">А1-А2 — базовые предложения, Б1-Б2 — продвинутые, Смешать = все</p>
+            <div id="cards-dir-box" class="cards-dir-box hidden">
+
+                <p class="mode-desc">Направление карточек</p>
+                <div class="cards-dir-row">
+
+                    <button class="menu-btn mode-pick" id="cards-dir-ru" onclick="setCardsDirection('ru-en')">Рус <img class="ico-png" src="UI/ICON/STRELA_PRAVO.webp" alt=""> Англ</button>
+                    <button class="menu-btn mode-pick" id="cards-dir-en" onclick="setCardsDirection('en-ru')">Англ <img class="ico-png" src="UI/ICON/STRELA_PRAVO.webp" alt=""> Рус</button>
+                </div>
+
+            </div>
+            <div class="category-grid">
+
+                <button class="menu-btn mode-pick" onclick="chooseLevel('a')"><img class="menu-ic" src="UI/ICON/BUKVAA.webp" alt=""> А1-А2<span class="level-count" id="level-count-a"></span></button>
+                <button class="menu-btn mode-pick" onclick="chooseLevel('b')"><img class="menu-ic" src="UI/ICON/BUKVAB.webp" alt=""> Б1-Б2<span class="level-count" id="level-count-b"></span></button>
+                <button class="menu-btn mode-pick menu-wide" onclick="chooseLevel('mix')"><img class="menu-ic" src="UI/ICON/STRELKI.webp" alt=""> Смешать<span class="level-count" id="level-count-all"></span></button>
+            </div>
+
+            <button class="menu-btn back-to-menu" onclick="backFromLevel()"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> Назад</button>
+        </div>
+
+    </div>
+
+
+
+    <!-- Экран выбора категории слов -->
+<div id="category-screen" class="screen hidden">
+
+    <div class="panel menu-panel">
+
+    <div class="frame-overlay"></div>
+
+    <img class="logo-img" src="MASKOT/LOGO.webp" alt="Nihon &amp; Zeno">
+
+            <h1>Категория слов</h1>
+            <p class="greeting">Какие слова возьмём в игру ?</p>
+            <div class="category-grid">
+
+                <button class="menu-btn mode-pick" onclick="startGameWithCategory('noun')"><img class="menu-ic" src="UI/ICON/DOM.webp" alt=""> Существительные</button>
+                <button class="menu-btn mode-pick" onclick="startGameWithCategory('adj')"><img class="menu-ic" src="UI/ICON/PALITRA.webp" alt=""> Прилагательные</button>
+                <button class="menu-btn mode-pick" onclick="startGameWithCategory('verb')"><img class="menu-ic" src="UI/ICON/BEGUN.webp" alt=""> Глаголы</button>
+                <button class="menu-btn mode-pick" onclick="startGameWithCategory('adv')"><img class="menu-ic" src="UI/ICON/MOLNIA.webp" alt=""> Наречия</button>
+                <button class="menu-btn mode-pick" onclick="startGameWithCategory('num')"><img class="menu-ic" src="UI/ICON/CIFRI.webp" alt=""> Числительные</button>
+                <button class="menu-btn mode-pick" onclick="startGameWithCategory('pro')"><img class="menu-ic" src="UI/ICON/CHEL.webp" alt=""> Местоимения</button>
+                <button class="menu-btn mode-pick" onclick="startGameWithCategory('prep')"><img class="menu-ic" src="UI/ICON/TREK.webp" alt=""> Предлоги</button>
+                <button class="menu-btn mode-pick" onclick="startGameWithCategory('all')"><img class="menu-ic" src="UI/ICON/STRELKI.webp" alt=""> Перемешать</button>
+            </div>
+
+            <p class="mode-desc">Перемешать = все части речи вместе</p>
+            <button class="menu-btn back-to-menu" onclick="showScreen('level-screen')"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> Назад</button>
+        </div>
+
+    </div>
+
+
+
+    <!-- Экран игры -->
+    <div id="game-screen" class="screen hidden">
+
+        <div class="panel">
+
+            <div class="frame-overlay"></div>
+
+            <div class="game-header">
+
+                <button class="back-btn" onclick="backToMenu()"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> Назад</button>
+
+                <span class="progress-text" id="progress-text">0/0</span>
+
+                <span class="category-tag" id="current-category"></span>
+
+            </div>
+
+            <div class="speed-strip hidden" id="speed-strip">
+
+                <span class="speed-score">Очки: <b id="speed-score">0</b></span>
+                <span class="speed-combo" id="speed-combo">×1</span>
+                <div class="speed-barwrap"><div class="speed-bar" id="speed-bar"></div></div>
+
+            </div>
+
+
+
+            <!-- Режим ввода слов -->
+            <div id="input-area">
+
+                <div class="bar-wrap">
+
+                    <div class="progress-fill" id="progress-fill"></div>
+
+                </div>
+
+                <div class="game-card" id="game-card">
+
+                    <p class="word-label" id="word-label">ПЕРЕВЕДИТЕ</p>
+                    <p class="word" id="current-word">apple</p>
+
+                    <div class="word-tools">
+
+                        <button class="tts-btn" id="current-speak" onclick="ttsSpeakCurrent()">🔊</button>
+                        <button class="fav-btn" id="current-fav" onclick="toggleCurrentFav()"><img class="fav-ico" src="UI/ICON/ZVEZDAKRUG.webp" alt=""></button>
+                    </div>
+
+                    <div class="answer-row">
+
+                        <input type="text" id="answer-input" placeholder="Введите перевод..." autocomplete="off">
+                        <button class="mic-btn" id="answer-mic" title="Голосовой ввод" aria-label="Голосовой ввод"></button>
+                    </div>
+
+                    <button class="check-btn" id="check-btn" onclick="checkAnswer()"><img class="ico-png" src="UI/ICON/GALKA.webp" alt=""> Проверить</button>
+                    <p class="feedback" id="feedback"></p>
+
+                    <button class="next-btn hidden" id="next-btn" onclick="nextWord()">Далее <img class="ico-png" src="UI/ICON/STRELA_PRAVO.webp" alt=""></button>
+                </div>
+
+            </div>
+
+
+
+            <!-- Режим боя с ботом (5 к 1) -->
+            <div id="battle-area" class="hidden">
+
+                <div class="battle-header">
+
+                    <div class="deck-info">
+
+                        <span class="deck-icon"><img class="ico-png" src="UI/ICON/BOT.webp" alt=""></span>
+                        <div class="deck-count">
+
+                            <span class="deck-num" id="bot-deck-num">50</span>
+
+                            <span class="deck-label">Бот</span>
+                        </div>
+
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="deck-info player-deck">
+
+                        <div class="deck-count">
+
+                            <span class="deck-num" id="player-deck-num">50</span>
+
+                            <span class="deck-label">Вы</span>
+                        </div>
+
+                        <span class="deck-icon"><img class="ico-png" src="UI/ICON/CHEL.webp" alt=""></span>
+                    </div>
+
+                </div>
+
+
+
+                <div class="battle-table" id="battle-table">
+                    <div class="hearts" id="hearts">
+                        <span class="heart" data-full="♥"></span>
+                        <span class="heart" data-full="♥"></span>
+                        <span class="heart" data-full="♥"></span>
+                    </div>
+
+                    <!-- Зона бота: колода и раздаётся карта -->
+                    <div class="bot-zone">
+
+                        <div class="bot-deal-area">
+
+                            <!-- Рубашечная колода, из которой выдаётся карта -->
+                            <div class="bot-deck" id="bot-deck">
+
+                                <span class="deck-card-bg"></span>
+
+                                <span class="deck-card-bg"></span>
+
+                                <span class="deck-card-bg"></span>
+
+                                <span class="deck-card-bg"></span>
+
+                            </div>
+
+                            <!-- Раздаваемая карта -->
+                            <div class="bot-card-wrap" id="bot-card-wrap">
+
+                                <div class="battle-card bot-card" id="bot-card">
+
+                                    <div class="card-face card-back">
+
+                                    </div>
+
+                                    <div class="card-face card-front bot-front">
+
+                                        <span class="stars" aria-hidden="true">
+
+                                            <span class="star" style="--x:14%;--y:16%;--s:3px;--d:0s"></span>
+
+                                            <span class="star" style="--x:68%;--y:12%;--s:2px;--d:1.2s"></span>
+
+                                            <span class="star" style="--x:82%;--y:34%;--s:3px;--d:2.1s"></span>
+
+                                            <span class="star" style="--x:26%;--y:40%;--s:2px;--d:0.6s"></span>
+
+                                            <span class="star" style="--x:55%;--y:58%;--s:2px;--d:1.7s"></span>
+
+                                            <span class="star" style="--x:12%;--y:66%;--s:3px;--d:2.6s"></span>
+
+                                            <span class="star" style="--x:74%;--y:74%;--s:2px;--d:0.3s"></span>
+
+                                            <span class="star" style="--x:38%;--y:84%;--s:3px;--d:1.9s"></span>
+
+                                            <span class="star" style="--x:90%;--y:78%;--s:2px;--d:3.1s"></span>
+
+                                            <span class="star" style="--x:48%;--y:92%;--s:2px;--d:0.9s"></span>
+
+                                        </span>
+
+                                        <span class="card-suit"><img class="ico-png" src="UI/ICON/ROMB.webp" alt=""></span>
+                                        <span class="card-word" id="bot-card-word">apple</span>
+
+                                        <span class="card-suit"><img class="ico-png" src="UI/ICON/ROMB.webp" alt=""></span>
+                                    </div>
+
+                                    <div class="card-pixels" id="bot-pixels"></div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Слово для покрытия -->
+                    <div class="battle-center">
+
+                        <span class="center-label">ПОКРОЙ КАРТУ</span>
+                        <button class="tts-btn" id="bot-speak" onclick="ttsSpeakBot()">🔊</button>
+                        <div class="feedback" id="battle-feedback"></div>
+
+                    </div>
+
+
+
+                    <!-- Карты игрока (варианты) — один ряд -->
+                    <div class="player-zone">
+
+                        <div class="zone-label">ВАШИ КАРТЫ</div>
+                        <div class="options" id="options"></div>
+
+                    </div>
+
+                    <canvas class="bot-dissolve-fx" id="bot-dissolve-fx" aria-hidden="true"></canvas>
+
+                    <canvas class="player-appear-fx" id="player-appear-fx" aria-hidden="true"></canvas>
+
+                </div>
+
+
+
+                <button class="next-btn hidden" id="battle-next" onclick="nextWord()">Следующая карта <img class="ico-png" src="UI/ICON/STRELA_PRAVO.webp" alt=""></button>
+            </div>
+
+
+
+            <!-- Режим карточек: собери предложение из разданных слов -->
+            <div id="cards-area" class="hidden">
+
+                <div class="cards-prompt">
+
+                    <p class="word-label" id="cards-label">СОБЕРИТЕ ПРЕДЛОЖЕНИЕ</p>
+                    <p class="word sentence" id="cards-source"></p>
+
+                    <div class="cards-tools">
+
+                        <button class="tts-btn" id="cards-speak" onclick="ttsSpeakCards()">🔊</button>
+                        <button class="audio-toggle" id="cards-audio-toggle" onclick="toggleCardsAudio()"><img class="ico-png" src="UI/ICON/UHO.webp" alt=""> Аудирование</button>
+                    </div>
+
+                </div>
+
+                <div class="cards-field" id="cards-field">
+                    <div class="cards-grid player-zone" id="cards-grid"></div>
+                </div>
+
+                <p class="feedback" id="cards-feedback"></p>
+
+                <div class="cards-controls">
+
+                    <button class="next-btn cards-reset-btn" id="cards-reset" onclick="cardsReset()"><img class="ico-png" src="UI/ICON/REVERS.webp" alt=""> Сброс</button>
+                    <button class="check-btn" id="cards-check" onclick="checkCardsAnswer()"><img class="ico-png" src="UI/ICON/GALKA.webp" alt=""> Проверить</button>
+                    <button class="next-btn hidden" id="cards-next" onclick="nextWord()">Далее <img class="ico-png" src="UI/ICON/STRELA_PRAVO.webp" alt=""></button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Экран словаря -->
+    <div id="dictionary-screen" class="screen hidden">
+
+        <div class="panel">
+
+            <div class="frame-overlay"></div>
+
+            <div class="game-header">
+
+                <button class="back-btn" onclick="backToMenu()"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> Назад</button>
+                <h2>СЛОВАРЬ</h2>
+            </div>
+
+            <div class="filter-buttons">
+
+                <button class="filter-btn active" data-filter="all" onclick="filterDictionary('all', this)"><img class="ico-png" src="UI/ICON/DEKA.webp" alt=""> Все</button>
+                <button class="filter-btn" data-filter="learned" onclick="filterDictionary('learned', this)"><img class="filt-ic" src="UI/Serdce_aktiv.webp" alt=""> Выученные</button>
+                <button class="filter-btn" data-filter="unlearned" onclick="filterDictionary('unlearned', this)"><img class="filt-ic" src="UI/Serdce_seroe.webp" alt=""> Не выученные</button>
+                <button class="filter-btn" data-filter="favorites" onclick="filterDictionary('favorites', this)"><img class="fav-star" src="UI/Zvezda_osnova.webp" alt=""> Избранные</button>
+            </div>
+
+            <div class="dict-search-box">
+                <input type="text" id="dict-search" placeholder="Поиск слова или перевода..." autocomplete="off" oninput="onDictSearch()">
+            </div>
+
+            <div class="dictionary-list" id="dictionary-list"></div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Экран «Мои слова»: свои слова игрока — добавляются в файл userwords -->
+    <div id="user-words-screen" class="screen hidden">
+
+        <div class="panel">
+
+            <div class="frame-overlay"></div>
+
+            <div class="game-header">
+
+                <button class="back-btn" onclick="backToMenu()"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> Назад</button>
+                <h2>МОИ СЛОВА</h2>
+            </div>
+
+            <div class="uw-form settings-list">
+
+                <div class="setting-item">
+                    <label for="uw-en">Слово</label>
+                    <input type="text" id="uw-en" placeholder="например, apple" autocomplete="off">
+                </div>
+
+                <div class="setting-item">
+                    <label for="uw-ru">Перевод</label>
+                    <input type="text" id="uw-ru" placeholder="например, яблоко" autocomplete="off">
+                </div>
+
+                <div class="setting-item">
+                    <label for="uw-lvl">Уровень</label>
+                    <select id="uw-lvl" data-fs-title="Уровень" aria-label="Уровень">
+                        <option value="a">A1-A2</option>
+                        <option value="b">B1-B2</option>
+                    </select>
+                </div>
+
+                <div class="setting-item">
+                    <label for="uw-pos">Часть речи</label>
+                    <select id="uw-pos" data-fs-title="Часть речи" aria-label="Часть речи">
+                        <option value="noun">Существительное</option>
+                        <option value="verb">Глагол</option>
+                        <option value="adj">Прилагательное</option>
+                        <option value="adv">Наречие</option>
+                        <option value="num">Числительное</option>
+                        <option value="pro">Местоимение</option>
+                        <option value="prep">Предлог</option>
+                        <option value="other">Другое</option>
+                    </select>
+                </div>
+
+                <div class="setting-item">
+                    <label for="uw-note">Заметка</label>
+                    <input type="text" id="uw-note" placeholder="пример или заметка" autocomplete="off">
+                </div>
+
+                <button class="check-btn uw-add-btn" onclick="addUserWord()"><img class="ico-png" src="UI/ICON/CHELCPLUSOM.webp" alt=""> Добавить слово</button>
+            </div>
+
+            <div class="uw-search-box">
+                <input type="text" id="uw-search" placeholder="Поиск по моим словам..." autocomplete="off" oninput="renderUserWordsList()">
+            </div>
+
+            <div class="user-words-list" id="user-words-list"></div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Экран уроков: список тем -->
+    <div id="lessons-screen" class="screen hidden">
+
+        <div class="panel">
+
+            <div class="frame-overlay"></div>
+
+            <div class="game-header">
+
+                <button class="back-btn" onclick="backToMenu()"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> Назад</button>
+                <h2>УРОКИ</h2>
+            </div>
+
+            <p class="mode-desc">Базовые правила английского — читайте, учите и закрепляйте тестом</p>
+            <div class="level-tabs">
+
+                <button class="level-tab active" id="lessons-lvl-a" onclick="selectLessonsLevel('a')"><img class="ico-png" src="UI/ICON/KNIGA_ZEL.webp" alt=""> А1-А2</button>
+                <button class="level-tab" id="lessons-lvl-b" onclick="selectLessonsLevel('b')"><img class="ico-png" src="UI/ICON/KNIGA_ORANGE.webp" alt=""> Б1-Б2</button>
+            </div>
+
+            <div class="lessons-list" id="lessons-list"></div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Экран чтения урока -->
+    <div id="lesson-screen" class="screen hidden">
+
+        <div class="panel">
+
+            <div class="frame-overlay"></div>
+
+            <div class="game-header">
+
+                <button class="back-btn" onclick="showLessonsMenu()"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> К урокам</button>
+                <h2 id="lesson-title"></h2>
+
+            </div>
+
+            <div class="lesson-body" id="lesson-body"></div>
+
+            <div class="lesson-nav">
+
+                <button class="next-btn lesson-prev" id="lesson-prev" onclick="lessonNav(-1)"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> Предыдущий</button>
+                <span class="lesson-progress" id="lesson-progress"></span>
+
+                <button class="check-btn" id="lesson-next" onclick="lessonNav(1)">Следующий <img class="ico-png" src="UI/ICON/STRELA_PRAVO.webp" alt=""></button>
+            </div>
+
+            <button class="check-btn" id="lesson-test-btn"><img class="ico-png" src="UI/ICON/LIST.webp" alt=""> Тест по уроку (10 вопросов)</button>
+            <button class="check-btn" id="lesson-done-btn" style="display:none" title="Отметить урок изученным"><img class="ico-png" src="UI/ICON/GALKA_2.webp" alt=""> Я изучил этот урок</button>
+        </div>
+
+    </div>
+
+
+
+    <!-- Экран теста по урокам -->
+    <div id="lesson-test-screen" class="screen hidden">
+
+        <div class="panel">
+
+            <div class="frame-overlay"></div>
+
+            <div class="game-header">
+
+                <button class="back-btn" onclick="exitLessonTest()"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> Выйти</button>
+                <h2 id="lesson-test-title">ТЕСТ ПО УРОКУ</h2>
+            </div>
+
+            <div class="bar-wrap test-bar"><div class="progress-fill" id="test-fill"></div></div>
+
+            <div class="test-progress" id="test-progress"></div>
+
+            <div class="test-card" id="test-card"></div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Экран прогресса: уровень, дейлики, награды -->
+    <div id="progress-screen" class="screen hidden">
+
+        <div class="panel">
+
+            <div class="frame-overlay"></div>
+
+            <div class="game-header">
+
+                <button class="back-btn" onclick="backToMenu()"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> Назад</button>
+                <h2>ПРОГРЕСС</h2>
+            </div>
+
+            <div class="level-box">
+
+            <div class="level-top">
+
+            <span class="level-xp" id="level-xp">0 / 100 XP</span>
+
+            </div>
+
+                <div class="level-bar"><span class="level-badge" id="level-badge">Уровень 1</span><div class="level-bar-fill" id="level-bar-fill"></div></div>
+
+                <div class="level-next" id="level-next">До следующего уровня: 100 XP</div>
+            </div>
+
+            <!-- <h3 class="card-pick-title">Награды уровней</h3>
+            <div class="reward-grid" id="reward-grid"></div> -->
+
+            <div class="progress-tabs">
+                <button class="progress-tab is-active" type="button" onclick="switchProgressTab('daily')">Дейлики</button>
+                <button class="progress-tab" type="button" onclick="switchProgressTab('ach')">Достижения</button>
+            </div>
+            <div id="progress-tab-daily">
+                <div class="daily-list" id="daily-list"></div>
+                <div class="daily-bonus" id="daily-bonus"></div>
+            </div>
+            <div id="progress-tab-ach" class="hidden">
+                <div class="achievements-list" id="achievements-list"></div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <!-- Экран настроек -->
+    <div id="settings-screen" class="screen hidden">
+
+        <div class="panel">
+
+            <div class="frame-overlay"></div>
+
+            <div class="game-header">
+
+                <button class="back-btn" onclick="backToMenu()"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> Назад</button>
+                <h2>НАСТРОЙКИ</h2>
+            </div>
+
+            <div class="settings-list">
+
+                <div class="setting-item">
+
+                    <label>Направление</label>
+                    <select id="direction-select" onchange="saveDirection()">
+
+                        <option value="en-ru">Англ → Рус</option>
+                        <option value="ru-en">Рус → Англ</option>
+                    </select>
+
+                </div>
+
+                <div class="setting-item">
+
+                    <label>Режим игры</label>
+                    <select id="mode-select" onchange="saveMode()">
+
+                        <option value="sequential">По порядку</option>
+                        <option value="random">Случайный</option>
+                        <option value="learned">Все выученные</option><option value="unlearned">Не выученные</option>
+                        <option value="favorites">Только избранное</option>
+                        <option value="mistakes">Только мои ошибки</option>
+                    </select>
+
+                </div>
+
+                <div class="setting-item">
+
+                    <label>Карт в раунде</label>
+                    <select id="rounds-select" onchange="saveRounds()">
+
+                        <option value="5">5</option>
+
+                        <option value="10">10</option>
+
+                        <option value="20">20</option>
+
+                        <option value="0">Все (∞)</option>
+                    </select>
+
+                </div>
+
+                <div class="setting-item check-row">
+
+                    <label>Без сердец (бесконечно)</label>
+                    <input type="checkbox" id="infinite-toggle" onchange="saveToggles()">
+
+                </div>
+
+                <div class="setting-item check-row">
+
+                    <label>Озвучка слов (TTS)</label>
+                    <input type="checkbox" id="tts-toggle" checked onchange="saveToggles()">
+
+                </div>
+
+                <div class="tts-warn hidden" id="tts-warn">Озвучка выключена. Включите её, чтобы слышать слова и фразы.</div>
+                <div class="setting-item check-row">
+
+                    <label>Читать вопрос автоматически</label>
+                    <input type="checkbox" id="tts-auto" onchange="saveToggles()">
+
+                </div>
+
+                <div class="setting-item check-row">
+
+                    <label>Голосовой ответ — авто-проверка (🎤)</label>
+                    <input type="checkbox" id="mic-auto-check" checked onchange="saveToggles()">
+
+                </div>
+
+                <div class="setting-item check-row">
+
+                    <label>Скоростной режим (таймер + комбо)</label>
+                    <input type="checkbox" id="speed-toggle" onchange="saveToggles()">
+
+                </div>
+
+                <div class="setting-item">
+
+                    <label>Громкость звуков</label>
+                    <input type="range" class="sfx-volume sfx-slider" id="sfx-volume" min="0" max="100" value="100" oninput="setSfxVolume(this.value)">
+
+                    <span class="sfx-vol-num" id="sfx-vol-num">100</span>
+
+                </div>
+
+                <button class="danger-btn" onclick="testSound()" hidden><img class="ico-png" src="UI/ICON/NAUSH.webp" alt=""> Диагностика звука</button>
+
+                <div class="danger-row">
+
+                    <button class="danger-btn" onclick="resetProgress()"><img class="ico-png" src="UI/ICON/RECYCLE.webp" alt="">Сбросить прогресс</button>
+
+                    <button class="danger-btn" onclick="resetAll()"><img class="ico-png" src="UI/ICON/TRASH.webp" alt="">Удалить все данные</button>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Экран результатов -->
+    <div id="result-screen" class="screen hidden">
+
+        <div class="panel">
+
+            <div class="frame-overlay"></div>
+
+            <div class="logo">Nihon &amp; Zeno</div>
+
+            <h1>Раунд завершён !</h1>
+            <div class="result-box">
+
+                <p>Правильных ответов: <span id="result-correct">0</span> из <span id="result-total">0</span></p>
+                <p>Точность: <span id="result-accuracy">0%</span></p>
+            </div>
+
+            <div class="menu-grid">
+                <button class="menu-btn" id="res-pregame" onclick="backToPreGame()"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> К выбору</button>
+                <button class="menu-btn" onclick="restartSame()"><img class="menu-ic" src="UI/ICON/STREL_2.webp" alt=""> Ещё раз</button>
+                <button class="menu-btn menu-wide" onclick="backToMenu()"><img class="menu-ic" src="UI/ICON/DOM.webp" alt=""> В главное меню</button>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <!-- Экран_GAME_OVER -->
+    <div id="gameover-screen" class="screen hidden">
+
+        <div class="panel">
+
+            <div class="frame-overlay"></div>
+
+            <div class="logo">Nihon &amp; Zeno</div>
+
+            <h1 class="gameover-title">Игра окончена !</h1>
+            <div class="gameover-hearts" id="gameover-hearts"></div>
+
+            <div class="result-box">
+
+                <p>Верных ответов: <span id="go-correct">0</span></p>
+                <p>Пройдено слов: <span id="go-words">0</span></p>
+            </div>
+
+            <div class="menu-grid">
+                <button class="menu-btn" id="go-pregame" onclick="backToPreGame()"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> К выбору</button>
+                <button class="menu-btn" onclick="restartSame()"><img class="menu-ic" src="UI/ICON/STREL_2.webp" alt=""> Ещё раз</button>
+                <button class="menu-btn menu-wide" onclick="backToMenu()"><img class="menu-ic" src="UI/ICON/DOM.webp" alt=""> В главное меню</button>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <script src="data/a1-a2/words/other.js?v=20260950"></script>
+
+    <script src="data/a1-a2/words/adj.js?v=20260916"></script>
+
+    <script src="data/a1-a2/words/verb.js?v=20260916"></script>
+
+    <script src="data/a1-a2/words/adv.js?v=20260916"></script>
+
+    <script src="data/a1-a2/words/num.js?v=20260916"></script>
+
+    <script src="data/a1-a2/words/pro.js?v=20260916"></script>
+
+    <script src="data/a1-a2/words/prep.js?v=20260916"></script>
+
+    <script src="data/a1-a2/sentences/sentences.js?v=20261115"></script>
+
+    <script src="data/b1-b2/sentences/sentences.js?v=20261115"></script>
+
+    <script src="data/b1-b2/words/other.js?v=20260960"></script>
+
+    <script src="data/b1-b2/words/adj.js?v=20260960"></script>
+
+    <script src="data/b1-b2/words/verb.js?v=20260960"></script>
+
+    <script src="data/b1-b2/words/adv.js?v=20260960"></script>
+
+    <script src="data/b1-b2/words/num.js?v=20260960"></script>
+
+    <script src="data/b1-b2/words/pro.js?v=20260960"></script>
+
+    <script src="data/b1-b2/words/prep.js?v=20260960"></script>
+
+    <script src="data/lessons/a1-a2/lessons.js?v=20261115"></script>
+
+    <script src="data/ja/lessons/a1-a2/lessons.js?v=20261115"></script>
+
+    <script src="data/ja/lessons/b1-b2/lessons.js?v=20261115"></script>
+
+    <script src="data/lessons/a1-a2/tests/test-word-order.js?v=20261115"></script>
+
+    <script src="data/lessons/a1-a2/tests/test-to-be.js?v=20261115"></script>
+
+    <script src="data/lessons/a1-a2/tests/test-plural-articles.js?v=20261115"></script>
+
+    <script src="data/lessons/a1-a2/tests/test-pronouns.js?v=20261115"></script>
+
+    <script src="data/lessons/a1-a2/tests/test-can-must.js?v=20261115"></script>
+
+    <script src="data/lessons/a1-a2/tests/test-question-words.js?v=20261115"></script>
+
+    <script src="data/lessons/a1-a2/tests/test-present-continuous.js?v=20261115"></script>
+
+    <script src="data/lessons/a1-a2/tests/test-prepositions.js?v=20261115"></script>
+
+    <script src="data/lessons/b1-b2/lessons.js?v=20261115"></script>
+
+    <script src="data/lessons/b1-b2/tests/test-present-perfect.js?v=20261115"></script>
+
+    <script src="data/lessons/b1-b2/tests/test-past-continuous.js?v=20261115"></script>
+
+    <script src="data/lessons/b1-b2/tests/test-future-forms.js?v=20261115"></script>
+
+    <script src="data/lessons/b1-b2/tests/test-conditionals.js?v=20260941"></script>
+
+    <script src="data/lessons/b1-b2/tests/test-modal-deduction.js?v=20261115"></script>
+
+    <script src="data/lessons/b1-b2/tests/test-comparatives.js?v=20260941"></script>
+
+    <script src="data/lessons/b1-b2/tests/test-relative-clauses.js?v=20260941"></script>
+
+<script src="data/lessons/b1-b2/tests/test-reported-speech.js?v=20260941"></script>
+
+<script src="data/ja/tests/ja-tests-a1a2.js?v=20261115"></script>
+
+<script src="data/ja/tests/ja-tests-b1b2.js?v=20261115"></script>
+
+<script src="data/ja/a1-a2/words/other.js?v=20261024"></script>
+
+<script src="data/ja/a1-a2/words/adj.js?v=20261024"></script>
+
+<script src="data/ja/a1-a2/words/verb.js?v=20261024"></script>
+
+<script src="data/ja/a1-a2/words/adv.js?v=20261024"></script>
+
+<script src="data/ja/a1-a2/words/num.js?v=20261024"></script>
+
+<script src="data/ja/a1-a2/words/pro.js?v=20261024"></script>
+
+<script src="data/ja/a1-a2/words/prep.js?v=20261024"></script>
+
+<script src="data/ja/a1-a2/sentences/sentences.js?v=20261115"></script>
+
+<script src="data/ja/b1-b2/words/other.js?v=20261024"></script>
+
+<script src="data/ja/b1-b2/words/adj.js?v=20261024"></script>
+
+<script src="data/ja/b1-b2/words/verb.js?v=20261024"></script>
+
+<script src="data/ja/b1-b2/words/adv.js?v=20261024"></script>
+
+<script src="data/ja/b1-b2/words/num.js?v=20261024"></script>
+
+<script src="data/ja/b1-b2/words/pro.js?v=20261024"></script>
+
+<script src="data/ja/b1-b2/words/prep.js?v=20261024"></script>
+
+<script src="data/ja/b1-b2/sentences/sentences.js?v=20261115"></script>
+
+    <!-- ПК-версия скрыта: на широком окне приложение открывается в телефонном
+         фрейме 480px. Так мобильные медиазапросы (max-width: 700/540/400)
+         срабатывают по-настоящему: без фрейма окно 1920px, а вёрстка живёт
+         в колонке — правила узкого экрана не включались, и шапки/селекты
+         разъезжались. На узком экране (телефон, Telegram) грузится обычная
+         вёрстка без фрейма. -->
+    <script>
+    (function () {
+        var PHONE_W = 420, MIN_W = 560;
+        if (window.innerWidth <= MIN_W) {
+            document.write('<script src="script.js?v=20261151"><\/script>');
+            return;
+        }
+        document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');
+        var f = document.createElement('iframe');
+        f.id = 'phone-frame';
+        f.title = 'Nihon & Zeno';
+        f.src = location.pathname + '?embed=1&cb=' + Date.now() +
+            (/[?&#]tg=0([&#]|$)/.test(location.search + location.hash) ? '&tg=0' : '');
+        f.style.cssText = 'position:fixed;top:0;left:0;width:' + PHONE_W +
+            'px;height:100vh;border:0;display:block;background:#0f0c1b;';
+        document.body.appendChild(f);
+        // Родительская страница больше не нужна: убираем её содержимое
+        // (иначе собственный #boot-screen висит поверх фрейма)
+        document.body.innerHTML = '';
+        document.body.style.cssText = 'margin:0;background:#0f0c1b;overflow:hidden;';
+        document.body.appendChild(f);
+        var last = true;
+        window.addEventListener('resize', function () {
+            var wide = window.innerWidth > MIN_W;
+            f.style.left = Math.max(0, Math.round((window.innerWidth - PHONE_W) / 2)) + 'px';
+            f.style.height = window.innerHeight + 'px';
+            if (wide !== last) { last = wide; location.replace(location.pathname); }
+        });
+        f.style.left = Math.max(0, Math.round((window.innerWidth - PHONE_W) / 2)) + 'px';
+        f.style.height = window.innerHeight + 'px';
+    })();
+    </script>
+
+    <div id="ach-toasts"></div>
+
+        <!-- Метка версии файлов: показывает, что реально загрузил браузер.
+         Нужна, потому что скриншоты часто снимаются без перезагрузки
+         и показывают предыдущий CSS. Убирается одним блоком. -->
+    <div id="ver-tag" style="position:fixed;left:3px;bottom:3px;z-index:99999;
+        font:9px/1.25 monospace;color:#8f8;background:#000b;padding:2px 4px;
+        border-radius:4px;pointer-events:none"></div>
+    <script>
+    (function () {
+        var t = document.getElementById('ver-tag');
+        function show() {
+            var l = document.querySelector('link[rel="stylesheet"][href*="style.css"]');
+            var v = l ? (l.href.match(/v=([^&]+)/) || [, '?'])[1] : 'нет';
+            t.textContent = 'CSS ' + v;
+        }
+        show();
+        window.addEventListener('load', show);
+    })();
+    </script>
+
+</body>
+
+</html>
+
+
+
