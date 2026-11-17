@@ -1448,26 +1448,44 @@ let dictBuildToken = 0;
     // расчёты — отступы рамки, --ui-fit, подложка — идут от «сцены», а не окна.
     const PHONE_STAGE_W = 420;
     const PHONE_STAGE_H = 940;
-    // Клавиатура сжимает innerHeight/dvh — держим сцену прежней высоты,
-    // пока клавиатура открыта, и возвращаем нормальный режим после её закрытия.
+    // Клавиатура в Telegram Android сжимает САМ WebView: innerHeight и svh
+    // уменьшаются. Держим высоту ЗАМОРОЖЕННОЙ в пикселях, пока она открыта, —
+    // рамка и контент не перестраиваются под уменьшившееся окно.
     let stableVH = window.innerHeight;
+    let stableVW = window.innerWidth;
     let kbOpen = false;
-    try {
-        if (window.visualViewport) {
-            const vv = window.visualViewport;
-            const onVV = () => {
-                const h = vv.height || window.innerHeight;
-                const next = h < stableVH - 120;
-                if (next === kbOpen) return;
-                kbOpen = next;
-                if (!kbOpen) stableVH = window.innerHeight;
-                try { document.body.classList.toggle("kb-open", kbOpen); } catch (e) {}
-                try { if (window.__schedulePinFrame) window.__schedulePinFrame(); } catch (e) {}
-            };
-            vv.addEventListener("resize", onVV);
+    function applyVhVar() {
+        try {
+            document.documentElement.style.setProperty('--app-vh',
+                (kbOpen ? stableVH : window.innerHeight) + 'px');
+        } catch (e) {}
+    }
+    function checkKeyboard() {
+        const ih = window.innerHeight;
+        const vh = (window.visualViewport && window.visualViewport.height) || ih;
+        // Поворот/широкое окно — это не клавиатура: просто фиксируем новую высоту.
+        if (Math.abs(window.innerWidth - stableVW) > 60) {
+            stableVW = window.innerWidth;
+            stableVH = ih;
+            kbOpen = false;
+            try { document.body.classList.remove("kb-open"); } catch (e) {}
+            applyVhVar();
+            return;
         }
-    } catch (e) {}
-    window.addEventListener("resize", () => { if (!kbOpen) stableVH = window.innerHeight; });
+        const next = ih < stableVH - 120 || vh < stableVH - 120;
+        if (next === kbOpen) {
+            if (!kbOpen && Math.abs(ih - stableVH) > 2) { stableVH = ih; applyVhVar(); }
+            return;
+        }
+        kbOpen = next;
+        if (!kbOpen) stableVH = ih;
+        applyVhVar();
+        try { document.body.classList.toggle("kb-open", kbOpen); } catch (e) {}
+        try { if (window.__schedulePinFrame) window.__schedulePinFrame(); } catch (e) {}
+    }
+    applyVhVar();
+    window.addEventListener("resize", checkKeyboard);
+    try { if (window.visualViewport) window.visualViewport.addEventListener("resize", checkKeyboard); } catch (e) {};
     function stageRect() {
         const iw = window.innerWidth, ih = kbOpen ? stableVH : window.innerHeight;
         // Фулскрин Telegram: плавающие кнопки («Закрыть», «∨ ⋮») и системные
