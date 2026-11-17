@@ -1878,11 +1878,8 @@ const TG = (() => {
         return (v[0] > 6) || (v[0] === 6 && v[1] >= 1);
     };
     function init() {
-        // Телефонная вёрстка включается ВСЕГДА: класс .tg-mini-app переключает
-        // раскладку, размеры панелей и прокрутку на мобильный вид. ПК-версия
-        // (ветки :not(.tg-mini-app) в CSS и рамка с полями body) этим
-        // отключается — временно, вернуть её можно, убрав одну строку.
-        document.body.classList.add("tg-mini-app");
+        // Класс .tg-mini-app ставится инлайном в <body> только на мобильных.
+        // ПК остаётся в окне с рамкой (:not(.tg-mini-app) в CSS).
         try {
             if (window.__NO_TG__) { active = false; return false; }
             if (window.Telegram && window.Telegram.WebApp) {
@@ -1897,7 +1894,9 @@ const TG = (() => {
                     // parseFloat(version) >= 8: фулскрин появился в Bot API 8.0.
                     // Мок SDK в обычных браузерах («6.0») и старые клиенты —
                     // без вызова, без шума в консоли.
-                    if (typeof app.requestFullscreen === "function" && !app.isFullscreen && parseFloat(app.version) >= 8) {
+                    var plat = String(app.platform || "");
+                    var desktop = /tdesktop|macos|weba|webk|unigram/i.test(plat) || window.innerWidth > 900;
+                    if (!desktop && typeof app.requestFullscreen === "function" && !app.isFullscreen && parseFloat(app.version) >= 8) {
                         app.requestFullscreen();
                     }
                 } catch (e) {}

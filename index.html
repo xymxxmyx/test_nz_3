@@ -145,7 +145,16 @@
      Раньше класс вешал только хвост script.js, и при загрузке/обновлении
      радио успевало проскочить до его выполнения. Хвост script.js остаётся
      владельцем класса (переключение кодовым словом). -->
-<body class="radio-hidden tg-mini-app" data-theme="plush" data-back="b12" data-wordbg="w1">
+<body class="radio-hidden" data-theme="plush" data-back="b12" data-wordbg="w1">
+    <script>
+    /* ПК оставляем в окне с рамкой; телефонную вёрстку включаем только на
+       мобильных — до первой отрисовки контента, чтобы не было скачка. */
+    (function () {
+        var mob = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+                  Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 700;
+        if (mob) document.body.classList.add("tg-mini-app");
+    })();
+    </script>
 
     <!-- Подложка внутри рамки: видна только в прозрачной середине рамки, позади контента -->
     <div id="bg-inset" aria-hidden="true"></div>
@@ -1244,7 +1253,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.innerWidth <= MIN_W) {
-            document.write('<script src="script.js?v=20261177"><\/script>');
+            document.write('<script src="script.js?v=20261178"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');
