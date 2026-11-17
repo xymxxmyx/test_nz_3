@@ -743,6 +743,10 @@ const CloudSync = (() => {
     }
 
     function applyRemote(remote) {
+        // Отменяем отложенную запись, запланированную ДО применения облака:
+        // иначе устаревший локальный pack перезапишет только что загруженное.
+        if (flushTimer) { clearTimeout(flushTimer); flushTimer = null; }
+        pendingEnv = null;
         try {
             const main = remote.main || {};
             const learn = remote.learn || {};
@@ -834,12 +838,22 @@ const CloudSync = (() => {
     let ready = false;
     let bootInfo = ""; // что сделал boot: из облака / отправка в облако / пусто / ошибка
     let writeOk = null;
+    function queuePush(info) {
+        pendingEnv = pack();
+        // После пуша локальный ts = ts отправки: следующее открытие увидит
+        // совпадение и не станет делать лишний пуш.
+        try { state.savedAt = pendingEnv.ts; localStorage.setItem("dictionaryGameState", JSON.stringify(state)); } catch (e) {}
+        flushSave();
+        bootInfo = info;
+    }
     async function runBoot(hasLocal) {
         if (bootDone) return;
         bootDone = true;
+        // Снимаем ts ДО await: refreshFeatureUnlocks/initDaily на старте могут
+        // поднять savedAt, и сравнение стало бы «локаль новее» каждый раз.
+        const localTs = Number(state.savedAt) || 0;
         try {
             const remote = await readAll();
-            const localTs = Number(state.savedAt) || 0;
             const remoteTs = Number(remote && remote.main && remote.main.ts) || 0;
             if (!remote) {
                 // облако пустое: первый пуш локальных данных, если они есть
@@ -850,7 +864,7 @@ const CloudSync = (() => {
                         Object.keys(state.history || {}).length > 0 ||
                         (Number(state.xp) || 0) > 0 || (Number(state.score) || 0) > 0 ||
                         (USER_WORDS && USER_WORDS.length > 0);
-                    if (hasAny) { pendingEnv = pack(); flushSave(); bootInfo = "отправка в облако"; }
+                    if (hasAny) queuePush("отправка в облако");
                     else bootInfo = "облако пусто";
                 } else bootInfo = "нет данных";
             } else if (remoteTs > localTs) {
@@ -858,9 +872,7 @@ const CloudSync = (() => {
                 bootInfo = "из облака";
             } else if (remoteTs < localTs && hasLocal) {
                 // локальное свежее (играли офлайн) — выталкиваем его в облако
-                pendingEnv = pack();
-                flushSave();
-                bootInfo = "локаль новее";
+                queuePush("локаль новее");
             } else bootInfo = "актуально";
             // при равенстве — облако уже записано этим же сохранением
         } catch (e) { bootInfo = "ошибка применения"; }
@@ -1044,7 +1056,9 @@ function refreshFeatureUnlocks(silent) {
         });
     }
     state.lastUnlockCheck = state.learnedWords.length;
-    saveData();
+    // На старте (silent) пересчёт ничего не меняет — не дёргаем saveData():
+    // он поднимал savedAt и заставлял boot каждый раз решать «локаль новее».
+    if (!silent || fresh.length) saveData();
 }
 
 // Очередь плашек (#ach-toasts): на экране висит ОДНА плашка, остальные ждут,
