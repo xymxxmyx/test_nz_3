@@ -9025,7 +9025,9 @@ body[data-theme="plush"] #dictionary-screen.active {
    Welcome и главное меню не трогаем — там прокрутки нет. */
 /* Прогресс исключён: маск на всём экране создаёт слой и рисует контент
    поверх рамки — там feather остаётся только у внутренних списков. */
-body[data-theme="plush"] .screen.active:not(#welcome-screen):not(#main-menu):not(#progress-screen),
+/* #game-screen исключён: сердечки выведены за край своей области
+   (bottom:100%), а маск делает всё за краем экрана прозрачным. */
+body[data-theme="plush"] .screen.active:not(#welcome-screen):not(#main-menu):not(#progress-screen):not(#game-screen),
 body[data-theme="plush"] .updates-panel,
 body[data-theme="plush"] .fs-modal {
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 20px, #000 calc(100% - 28px), transparent);
