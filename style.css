@@ -11508,3 +11508,13 @@ body[data-theme="plush"] #battle-area .player-zone .option-card.drag-origin .car
     box-shadow: none !important;
     filter: none !important;
 }
+
+
+/* === Карты игрока = карты бота: та же ширина, пропорция 63:88 === */
+body[data-theme="plush"] #battle-area .player-zone .option-card {
+    flex: 0 0 auto;
+    width: var(--bot-card-w, calc(114px * var(--ui-fit, 1)));
+    height: calc(var(--bot-card-w, calc(114px * var(--ui-fit, 1))) * 1.26);
+    aspect-ratio: auto;
+    max-height: none;
+}
