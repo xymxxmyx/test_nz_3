@@ -7545,7 +7545,13 @@ function restartLessonsTest() {
         // WebM с настоящей альфой показываем напрямую: канвас-клеинг был
         // нужен только для MP4 (чёрный фон по яркости). Нативный ролик идёт
         // в своём разрешении — без пикселизации и без нагрузки на CPU.
-        const canWebM = typeof v.canPlayType === "function" && v.canPlayType('video/webm; codecs="vp9"');
+        // iOS (WKWebView) может объявить VP9, но НЕ умеет альфу в WebM —
+        // ролик пошёл бы чёрным прямоугольником. На iPhone/iPad оставляем
+        // канвас-клеинг (он одинаково годится и для WebM, и для MP4).
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            /iPhone|iPad|iPod/.test(navigator.platform || "") ||
+            (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+        const canWebM = !isIOS && typeof v.canPlayType === "function" && v.canPlayType('video/webm; codecs="vp9"');
         if (canWebM) {
             const bs0 = document.getElementById("boot-screen");
             if (bs0) bs0.classList.add("alpha-src");
