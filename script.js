@@ -6213,14 +6213,13 @@ function checkAchievements() {
 }
 
 function showAchievementToast(a) {
-    TOAST_QUEUE.push(() => makeToastEl("ach-toast", `
-        <span class="ach-icon">' + iconHTML("🏅") + '</span>
-        <span class="ach-meta">
-            <span class="ach-label">Достижение разблокировано</span>
-            <span class="ach-name">${a.name}</span>
-            <span class="ach-desc">${a.desc}</span>
-        </span>
-    `), 4500, () => { if (Sound && Sound.unlock) Sound.unlock(); });
+    TOAST_QUEUE.push(() => makeToastEl("ach-toast",
+        '<span class="ach-icon">' + iconHTML("🏅") + '</span>' +
+        '<span class="ach-meta">' +
+            '<span class="ach-label">Достижение разблокировано</span>' +
+            '<span class="ach-name">' + escHTML(a.name) + '</span>' +
+            '<span class="ach-desc">' + escHTML(a.desc) + '</span>' +
+        '</span>'), 4500, () => { if (Sound && Sound.unlock) Sound.unlock(); });
 }
 
 function renderAchievements() {
