@@ -9009,6 +9009,16 @@ body[data-theme="plush"] #dictionary-screen.active {
     mask-image: linear-gradient(to bottom, transparent, #000 20px, #000 calc(100% - 28px), transparent);
 }
 
+/* Тот же feather-эффект ВЕЗДЕ: контент, который не влезает в экран,
+   плавно растворяется у верхней и нижней границы вместо резкой обрезки.
+   Welcome и главное меню не трогаем — там прокрутки нет. */
+body[data-theme="plush"] .screen.active:not(#welcome-screen):not(#main-menu),
+body[data-theme="plush"] .updates-panel,
+body[data-theme="plush"] .fs-modal {
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 20px, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 20px, #000 calc(100% - 28px), transparent);
+}
+
 /* =========================================================================
    Р вЂ™Р вЂўР В Р Тђ Р ВР вЂњР В Р С›Р вЂ™Р В«Р Тђ Р В­Р С™Р В Р С’Р СњР С›Р вЂ™ (plush): Р’В«5 Р С” 1Р’В» Р С‘ Р’В«Р РЋР С•Р В±Р ВµРЎР‚Р С‘ Р С—РЎР‚Р ВµР Т‘Р В»Р С•Р В¶Р ВµР Р…Р С‘Р ВµР’В»
    1) Р СџР В»Р В°РЎв‚¬Р С”Р В° Р С”Р В°РЎвЂљР ВµР С–Р С•РЎР‚Р С‘Р С‘ Р Р† РЎв‚¬Р В°Р С—Р С”Р Вµ РІР‚вЂќ Р С—Р С‘Р В»РЎР‹Р В»РЎРЏ Р С‘Р В· bottom_trim.png, Р С—РЎР‚Р С‘Р С–Р В»РЎС“РЎв‚¬РЎвЂР Р…Р Р…Р В°РЎРЏ
