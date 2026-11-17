@@ -11480,3 +11480,31 @@ body[data-theme="plush"] #user-words-screen .user-words-list {
     -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 26px), transparent 100%) !important;
     mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 26px), transparent 100%) !important;
 }
+
+
+/* === КАРТЫ ИГРОКА = карты бота (5 к 1): та же форма, без веера === */
+/* Форма: та же плюшевая кривая арта KARTA, что у .battle-card .card-face */
+body[data-theme="plush"] #battle-area .player-zone .option-card .card-inner {
+    border-radius: calc(16px * var(--ui-fit, 1));
+}
+/* Снимаем веер — карты стоят ровно, как у бота */
+body[data-theme="plush"] #battle-area .player-zone .option-card {
+    --fan-rot: 0deg;
+    --fan-y: 0px;
+}
+body[data-theme="plush"] #battle-area .player-zone .option-card:nth-child(n) {
+    --fan-rot: 0deg;
+    --fan-y: 0px;
+}
+/* Тень после исчезновения: убираем box-shadow/drop-shadow у card-inner —
+   они оставались «следом» после анимации dissolve/flying */
+body[data-theme="plush"] #battle-area .player-zone .option-card .card-inner,
+body[data-theme="plush"] #cards-area .cards-word .card-inner {
+    box-shadow: none !important;
+    filter: none !important;
+}
+body[data-theme="plush"] #battle-area .player-zone .option-card.card-flying .card-inner,
+body[data-theme="plush"] #battle-area .player-zone .option-card.drag-origin .card-inner {
+    box-shadow: none !important;
+    filter: none !important;
+}
