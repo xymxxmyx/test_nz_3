@@ -11242,3 +11242,15 @@ body #progress-screen .achievements-list .achieve:nth-child(9) .achieve-icon img
 body[data-theme="plush"] .ach-toast .ach-icon img {
     animation: menuIconFloat 3.2s ease-in-out infinite;
 }
+
+
+/* Сердечки при вводе слов: между прогресс-баром и карточкой слова */
+body[data-theme="plush"] #input-area .hearts {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    transform: none;
+    width: auto;
+    justify-content: center;
+    margin: calc(6px * var(--ui-fit, 1)) 0 calc(8px * var(--ui-fit, 1));
+}

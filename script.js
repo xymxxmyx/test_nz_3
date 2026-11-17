@@ -2383,6 +2383,16 @@ function placeAnswerMic(inTools) {
 function placeHearts(inCards) {
     const hearts = document.getElementById("hearts");
     if (!hearts) return;
+    if (inCards === "input") {
+        // Ввод слов / аудирование: сердечки между прогресс-баром и карточкой.
+        const host = document.getElementById("input-area");
+        const card = document.getElementById("game-card");
+        if (!host) return;
+        if (hearts.parentElement !== host || hearts.nextElementSibling !== card) {
+            host.insertBefore(hearts, card || null);
+        }
+        return;
+    }
     const host = inCards
         ? document.querySelector("#cards-area .cards-tools")
         : document.querySelector(".battle-table");
@@ -2393,6 +2403,7 @@ function placeHearts(inCards) {
 // Режим аудирования: слово не показываем — только слушаем и пишем по-английски
 function showListeningRound() {
     document.getElementById("input-area").classList.remove("hidden");
+    placeHearts("input");
 
     const wordEl = document.getElementById("current-word");
     wordEl.classList.remove("sentence");
@@ -2425,7 +2436,9 @@ function showListeningRound() {
     setTimeout(speakCurrentWord, 350);
 }
 
-function showInputRound(displayWord) {    document.getElementById("input-area").classList.remove("hidden");
+function showInputRound(displayWord) {
+    document.getElementById("input-area").classList.remove("hidden");
+    placeHearts("input");
     document.getElementById("battle-area").classList.add("hidden");
     
     const word = state.gameWords[state.currentWordIndex];
