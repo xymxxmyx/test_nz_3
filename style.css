@@ -11281,3 +11281,27 @@ body[data-theme="plush"] #category-screen .menu-ic,
 body[data-theme="plush"] #level-screen .menu-ic {
     filter: drop-shadow(0 1px 2px rgba(24, 2, 40, 0.7));
 }
+
+
+/* Боевые карты: жёсткая сетка 3 столбца вместо flex-wrap. Позиции NOT
+   зависят от --ui-fit / оборудования: 5 карт = ровно 2 ряда (3+2),
+   веерные сдвиги обнуляем, размер выводим из пропорции карты. */
+body[data-theme="plush"] #battle-area .player-zone .options,
+body[data-theme="plush"] #battle-area .player-zone .options.show {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    justify-items: center;
+    align-items: start;
+    gap: calc(10px * var(--ui-fit, 1));
+    width: 100%;
+}
+body[data-theme="plush"] #battle-area .player-zone .option-card {
+    flex: none;
+    width: 100%;
+    max-width: calc(126px * var(--ui-fit, 1));
+    height: auto;
+    aspect-ratio: 126 / 160;
+    --deal-x: 0px;
+    --deal-y: 0px;
+    --deal-angle: 0deg;
+}
