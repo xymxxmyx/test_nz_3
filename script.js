@@ -817,7 +817,12 @@ const CloudSync = (() => {
             if (!state.studyLevel) state.studyLevel = "mix";
             initDaily();
             rebuildActiveLanguage();
-            saveData();
+            // Важно: НЕ вызывать saveData() — он обновил бы savedAt и запустил
+            // повторную запись всех ключей в облако при КАЖДОМ открытии
+            // (pull → push → pull → push...), из-за чего приложение тормозит.
+            // Локальная копия сохраняется с тем же ts, что и в облаке:
+            // следующее открытие увидит «актуально» и не сделает ни одной записи.
+            try { localStorage.setItem("dictionaryGameState", JSON.stringify(state)); } catch (e) {}
             // перерисовать видимые экраны
             if (currentScreen === "main-menu") { try { showMainMenu(); } catch (e) {} }
             else if (currentScreen === "progress-screen") { try { renderProgress(); } catch (e) {} }
