@@ -11300,16 +11300,6 @@ body[data-theme="plush"] #battle-area .player-zone .option-card {
 }
 
 
-/* Игровой экран НЕ скроллится и НЕ обрезается: всё вписывается за счёт
-   масштаба fitUI (holeH/800). Снимаем и базовый лимит .screen.active,
-   и групповой max-height/overflow из блока экранов выше. */
-.screen.active#game-screen {
-    max-height: none !important;
-    overflow: visible !important;
-    overflow-y: visible !important;
-}
-
-
 body[data-theme="plush"] #user-words-screen .user-word-item .uw-main {
     min-width: 0;
     overflow: hidden;
