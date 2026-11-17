@@ -11364,3 +11364,76 @@ body[data-theme="plush"] #user-words-screen .user-words-list {
     -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 14px), transparent 100%) !important;
     mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 14px), transparent 100%) !important;
 }
+
+
+/* Карточка своего слова — как у словаря: иконки по краям, центр гибкий,
+   кастомная высота (был жёсткий aspect-ratio словаря), текст не вылезает. */
+body[data-theme="plush"] #user-words-screen .user-word-item.dict-item {
+    aspect-ratio: auto !important;
+    height: auto;
+    min-height: calc(62px * var(--ui-fit, 1));
+    align-items: center;
+    gap: calc(8px * var(--ui-fit, 1));
+    padding: calc(8px * var(--ui-fit, 1)) 4%;
+    box-sizing: border-box;
+    contain: none;
+    content-visibility: visible;
+}
+body[data-theme="plush"] #user-words-screen .user-word-item .tts-btn,
+body[data-theme="plush"] #user-words-screen .user-word-item .dict-fav {
+    flex: 0 0 auto;
+    width: calc(30px * var(--ui-fit, 1));
+    height: calc(30px * var(--ui-fit, 1));
+}
+body[data-theme="plush"] #user-words-screen .user-word-item .dict-status {
+    flex: 0 0 auto;
+    width: calc(24px * var(--ui-fit, 1));
+    height: auto;
+    aspect-ratio: 1;
+}
+body[data-theme="plush"] #user-words-screen .user-word-item .dict-del {
+    flex: 0 0 auto;
+    width: calc(28px * var(--ui-fit, 1));
+    height: calc(28px * var(--ui-fit, 1));
+}
+body[data-theme="plush"] #user-words-screen .user-word-item .dict-front.uw-main {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1px;
+    min-width: 0;
+    flex: 1 1 auto;
+    padding: 0;
+    overflow: hidden;
+}
+body[data-theme="plush"] #user-words-screen .user-word-item .dict-word-uw {
+    font-size: calc(15px * var(--ui-fit, 1));
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+body[data-theme="plush"] #user-words-screen .user-word-item .uw-ru {
+    font-size: calc(12px * var(--ui-fit, 1));
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+body[data-theme="plush"] #user-words-screen .user-word-item .uw-note {
+    font-size: calc(10px * var(--ui-fit, 1));
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+body[data-theme="plush"] #user-words-screen .user-word-item .uw-badges {
+    font-size: calc(9px * var(--ui-fit, 1));
+    color: rgba(255, 228, 242, 0.75);
+    text-align: left;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

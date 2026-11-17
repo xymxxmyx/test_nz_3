@@ -226,30 +226,51 @@ function renderUserWordsList() {
         return;
     }
     visible.slice().reverse().forEach((w, idx) => {
+        const tw = tgt(w);
+        const isLearned = state.learnedWords.includes(tw);
+        const isFav = state.favoriteWords.includes(tw);
         const item = document.createElement("div");
-        item.className = "dict-item user-word-item";
+        item.className = "dict-item user-word-item" + (isLearned ? " learned" : " unlearned");
         item.style.animationDelay = (Math.min(idx * 0.02, 0.5)) + "s";
-        const wrap = document.createElement("div");
-        wrap.className = "uw-main";
-        const enSpan = document.createElement("span");
-        enSpan.className = "dict-word-uw";
-        enSpan.textContent = w.en;
-        const ruSpan = document.createElement("span");
-        ruSpan.className = "uw-ru";
-        ruSpan.textContent = w.ru;
-        wrap.appendChild(enSpan);
-        wrap.appendChild(ruSpan);
+
+        //Та же структура, что у карточки словаря: динамик, звезда, слово+перевод, сердечко
+        const speakLang = (w.lang === "ja") ? "ja" : "en";
+        item.appendChild(makeSpeakBtn(w.en, speakLang));
+
+        const favBtn = document.createElement("button");
+        favBtn.type = "button";
+        favBtn.className = "fav-btn dict-fav" + (isFav ? " is-fav" : "");
+        favBtn.setAttribute("aria-label", "В избранное");
+        favBtn.addEventListener("click", () => { Sound.click(); toggleFav(tw); renderUserWordsList(); });
+        item.appendChild(favBtn);
+
+        const front = document.createElement("div");
+        front.className = "dict-front uw-main";
+        const wordSpan = document.createElement("span");
+        wordSpan.className = "dict-word dict-word-uw";
+        wordSpan.textContent = w.en;
+        front.appendChild(wordSpan);
+        const trSpan = document.createElement("span");
+        trSpan.className = "dict-tr uw-ru";
+        trSpan.textContent = w.ru;
+        front.appendChild(trSpan);
         if (w.note) {
-            const note = document.createElement("div");
+            const note = document.createElement("span");
             note.className = "uw-note";
-            note.innerHTML = iconHTML("💡") + " " + escHTML(w.note);
-            wrap.appendChild(note);
+            note.textContent = w.note;
+            front.appendChild(note);
         }
-        item.appendChild(wrap);
         const badge = document.createElement("span");
         badge.className = "uw-badges";
         badge.textContent = (USER_LVL_LABELS[w.lvl] || w.lvl) + " · " + (USER_POS_LABELS[w.pos] || w.pos);
-        wrap.appendChild(badge);
+        front.appendChild(badge);
+        item.appendChild(front);
+
+        const status = document.createElement("span");
+        status.className = "dict-status";
+        status.textContent = isLearned ? "♥" : "○";
+        item.appendChild(status);
+
         const del = document.createElement("button");
         del.type = "button";
         del.className = "fav-btn dict-del";
