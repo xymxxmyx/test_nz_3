@@ -11308,3 +11308,13 @@ body[data-theme="plush"] #battle-area .player-zone .option-card {
     --deal-y: 0px;
     --deal-angle: 0deg;
 }
+
+
+/* Игровой экран НЕ скроллится и НЕ обрезается: всё вписывается за счёт
+   масштаба fitUI (holeH/800). Снимаем и базовый лимит .screen.active,
+   и групповой max-height/overflow из блока экранов выше. */
+.screen.active#game-screen {
+    max-height: none !important;
+    overflow: visible !important;
+    overflow-y: visible !important;
+}
