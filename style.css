@@ -9023,7 +9023,9 @@ body[data-theme="plush"] .fs-modal {
 
 /* Feather для внутренних списков прогресса (без слоя на всем экране) */
 body[data-theme="plush"] #progress-screen .daily-list,
-body[data-theme="plush"] #progress-screen .achievements-list {
+body[data-theme="plush"] #progress-screen .achievements-list,
+body[data-theme="plush"] #dictionary-screen .dictionary-list,
+body[data-theme="plush"] #user-words-screen .user-words-list {
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 20px, #000 calc(100% - 28px), transparent);
     mask-image: linear-gradient(to bottom, transparent, #000 20px, #000 calc(100% - 28px), transparent);
 }
