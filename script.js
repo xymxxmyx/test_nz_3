@@ -7542,7 +7542,18 @@ function restartLessonsTest() {
         let ctx = null;
         try { ctx = cv.getContext("2d", { willReadFrequently: true }); } catch (e) { }
         if (!ctx) return false;
-        const S = 256;
+        // WebM с настоящей альфой показываем напрямую: канвас-клеинг был
+        // нужен только для MP4 (чёрный фон по яркости). Нативный ролик идёт
+        // в своём разрешении — без пикселизации и без нагрузки на CPU.
+        const canWebM = typeof v.canPlayType === "function" && v.canPlayType('video/webm; codecs="vp9"');
+        if (canWebM) {
+            const bs0 = document.getElementById("boot-screen");
+            if (bs0) bs0.classList.add("alpha-src");
+            cv.style.display = "none";
+            v.style.opacity = "";
+            return false;
+        }
+        const S = 384;
         cv.width = S;
         cv.height = S;
         let last = 0;
