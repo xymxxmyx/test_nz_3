@@ -56,7 +56,8 @@ body.kb-open {
     padding: 0;
     box-sizing: border-box;
     user-select: auto;
-    image-rendering: pixelated;
+    /* image-rendering: pixelated убран: на ПК (DPR 1) он давал «лего» при
+       уменьшении артов в сцену 420px. Оставлен только у .heart (пиксель-арт). */
     -webkit-tap-highlight-color: transparent;
 }
 /* Синий системный хайлайт при тапе по кнопкам (Android/TG WebView) убираем */
