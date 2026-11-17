@@ -11510,11 +11510,16 @@ body[data-theme="plush"] #battle-area .player-zone .option-card.drag-origin .car
 }
 
 
-/* === Карты игрока = карты бота: та же ширина, пропорция 63:88 === */
+/* === Карты игрока = карты бота: та же ширина/высота, без растяжения ===
+   Переменные --bot-card-w/--card-w определены только внутри .battle-table
+   и здесь НЕ доступны — повторяем ту же формулу целиком. === */
+body[data-theme="plush"] #battle-area .battle-table {
+    --pcard-w: min(calc(140px * var(--ui-fit, 1)), max(calc(126px * var(--ui-fit, 1)), calc(20% - 4px * var(--ui-fit, 1))));
+}
 body[data-theme="plush"] #battle-area .player-zone .option-card {
     flex: 0 0 auto;
-    width: var(--bot-card-w, calc(114px * var(--ui-fit, 1)));
-    height: calc(var(--bot-card-w, calc(114px * var(--ui-fit, 1))) * 1.26);
+    width: var(--pcard-w, calc(126px * var(--ui-fit, 1)));
+    height: calc(var(--pcard-w, calc(126px * var(--ui-fit, 1))) * 1.26);
     aspect-ratio: auto;
     max-height: none;
 }
