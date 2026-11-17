@@ -11435,28 +11435,27 @@ body[data-theme="plush"] #user-words-screen .uw-form .setting-item label {
     flex: 1 1 auto;
     min-width: 0;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
+    text-overflow: clip;
     color: #3d0a1e;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.22);
-    font-size: 11px;
+    font-size: calc(12px * var(--ui-fit, 1));
 }
-/* Кнопка «Добавить слово» = точная копия .fs-btn из Настроек */
+/* «Добавить слово» — прежняя широкая плашка, только чуть уменьшена */
 body[data-theme="plush"] #user-words-screen .uw-form .uw-add-btn {
     display: block;
-    width: auto;
-    max-width: 100%;
-    height: calc(28px * var(--ui-fit, 1));
-    min-width: calc(96px * var(--ui-fit, 1));
-    margin: calc(6px * var(--ui-fit, 1)) auto calc(4px * var(--ui-fit, 1));
+    width: 100%;
+    height: calc(40px * var(--ui-fit, 1));
+    min-height: calc(40px * var(--ui-fit, 1));
+    margin: calc(6px * var(--ui-fit, 1)) 0 calc(4px * var(--ui-fit, 1));
     padding: 0 calc(14px * var(--ui-fit, 1));
     border: 0;
     border-radius: 0;
-    background: transparent url("UI/Vipad_osnova.webp") no-repeat center / 100% 100%;
+    background: transparent url("UI/extracted/bottom_trim.webp") no-repeat center / 100% 100%;
     box-shadow: none;
-    color: #ffe4f2;
+    color: #e6d4ff;
     font-family: inherit;
-    font-size: calc(11px * var(--ui-fit, 1));
+    font-size: calc(12px * var(--ui-fit, 1));
     line-height: 1.2;
     text-align: center;
     white-space: nowrap;
