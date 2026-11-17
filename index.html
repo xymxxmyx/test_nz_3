@@ -1261,10 +1261,21 @@
         function show() {
             var l = document.querySelector('link[rel="stylesheet"][href*="style.css"]');
             var v = l ? (l.href.match(/v=([^&]+)/) || [, '?'])[1] : 'нет';
-            t.textContent = 'CSS ' + v;
+            var s = document.querySelector('script[src*="script.js?v="]');
+            var jv = s ? (s.src.match(/v=([^&]+)/) || [, '?'])[1] : 'нет';
+            var txt = 'CSS ' + v + ' | JS ' + jv;
+            try {
+                var cs = window.CloudSync;
+                if (cs && cs.isCloud && cs.isCloud()) {
+                    txt += (cs.booted && cs.booted()) ? ' | облако ✓' : ' | облако…';
+                } else txt += ' | облако: нет';
+            } catch (e) { txt += ' | облако: ?'; }
+            t.textContent = txt;
         }
         show();
         window.addEventListener('load', show);
+        // boot облака асинхронный — обновляем бейдж, пока статус не устаканится
+        [1500, 3000, 6000].forEach(function (d) { setTimeout(show, d); });
     })();
     </script>
 
