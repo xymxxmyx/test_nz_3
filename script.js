@@ -1920,8 +1920,11 @@ const TG = (() => {
         return (v[0] > 6) || (v[0] === 6 && v[1] >= 1);
     };
     function init() {
-        // Класс .tg-mini-app ставится инлайном в <body> только на мобильных.
-        // ПК остаётся в окне с рамкой (:not(.tg-mini-app) в CSS).
+        // Мобильную вёрстку включаем ЗДЕСЬ — вместе с расчётом переменных сцены
+        // в fitUI(), чтобы не было скачка между первой отрисовкой и JS.
+        var mob = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+                  Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 700;
+        try { document.body.classList.toggle("tg-mini-app", !!mob); } catch (e) {}
         try {
             if (window.__NO_TG__) { active = false; return false; }
             if (window.Telegram && window.Telegram.WebApp) {
