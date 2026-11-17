@@ -1284,6 +1284,9 @@ const MENU_PRESS_MS = 240;
         if (!btn || btn.closest("#main-menu")) return;
         if (btn.classList.contains("locked")) return;
         if (btn.dataset.pressBusy === "1") return;
+        // «Назад» из словаря: ~2000 пунктов всё ещё дорисовываются порциями.
+        // Любая задержка здесь оставляет телефон в фризе — уходим сразу.
+        if (btn.closest("#dictionary-screen")) { fn.call(btn, e); return; }
         const fn = btn.onclick;
         if (typeof fn !== "function") return;
         e.preventDefault();
@@ -5561,10 +5564,21 @@ async function resetAll() {
 }
 
 function backToMenu() {
+    // Останавливаем порции словаря СРАЗУ, не дожидаясь смены экрана:
+    // на телефоне дорисовка ~2000 пунктов висит в главном потоке.
+    dictBuildToken++;
     // Выход из игры/экранов: скорость и запись микрофона не должны жить в фоне
     MIC.stop();
     stopSpeedTimer();
     showMainMenu();
+    // Освобождаем DOM словаря уже после того, как меню нарисовано:
+    // синхронная очистка тысяч узлов в момент тапа тоже даёт фриз.
+    setTimeout(() => {
+        try {
+            const list = document.getElementById("dictionary-list");
+            if (list && currentScreen !== "dictionary-screen") list.innerHTML = "";
+        } catch (e) {}
+    }, 0);
 }
 
 // Экран, с которого начался раунд (для кнопки «← К выбору» на экране результатов)
