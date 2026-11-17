@@ -7542,7 +7542,7 @@ function restartLessonsTest() {
         let ctx = null;
         try { ctx = cv.getContext("2d", { willReadFrequently: true }); } catch (e) { }
         if (!ctx) return false;
-        const S = 384;
+        const S = 256;
         cv.width = S;
         cv.height = S;
         let last = 0;
@@ -7560,7 +7560,7 @@ function restartLessonsTest() {
         const tick = (ts) => {
             if (failed || isStopped()) return;
             requestAnimationFrame(tick);
-            if (v.readyState < 2 || ts - last < 33) return;
+            if (v.readyState < 2 || ts - last < 80) return;
             last = ts;
             try {
                 ctx.clearRect(0, 0, S, S);
@@ -7673,9 +7673,11 @@ function restartLessonsTest() {
         const p = v.play();
         if (p && p.catch) p.catch(() => {});
         // Видео не стартовало за 3 с — не держим заглушку, входим сразу
-        setTimeout(() => { if (!done && v.readyState < 2) finish(); }, 3000);
+        // Быстрый выход: видео не буферизовалось за 1.2 с — не держим UI.
+        setTimeout(() => { if (!done && v.readyState < 2) finish(); }, 1200);
         // Страховка: ролик длится 5 с, даём запас на случай потерянного ended
-        setTimeout(finish, 9000);
+        // Жёсткий лимит заставки: первая загрузка не ждёт 9-секундный ролик.
+        setTimeout(finish, 2500);
     }
 
     document.addEventListener("DOMContentLoaded", () => {
