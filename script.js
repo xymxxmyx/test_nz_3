@@ -1600,7 +1600,7 @@ let dictBuildToken = 0;
         // «Словарь» — аналогично: список слов всегда длиннее экрана, страж
         // гнал fit к 0.55 — карточки становились мелкими. Кнопка «Назад»
         // там от ужимания не зависит (считается от --ui-fit-base).
-        const shrinkable = screenId !== "progress-screen" && screenId !== "lessons-screen" && screenId !== "lesson-screen" && screenId !== "settings-screen" && screenId !== "dictionary-screen";
+        const shrinkable = screenId !== "progress-screen" && screenId !== "lessons-screen" && screenId !== "lesson-screen" && screenId !== "settings-screen" && screenId !== "dictionary-screen" && screenId !== "user-words-screen";
         while (shrinkable && guard++ < 14 && sc.scrollHeight > sc.clientHeight + 2 && fit > 0.55) {
             fit = Math.max(0.55, fit - 0.04);
             applyFit(fit);
