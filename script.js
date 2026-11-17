@@ -821,6 +821,7 @@ const CloudSync = (() => {
             // перерисовать видимые экраны
             if (currentScreen === "main-menu") { try { showMainMenu(); } catch (e) {} }
             else if (currentScreen === "progress-screen") { try { renderProgress(); } catch (e) {} }
+            else if (currentScreen === "welcome-screen" && state.playerName) { try { showMainMenu(); } catch (e) {} }
         } catch (e) {}
     }
 
@@ -7674,7 +7675,10 @@ function restartLessonsTest() {
         document.addEventListener("keydown", unlockSender, { once: true });
 
         const enter = () => {
-            if (hasData && state.playerName) {
+            // hasData снимался ДО boot: на втором устройстве прогресс из облака
+            // уже применён (имя подтянулось), а hasData ещё false — из-за этого
+            // заново просили имя. Имя есть = игра есть: входим сразу в меню.
+            if (state.playerName) {
                 showMainMenu();
             } else {
                 showScreen("welcome-screen");
