@@ -156,6 +156,7 @@ async function refreshUserWords() {
             // Перерисовываем с тем фильтром, который выбрал игрок
             filterDictionary(currentDictFilter, null);
         }
+        try { CloudSync.updateUwCapLine(); CloudSync.checkWordsCap(); if (CloudSync.booted()) CloudSync.scheduleSave(CloudSync.pack()); } catch (e) {}
         return true;
     } catch (e) {
         return false;
@@ -202,6 +203,7 @@ function showUserWords() {
     const uwSearch = document.getElementById("uw-search");
     if (uwSearch) uwSearch.value = "";
     renderUserWordsList();
+    try { CloudSync.updateUwCapLine(); } catch (e) {}
     showScreen("user-words-screen");
 }
 
@@ -337,8 +339,617 @@ function loadData() {
 
 function saveData() {
     try { checkAchievements(); } catch (e) {}
+    try { state.savedAt = Date.now(); } catch (e) {}
     localStorage.setItem("dictionaryGameState", JSON.stringify(state));
+    try { CloudSync.scheduleSave(CloudSync.pack()); } catch (e) {}
 }
+
+// ===== Облачная синхронизация (Telegram CloudStorage) =====
+// Прогресс должен быть одинаковым в Telegram на ПК и на телефоне. localStorage
+// остаётся полной (сырой) копией state — он не ограничен и служит мгновенным
+// кэшем. В облако Telegram (привязано к аккаунту, 4096 символов на ключ)
+// уходит упакованный конверт: выученные/избранные/ошибки — битовыми масками по
+// стабильному реестру слов, история — CSV за 60 дней, скаляры — компактный
+// JSON, свои слова — TSV-строки в ключах nz_w0..nz_w127 (кап 1000 слов).
+// Вне мини-аппа облака нет — работает только localStorage. Облако — источник
+// правды по свежести ts; свои слова сливаются объединением (удаление слова на
+// одном устройстве не переносится на другое — так ничего не теряется).
+const CloudSync = (() => {
+    const CLOUD_V = 2;
+    const K_MAIN = "nz_main";   // {v, rh, ts, m, hx, C} — скаляры + история + чит
+    const K_LEARN = "nz_learn"; // {L, F, W, xl, xf, xw} — маски + extras
+    const K_HIST = "nz_hist";   // CSV истории за 60 дней
+    const K_EXTRA = "nz_extra"; // CSV пройденных уроков (lessonDone)
+    const K_WN = "nz_wn";       // число заполненных ключей nz_w*
+    const WKEYS_MAX = 128;
+    const WORDS_CAP = 1000;     // мягкий кап синхронизации своих слов
+    const CHUNK_BYTES = 3900;   // байты ≥ символов: 3900 байт всегда < 4096 симв. лимита ключа
+    const HISTORY_DAYS = 60;
+    const SAVE_DEBOUNCE = 1500;
+
+    // Дефолты state: захват ДО загрузки сохранения (loadData вызывается позже).
+    // Нужен, чтобы пустое облако (сброс) обнуляло все поля на других устройствах.
+    const DEFAULTS = (() => { try { return JSON.parse(JSON.stringify(state)); } catch (e) { return {}; } })();
+    const BIG_FIELDS = { learnedWords: 1, favoriteWords: 1, wrongWords: 1, history: 1, gameWords: 1, cheatSnapshot: 1 };
+
+    let _te = null;
+    try { _te = new TextEncoder(); } catch (e) {}
+    function byteLen(s) {
+        if (_te) return _te.encode(s).length;
+        return unescape(encodeURIComponent(s)).length;
+    }
+
+    // CloudStorage появился в Bot API 6.9+: старые клиенты и мок-SDK обычного
+    // браузера («6.0») отсекаются до вызовов — без спама ошибками в консоли.
+    // window.__NZ_FORCE_CLOUD__ — ручной стаб в тестах (обычный браузер).
+    const cloudOK = () => {
+        try {
+            const app = window.Telegram && window.Telegram.WebApp;
+            if (!app || !app.CloudStorage ||
+                typeof app.CloudStorage.getItem !== "function" ||
+                typeof app.CloudStorage.setItem !== "function") return false;
+            if (window.__NZ_FORCE_CLOUD__ === true) return true;
+            return parseFloat(app.version || "0") >= 6.9;
+        } catch (e) { return false; }
+    };
+
+    // Колбэчный API Telegram → промисы. Любая ошибка = «нет данных/не записано».
+    function csGet(key) {
+        return new Promise((resolve) => {
+            try {
+                window.Telegram.WebApp.CloudStorage.getItem(key, (err, val) => {
+                    if (err || typeof val !== "string" || !val.length) resolve(null);
+                    else resolve(val);
+                });
+            } catch (e) { resolve(null); }
+        });
+    }
+    function csSet(key, val) {
+        return new Promise((resolve) => {
+            try {
+                window.Telegram.WebApp.CloudStorage.setItem(key, val, (err) => resolve(!err));
+            } catch (e) { resolve(false); }
+        });
+    }
+    function csRemove(keys) {
+        return new Promise((resolve) => {
+            try {
+                const cs = window.Telegram.WebApp.CloudStorage;
+                if (typeof cs.removeItems === "function") cs.removeItems(keys, (err) => resolve(!err));
+                else resolve(false);
+            } catch (e) { resolve(false); }
+        });
+    }
+
+    // ── Реестр слов: EN-слова, EN-предложения, JA-слова, JA-предложения ──
+    // Порядок берётся из data-файлов; реестр «только растёт» (новые слова
+    // дописываются в конец файлов) — индексы масок стабильны между версиями.
+    let REG = null;
+    function buildRegistry() {
+        const list = [];
+        const seen = new Set();
+        const grab = (pool, key) => {
+            if (!Array.isArray(pool)) return;
+            for (let i = 0; i < pool.length; i++) {
+                const w = pool[i];
+                const t = w ? w[key] : null;
+                if (typeof t !== "string" || !t || seen.has(t)) continue;
+                seen.add(t);
+                list.push(t);
+            }
+        };
+        grab(typeof A_OTHER_WORDS !== "undefined" ? A_OTHER_WORDS : null, "en");
+        grab(typeof A_ADJ_WORDS !== "undefined" ? A_ADJ_WORDS : null, "en");
+        grab(typeof A_VERB_WORDS !== "undefined" ? A_VERB_WORDS : null, "en");
+        grab(typeof A_ADV_WORDS !== "undefined" ? A_ADV_WORDS : null, "en");
+        grab(typeof A_NUM_WORDS !== "undefined" ? A_NUM_WORDS : null, "en");
+        grab(typeof A_PRO_WORDS !== "undefined" ? A_PRO_WORDS : null, "en");
+        grab(typeof A_PREP_WORDS !== "undefined" ? A_PREP_WORDS : null, "en");
+        grab(typeof B_OTHER_WORDS !== "undefined" ? B_OTHER_WORDS : null, "en");
+        grab(typeof B_ADJ_WORDS !== "undefined" ? B_ADJ_WORDS : null, "en");
+        grab(typeof B_VERB_WORDS !== "undefined" ? B_VERB_WORDS : null, "en");
+        grab(typeof B_ADV_WORDS !== "undefined" ? B_ADV_WORDS : null, "en");
+        grab(typeof B_NUM_WORDS !== "undefined" ? B_NUM_WORDS : null, "en");
+        grab(typeof B_PRO_WORDS !== "undefined" ? B_PRO_WORDS : null, "en");
+        grab(typeof B_PREP_WORDS !== "undefined" ? B_PREP_WORDS : null, "en");
+        grab(typeof A_SENTENCES !== "undefined" ? A_SENTENCES : null, "en");
+        grab(typeof B1B2_SENTENCES !== "undefined" ? B1B2_SENTENCES : null, "en");
+        grab(typeof JA_A_OTHER_WORDS !== "undefined" ? JA_A_OTHER_WORDS : null, "ja");
+        grab(typeof JA_A_ADJ_WORDS !== "undefined" ? JA_A_ADJ_WORDS : null, "ja");
+        grab(typeof JA_A_VERB_WORDS !== "undefined" ? JA_A_VERB_WORDS : null, "ja");
+        grab(typeof JA_A_ADV_WORDS !== "undefined" ? JA_A_ADV_WORDS : null, "ja");
+        grab(typeof JA_A_NUM_WORDS !== "undefined" ? JA_A_NUM_WORDS : null, "ja");
+        grab(typeof JA_A_PRO_WORDS !== "undefined" ? JA_A_PRO_WORDS : null, "ja");
+        grab(typeof JA_A_PREP_WORDS !== "undefined" ? JA_A_PREP_WORDS : null, "ja");
+        grab(typeof JA_B_OTHER_WORDS !== "undefined" ? JA_B_OTHER_WORDS : null, "ja");
+        grab(typeof JA_B_ADJ_WORDS !== "undefined" ? JA_B_ADJ_WORDS : null, "ja");
+        grab(typeof JA_B_VERB_WORDS !== "undefined" ? JA_B_VERB_WORDS : null, "ja");
+        grab(typeof JA_B_ADV_WORDS !== "undefined" ? JA_B_ADV_WORDS : null, "ja");
+        grab(typeof JA_B_NUM_WORDS !== "undefined" ? JA_B_NUM_WORDS : null, "ja");
+        grab(typeof JA_B_PRO_WORDS !== "undefined" ? JA_B_PRO_WORDS : null, "ja");
+        grab(typeof JA_B_PREP_WORDS !== "undefined" ? JA_B_PREP_WORDS : null, "ja");
+        grab(typeof JA_A_SENTENCES !== "undefined" ? JA_A_SENTENCES : null, "ja");
+        grab(typeof JA_B1B2_SENTENCES !== "undefined" ? JA_B1B2_SENTENCES : null, "ja");
+        let h = 5381;
+        for (let i = 0; i < list.length; i++) {
+            const s = list[i];
+            for (let j = 0; j < s.length; j++) h = ((h * 33) ^ s.charCodeAt(j)) >>> 0;
+        }
+        const idx = new Map();
+        for (let i = 0; i < list.length; i++) idx.set(list[i], i);
+        REG = { list: list, idx: idx, rh: h };
+    }
+    function reg() {
+        if (!REG) { try { buildRegistry(); } catch (e) { REG = { list: [], idx: new Map(), rh: 0 }; } }
+        return REG;
+    }
+
+    // ── Битовые маски (base64) ──
+    function b64Encode(bytes) {
+        let s = "";
+        for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+        return btoa(s);
+    }
+    function b64Decode(str) {
+        const s = atob(String(str || ""));
+        const out = new Uint8Array(s.length);
+        for (let i = 0; i < s.length; i++) out[i] = s.charCodeAt(i);
+        return out;
+    }
+    // Маска по реестру; цели своих слов пропускаются — их статус едет вместе
+    // с самим словом (TSV, биты st); строки вне реестра (сироты) — в extras.
+    function maskPack(words, skip) {
+        const r = reg();
+        const bits = new Uint8Array(Math.max(1, Math.ceil(Math.max(r.list.length, 1) / 8)));
+        const x = [];
+        (Array.isArray(words) ? words : []).forEach((t) => {
+            if (typeof t !== "string" || !t) return;
+            if (skip && skip.has(t)) return;
+            const i = r.idx.get(t);
+            if (i === undefined) { if (x.indexOf(t) < 0) x.push(t); }
+            else bits[i >> 3] |= (1 << (i & 7));
+        });
+        return { m: b64Encode(bits), x: x };
+    }
+    function maskUnpack(str, extras) {
+        const r = reg();
+        const out = [];
+        try {
+            const bits = b64Decode(str);
+            for (let i = 0; i < r.list.length; i++) {
+                const by = i >> 3;
+                if (by >= bits.length) break;
+                if (bits[by] & (1 << (i & 7))) out.push(r.list[i]);
+            }
+        } catch (e) {}
+        (Array.isArray(extras) ? extras : []).forEach((t) => {
+            if (typeof t === "string" && t && out.indexOf(t) < 0) out.push(t);
+        });
+        return out;
+    }
+    function mergeUniq(a, b) {
+        const out = (Array.isArray(a) ? a : []).slice();
+        (Array.isArray(b) ? b : []).forEach((t) => { if (out.indexOf(t) < 0) out.push(t); });
+        return out;
+    }
+
+    // ── История: CSV за последние 60 дней ("ГГММДД:выуч:верно:всего;...") ──
+    function historyPack(hist) {
+        const days = Object.keys(hist || {}).sort();
+        return days.slice(-HISTORY_DAYS).map((k) => {
+            const h = hist[k] || {};
+            const d = String(k).replace(/\D/g, "");
+            return d.slice(2) + ":" + (Number(h.learned) || 0) + ":" + (Number(h.correct) || 0) + ":" + (Number(h.total) || 0);
+        }).join(";");
+    }
+    function historyUnpack(str) {
+        const out = {};
+        String(str || "").split(";").forEach((p) => {
+            const m = p.split(":");
+            if (m.length !== 4 || !/^\d{6}$/.test(m[0])) return;
+            const key = "20" + m[0].slice(0, 2) + "-" + m[0].slice(2, 4) + "-" + m[0].slice(4, 6);
+            out[key] = { learned: Number(m[1]) || 0, correct: Number(m[2]) || 0, total: Number(m[3]) || 0 };
+        });
+        return out;
+    }
+
+    // ── Скаляры: все поля, кроме больших (маски/история/раунд/чит) ──
+    function scalarsPack(src) {
+        const s = src || state;
+        const m = {};
+        for (const k in s) {
+            if (BIG_FIELDS[k] || k === "savedAt") continue;
+            const v = s[k];
+            if (typeof v === "function" || v === undefined) continue;
+            m[k] = v;
+        }
+        m.inProgress = false; // активный раунд не переезжает между устройствами
+        // Пройденные уроки → CSV (в отдельном ключе nz_extra): JSON с реальными
+        // id уроков раздувал nz_main за предохранитель.
+        if (s.lessonDone && typeof s.lessonDone === "object") {
+            m.lessonDoneS = Object.keys(s.lessonDone).map((k) => k + ":" + (Number(s.lessonDone[k]) || 0)).join(";");
+            delete m.lessonDone;
+        }
+        return m;
+    }
+
+    // ── Чит-снапшот: {level, xp, daily, L, xl} ──
+    function cheatPack(skip) {
+        const s = state.cheatSnapshot;
+        if (!s) return null;
+        const lm = maskPack(s.learnedWords, skip);
+        return { level: s.level, xp: s.xp, daily: s.daily || null, L: lm.m, xl: lm.x };
+    }
+    function cheatUnpack(c) {
+        if (!c) return null;
+        return { level: c.level, xp: c.xp, daily: c.daily || null, learnedWords: maskUnpack(c.L, c.xl) };
+    }
+
+    // ── Свои слова: TSV-строки ("lang\ten\tlvl,pos\tru\tnote\tst"), куски ≤ CHUNK_BYTES ──
+    function wordToTSV(w, st) {
+        const esc = (s) => String(s == null ? "" : s).replace(/[\t\r\n]+/g, " ").trim();
+        return (w.lang === "ja" ? "1" : "0") + "\t" + esc(w.en) + "\t" +
+            esc(w.lvl) + "," + esc(w.pos) + "\t" + esc(w.ru) + "\t" +
+            esc(w.note) + "\t" + (st || 0);
+    }
+    function wordFromTSV(line) {
+        const p = String(line).split("\t");
+        if (p.length < 5 || !p[1]) return null;
+        const lv = String(p[2] || "").split(",");
+        return {
+            lang: p[0] === "1" ? "ja" : "en",
+            en: p[1],
+            lvl: lv[0] === "b" ? "b" : "a",
+            pos: lv[1] || "other",
+            ru: p[3],
+            note: p[4] || "",
+            st: parseInt(p[5], 10) || 0,
+            user: true
+        };
+    }
+    function unpackWords(chunks) {
+        const out = [];
+        (Array.isArray(chunks) ? chunks : []).forEach((c) => {
+            String(c || "").split("\n").forEach((line) => {
+                if (!line) return;
+                const w = wordFromTSV(line);
+                if (w) out.push(w);
+            });
+        });
+        return out;
+    }
+    function chunkWords(list, learnedSet, favSet, wrongSet) {
+        const chunks = [];
+        let cur = [], curBytes = 0, truncated = 0;
+        const n = Math.min((list || []).length, WORDS_CAP);
+        for (let i = 0; i < n; i++) {
+            const w = list[i];
+            const t = tgt(w);
+            let st = 0;
+            if (t) {
+                if (learnedSet.has(t)) st |= 1;
+                if (favSet.has(t)) st |= 2;
+                if (wrongSet.has(t)) st |= 4;
+            }
+            const line = wordToTSV(w, st);
+            const b = byteLen(line) + 1;
+            if (b > CHUNK_BYTES) { truncated++; continue; }
+            if (cur.length && curBytes + b > CHUNK_BYTES) {
+                if (chunks.length >= WKEYS_MAX) { truncated += (n - i); break; }
+                chunks.push(cur.join("\n"));
+                cur = []; curBytes = 0;
+            }
+            cur.push(line);
+            curBytes += b;
+        }
+        if (cur.length) {
+            if (chunks.length >= WKEYS_MAX) truncated += cur.length;
+            else chunks.push(cur.join("\n"));
+        }
+        return { chunks: chunks, truncated: truncated, sent: Math.max(0, n - truncated) };
+    }
+
+    // ── Конверт ──
+    let lastSyncSent = 0; // сколько слов реально уехало в облако последним пушем
+    function pack() {
+        const skip = (() => {
+            const s = new Set();
+            (USER_WORDS || []).forEach((w) => { const t = tgt(w); if (t) s.add(t); });
+            return s;
+        })();
+        const L = maskPack(state.learnedWords, skip);
+        const F = maskPack(state.favoriteWords, skip);
+        const W = maskPack(state.wrongWords, skip);
+        return {
+            v: CLOUD_V,
+            rh: reg().rh,
+            ts: Date.now(),
+            m: scalarsPack(),
+            hx: historyPack(state.history),
+            L: L.m, xl: L.x,
+            F: F.m, xf: F.x,
+            W: W.m, xw: W.x,
+            C: cheatPack(skip)
+        };
+    }
+
+    let pendingEnv = null;
+    let flushTimer = null;
+    let lastWordKeys = 0;
+    let wiping = false;
+
+    async function writeAll(env) {
+        if (!cloudOK() || !env) return false;
+        const mClean = Object.assign({}, env.m);
+        const extraStr = (typeof mClean.lessonDoneS === "string") ? mClean.lessonDoneS : "";
+        delete mClean.lessonDoneS;
+        const mainStr = JSON.stringify({ v: env.v, rh: env.rh, ts: env.ts, m: mClean, C: env.C || null });
+        const learnStr = JSON.stringify({ L: env.L, F: env.F, W: env.W, xl: env.xl || [], xf: env.xf || [], xw: env.xw || [] });
+        const histStr = String(env.hx || "");
+        if (byteLen(mainStr) > 3800 || byteLen(learnStr) > 3800 || byteLen(histStr) > 3800 || byteLen(extraStr) > 3800) return false; // не рискуем обрезкой
+        const wc = wiping
+            ? { chunks: [], truncated: 0, sent: 0 }
+            : chunkWords(USER_WORDS || [],
+                new Set(state.learnedWords || []), new Set(state.favoriteWords || []), new Set(state.wrongWords || []));
+        lastSyncSent = wc.sent;
+        // слова и маски — первыми, манифест nz_main — последним
+        let ok = await csSet(K_LEARN, learnStr);
+        ok = (await csSet(K_HIST, histStr)) && ok;
+        ok = (await csSet(K_EXTRA, extraStr)) && ok;
+        for (let i = 0; i < wc.chunks.length; i++) {
+            const r = await csSet("nz_w" + i, wc.chunks[i]);
+            ok = ok && r;
+        }
+        ok = (await csSet(K_WN, String(wc.chunks.length))) && ok;
+        ok = (await csSet(K_MAIN, mainStr)) && ok;
+        const stale = [];
+        for (let i = wc.chunks.length; i < lastWordKeys; i++) stale.push("nz_w" + i);
+        lastWordKeys = wc.chunks.length;
+        if (stale.length) await csRemove(stale);
+        return ok;
+    }
+
+    function scheduleSave(env) {
+        if (!cloudOK() || !env) return;
+        pendingEnv = env;
+        if (flushTimer) clearTimeout(flushTimer);
+        flushTimer = setTimeout(() => { flushTimer = null; flushSave(); }, SAVE_DEBOUNCE);
+    }
+    async function flushSave() {
+        const env = pendingEnv;
+        pendingEnv = null;
+        if (flushTimer) { clearTimeout(flushTimer); flushTimer = null; }
+        if (!env || !cloudOK()) return;
+        try { await writeAll(env); } catch (e) {}
+    }
+
+    async function readAll() {
+        const res = await Promise.all([csGet(K_MAIN), csGet(K_LEARN), csGet(K_HIST), csGet(K_EXTRA), csGet(K_WN)]);
+        const mainRaw = res[0];
+        if (!mainRaw) return null;
+        let main = null;
+        try { main = JSON.parse(mainRaw); } catch (e) { return null; }
+        if (!main || main.v !== CLOUD_V) return null;
+        let learn = null;
+        try { learn = JSON.parse(res[1] || "null"); } catch (e) {}
+        learn = learn || {};
+        learn.hx = res[2] || main.hx || ""; // история: новый ключ; старые конверты — из nz_main
+        learn.ld = res[3] || "";           // пройденные уроки: CSV
+        const wn = parseInt(res[4] || "0", 10) || 0;
+        const keys = [];
+        for (let i = 0; i < Math.min(wn, WKEYS_MAX); i++) keys.push("nz_w" + i);
+        const vals = await Promise.all(keys.map(csGet));
+        return { main: main, learn: learn || null, wchunks: vals };
+    }
+
+    function applyRemote(remote) {
+        try {
+            const main = remote.main || {};
+            const learn = remote.learn || {};
+            const rhOk = main.rh === reg().rh;
+            // поля активного раунда не трогаем
+            const keep = state.inProgress ? {
+                gameWords: state.gameWords,
+                currentWordIndex: state.currentWordIndex,
+                roundCorrect: state.roundCorrect,
+                roundTotal: state.roundTotal,
+                lives: state.lives,
+                selectedAnswer: state.selectedAnswer,
+                combo: state.combo,
+                score: state.score
+            } : null;
+            const m = main.m || {};
+            // скаляры: чего нет в облаке — из дефолтов (пустое облако = чистый аккаунт)
+            for (const k in DEFAULTS) {
+                if (BIG_FIELDS[k] || k === "savedAt") continue;
+                state[k] = (Object.prototype.hasOwnProperty.call(m, k)) ? m[k] : JSON.parse(JSON.stringify(DEFAULTS[k]));
+            }
+            // новые скаляры из облака, которых ещё нет в DEFAULTS (будущие версии)
+            for (const k in m) {
+                if (k in DEFAULTS || BIG_FIELDS[k] || k === "savedAt") continue;
+                state[k] = m[k];
+            }
+            if (typeof learn.ld === "string") {
+                // пройденные уроки: пересборка из CSV
+                state.lessonDone = {};
+                String(learn.ld).split(";").forEach((p) => { const i = p.lastIndexOf(":"); if (i > 0) state.lessonDone[p.slice(0, i)] = Number(p.slice(i + 1)) || 0; });
+            }
+            const L = maskUnpack(learn.L, learn.xl);
+            const F = maskUnpack(learn.F, learn.xf);
+            const W = maskUnpack(learn.W, learn.xw);
+            if (rhOk) {
+                state.learnedWords = L;
+                state.favoriteWords = F;
+                state.wrongWords = W;
+            } else {
+                // реестр слов изменился: маски расшифрованы «лучшим усилием»,
+                // объединяем с локальными, чтобы не потерять прогресс
+                state.learnedWords = mergeUniq(state.learnedWords, L);
+                state.favoriteWords = mergeUniq(state.favoriteWords, F);
+                state.wrongWords = mergeUniq(state.wrongWords, W);
+            }
+            state.history = historyUnpack(learn.hx != null ? learn.hx : main.hx);
+            state.cheatSnapshot = main.C ? cheatUnpack(main.C) : null;
+            state.savedAt = main.ts || Date.now();
+            // свои слова: добавляем облачные, которых нет локально (по en+lang)
+            const cloudWords = unpackWords(remote.wchunks);
+            if (cloudWords.length) {
+                if (!Array.isArray(USER_WORDS)) USER_WORDS = [];
+                const have = new Set(USER_WORDS.map((w) => String(w.en).toLowerCase() + "|" + (w.lang || "en")));
+                cloudWords.forEach((w) => {
+                    const k = String(w.en).toLowerCase() + "|" + w.lang;
+                    if (!have.has(k)) {
+                        have.add(k);
+                        USER_WORDS.push({ lang: w.lang, en: w.en, lvl: w.lvl, pos: w.pos, ru: w.ru, note: w.note, user: true });
+                    }
+                    const t = tgt(w);
+                    if (t) {
+                        if ((w.st & 1) && state.learnedWords.indexOf(t) < 0) state.learnedWords.push(t);
+                        if ((w.st & 2) && state.favoriteWords.indexOf(t) < 0) state.favoriteWords.push(t);
+                        if ((w.st & 4) && state.wrongWords.indexOf(t) < 0) state.wrongWords.push(t);
+                    }
+                });
+                writeUserWordsLocal(USER_WORDS);
+                applyUserWords();
+            }
+            if (keep) Object.assign(state, keep);
+            state.level = Math.min(20, Math.max(1, Math.floor(Number(state.level) || 1)));
+            if (!state.studyLevel) state.studyLevel = "mix";
+            initDaily();
+            rebuildActiveLanguage();
+            saveData();
+            // перерисовать видимые экраны
+            if (currentScreen === "main-menu") { try { showMainMenu(); } catch (e) {} }
+            else if (currentScreen === "progress-screen") { try { renderProgress(); } catch (e) {} }
+        } catch (e) {}
+    }
+
+    let bootDone = false;
+    let ready = false;
+    async function boot(hasLocal) {
+        if (bootDone) return;
+        bootDone = true;
+        if (!cloudOK()) return;
+        try {
+            const remote = await readAll();
+            const localTs = Number(state.savedAt) || 0;
+            const remoteTs = Number(remote && remote.main && remote.main.ts) || 0;
+            if (!remote) {
+                // облако пустое: первый пуш локальных данных, если они есть
+                if (hasLocal) {
+                    const hasAny = (state.learnedWords && state.learnedWords.length) ||
+                        (state.favoriteWords && state.favoriteWords.length) ||
+                        (state.wrongWords && state.wrongWords.length) ||
+                        Object.keys(state.history || {}).length > 0 ||
+                        (Number(state.xp) || 0) > 0 || (Number(state.score) || 0) > 0 ||
+                        (USER_WORDS && USER_WORDS.length > 0);
+                    if (hasAny) { pendingEnv = pack(); flushSave(); }
+                }
+            } else if (remoteTs > localTs) {
+                applyRemote(remote);
+            } else if (remoteTs < localTs && hasLocal) {
+                // локальное свежее (играли офлайн) — выталкиваем его в облако
+                pendingEnv = pack();
+                flushSave();
+            }
+            // при равенстве — облако уже записано этим же сохранением
+        } catch (e) {}
+        ready = true;
+    }
+
+    // Полная очистка облака (полный сброс данных): пишем пустой конверт со
+    // свежим ts — другие устройства при следующем старте тоже обнулятся.
+    async function wipe() {
+        pendingEnv = null;
+        if (flushTimer) { clearTimeout(flushTimer); flushTimer = null; }
+        if (!cloudOK()) return;
+        try {
+            const wn = parseInt((await csGet(K_WN)) || "0", 10) || 0;
+            const stale = [K_LEARN, K_HIST, K_EXTRA, K_WN];
+            for (let i = 0; i < Math.min(Math.max(wn, lastWordKeys), WKEYS_MAX); i++) stale.push("nz_w" + i);
+            if (stale.length > 2) await csRemove(stale);
+            wiping = true;
+            const env = pack();
+            env.m = scalarsPack(DEFAULTS);
+            env.ts = Date.now();
+            env.L = ""; env.xl = []; env.F = ""; env.xf = []; env.W = ""; env.xw = [];
+            env.hx = ""; env.C = null;
+            lastWordKeys = 0;
+            lastSyncSent = 0;
+            await writeAll(env);
+        } catch (e) {}
+    }
+
+    // ── Кап своих слов: тосты на порогах + строка-счётчик ──
+    const CAP_TOASTED = { 900: false, 950: false, 990: false, 1000: false };
+    function checkWordsCap() {
+        try {
+            const n = (USER_WORDS || []).length;
+            const packed = Math.min(n, WORDS_CAP);
+            const marks = [900, 950, 990];
+            for (let i = 0; i < marks.length; i++) {
+                if (packed >= marks[i] && !CAP_TOASTED[marks[i]]) {
+                    CAP_TOASTED[marks[i]] = true;
+                    showInfoToast("Облако почти заполнено: " + packed + " из " + WORDS_CAP + " слов");
+                    break;
+                }
+            }
+            if (n > WORDS_CAP && !CAP_TOASTED[1000]) {
+                CAP_TOASTED[1000] = true;
+                showInfoToast("Лимит облачной синхронизации (" + WORDS_CAP + "). Слово сохранено только на этом устройстве");
+            }
+        } catch (e) {}
+    }
+    function updateUwCapLine() {
+        try {
+            const el = document.getElementById("uw-cap-line");
+            if (!el) return;
+            el.style.fontSize = "12px";
+            el.style.lineHeight = "1.35";
+            el.style.textAlign = "center";
+            el.style.margin = "8px 4px 0";
+            const n = (USER_WORDS || []).length;
+            if (!cloudOK()) {
+                el.style.color = "#9a90b8";
+                el.textContent = "Слова хранятся локально на этом устройстве";
+                return;
+            }
+            const synced = Math.min(n, WORDS_CAP, lastSyncSent > 0 ? lastSyncSent : WORDS_CAP);
+            el.style.color = n > WORDS_CAP ? "#ffb05c" : "#9a90b8";
+            el.textContent = (n > WORDS_CAP)
+                ? ("Синхронизировано " + synced + " из " + n + " слов — остальное хранится только на этом устройстве")
+                : ("Облачная синхронизация: " + synced + " из " + WORDS_CAP + " слов");
+        } catch (e) {}
+    }
+
+    // Срочная выгрузка при закрытии/свёртывании мини-аппа
+    try {
+        window.addEventListener("pagehide", () => { if (pendingEnv) flushSave(); });
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "hidden" && pendingEnv) flushSave();
+        });
+    } catch (e) {}
+
+    return {
+        pack: pack,
+        boot: boot,
+        scheduleSave: scheduleSave,
+        flushSave: flushSave,
+        wipe: wipe,
+        readCloud: readAll,
+        applyRemoteState: applyRemote,
+        checkWordsCap: checkWordsCap,
+        updateUwCapLine: updateUwCapLine,
+        isCloud: cloudOK,
+        booted: () => ready,
+        capLineSent: () => lastSyncSent,
+        capFlags: () => CAP_TOASTED,
+        // тест-хук: повторный прогон boot-логики в той же странице
+        _reboot: (hasLocal) => { bootDone = false; ready = false; return boot(hasLocal); },
+        WORDS_CAP: WORDS_CAP
+    };
+})();
+
 
 // ===== ПРОГРЕССИВНОЕ ОТКРЫТИЕ =====
 // Кампания: уроки → первая игра → карточки → продвинутое → свобода.
@@ -770,6 +1381,10 @@ const LEVEL_REWARDS = [
 
 let currentScreen = "welcome-screen";
 
+// Список словаря строится порциями (filterDictionary): счётчик отменяет
+// незавершённые порции прошлого рендера при новом поиске/фильтре/уходе.
+let dictBuildToken = 0;
+
 /* Рамка поверх ВСЕХ слоёв: элемент #top-frame живёт в body (вне стек-контекстов
    экранов), позиционируется по панели активного экрана и следует за скроллом. */
 (function () {
@@ -1089,6 +1704,9 @@ document.documentElement.style.setProperty('--ui-scale', String(k));
 
 function showScreen(screenId) {
     currentScreen = screenId;
+    // Список словаря строится порциями: уход со словаря отменяет
+    // незавершённые порции — не тратим поток на скрытый список.
+    if (screenId !== "dictionary-screen") dictBuildToken++;
     document.querySelectorAll(".screen").forEach(s => {
         s.classList.remove("active");
         s.classList.add("hidden");
@@ -4214,121 +4832,142 @@ function filterDictionary(filter, btn, instant) {
     const favSet = new Set(state.favoriteWords);
     const own = USER_WORDS.slice().reverse().filter(w => (w.lang || "en") === tgtLang());
     const all = DICTIONARY.concat(own);
-    const frag = document.createDocumentFragment();
     const dictLang = state.direction === "ru-en" ? "ru" : langTTS();
     const ja = isJa();
     const ANIM_LIMIT = instant ? 0 : 12;
     const delayBase = instant ? 0 : (btn ? 0.06 : 0.62);
     let shown = 0;
 
-    all.forEach((word) => {
-        const isUser = !!word.user;
-        const tw = tgt(word);
-        const nw = nat(word);
-        const isLearned = learnedSet.has(tw);
-        const isFav = favSet.has(tw);
+    // Список строится порциями: ~2000 пунктов за один проход блокируют
+    // главный поток телефона на секунды — тап «Назад» в это время не
+    // обрабатывается, и кажется, что игра «виснет», пока всё дорисуется.
+    // Первая порция рисуется сразу, дальше — по таймеру; новый поиск,
+    // фильтр или уход с экрана отменяет незавершённые порции.
+    const DICT_CHUNK = 200;
+    const dictToken = ++dictBuildToken;
+    let dictPos = 0;
 
-        if (filter === "learned" && !isLearned) return;
-        if (filter === "unlearned" && isLearned) return;
-        if (filter === "favorites" && !isFav) return;
+    function buildDictChunk() {
+        if (dictToken !== dictBuildToken) return;
+        const from = dictPos;
+        const to = Math.min(all.length, from + DICT_CHUNK);
+        dictPos = to;
+        const frag = document.createDocumentFragment();
+        for (let di = from; di < to; di++) {
+            const word = all[di];
+            const isUser = !!word.user;
+            const tw = tgt(word);
+            const nw = nat(word);
+            const isLearned = learnedSet.has(tw);
+            const isFav = favSet.has(tw);
 
-        // Поиск: слово, перевод, кана и ромадзи — регистр не важен
-        if (dictSearchQuery) {
-            const hay = (tw + "\n" + nw + "\n" + (word.kana || "") + "\n" + (word.romaji || "")).toLowerCase();
-            if (hay.indexOf(dictSearchQuery) === -1) return;
-        }
+            if (filter === "learned" && !isLearned) continue;
+            if (filter === "unlearned" && isLearned) continue;
+            if (filter === "favorites" && !isFav) continue;
 
-        const item = document.createElement("div");
-        // Появление каскадом, как у кнопок главного меню: шаг 0.1s.
-        // Анимируем только первые ANIM_LIMIT, остальные сразу видны.
-        const animate = shown < ANIM_LIMIT;
-        item.className = `dict-item ${isLearned ? "learned" : "unlearned"}${isUser ? " is-user" : ""}${ja ? " dict-cjk" : ""}` + (animate ? "" : " dict-plain");
-        if (animate) item.style.animationDelay = (delayBase + shown * 0.1).toFixed(2) + "s";
-        shown++;
+            // Поиск: слово, перевод, кана и ромадзи — регистр не важен
+            if (dictSearchQuery) {
+                const hay = (tw + "\n" + nw + "\n" + (word.kana || "") + "\n" + (word.romaji || "")).toLowerCase();
+                if (hay.indexOf(dictSearchQuery) === -1) continue;
+            }
 
-        const dictText = dictLang === "ru"
-            ? nw
-            : (ja ? (word.kana || tw) : tw);
-        item.appendChild(makeSpeakBtn(dictText, dictLang));
+            const item = document.createElement("div");
+            // Появление каскадом, как у кнопок главного меню: шаг 0.1s.
+            // Анимируем только первые ANIM_LIMIT, остальные сразу видны.
+            const animate = shown < ANIM_LIMIT;
+            item.className = `dict-item ${isLearned ? "learned" : "unlearned"}${isUser ? " is-user" : ""}${ja ? " dict-cjk" : ""}` + (animate ? "" : " dict-plain");
+            if (animate) item.style.animationDelay = (delayBase + shown * 0.1).toFixed(2) + "s";
+            shown++;
 
-        const favBtn = document.createElement("button");
-        favBtn.type = "button";
-        favBtn.className = "fav-btn dict-fav" + (isFav ? " is-fav" : "");
-        favBtn.textContent = "";
-        favBtn.setAttribute("aria-label", "В избранное");
-        favBtn.addEventListener("click", () => {
-            Sound.click();
-            toggleFav(tw);
-            filterDictionary(filter, activeBtn);
-        });
-        item.appendChild(favBtn);
+            const dictText = dictLang === "ru"
+                ? nw
+                : (ja ? (word.kana || tw) : tw);
+            item.appendChild(makeSpeakBtn(dictText, dictLang));
 
-        if (isUser) {
-            const delBtn = document.createElement("button");
-            delBtn.type = "button";
-            delBtn.className = "fav-btn dict-del";
-            delBtn.innerHTML = iconHTML("🗑");
-            delBtn.setAttribute("aria-label", "Удалить слово");
-            delBtn.addEventListener("click", () => {
+            const favBtn = document.createElement("button");
+            favBtn.type = "button";
+            favBtn.className = "fav-btn dict-fav" + (isFav ? " is-fav" : "");
+            favBtn.textContent = "";
+            favBtn.setAttribute("aria-label", "В избранное");
+            favBtn.addEventListener("click", () => {
                 Sound.click();
-                removeUserWord(tw);
+                toggleFav(tw);
+                filterDictionary(filter, activeBtn);
             });
-            item.appendChild(delBtn);
-        }
+            item.appendChild(favBtn);
 
-        const front = document.createElement("div");
-        front.className = "dict-front";
-        const enSpan = document.createElement("span");
-        enSpan.className = "dict-word";
-        enSpan.textContent = tw;
-        if (ja && word.kana) {
-            const kanaSpan = document.createElement("span");
-            kanaSpan.className = "dict-kana";
-            kanaSpan.textContent = word.kana;
-            front.appendChild(enSpan);
-            front.appendChild(kanaSpan);
-            if (word.romaji) {
-                const romajiSpan = document.createElement("span");
-                romajiSpan.className = "dict-tr";
-                romajiSpan.textContent = word.romaji;
-                front.appendChild(romajiSpan);
+            if (isUser) {
+                const delBtn = document.createElement("button");
+                delBtn.type = "button";
+                delBtn.className = "fav-btn dict-del";
+                delBtn.innerHTML = iconHTML("🗑");
+                delBtn.setAttribute("aria-label", "Удалить слово");
+                delBtn.addEventListener("click", () => {
+                    Sound.click();
+                    removeUserWord(tw);
+                });
+                item.appendChild(delBtn);
             }
-        } else {
-            front.appendChild(enSpan);
-            if (word.tr) {
-                const trSpan = document.createElement("span");
-                trSpan.className = "dict-tr";
-                trSpan.textContent = word.tr;
-                front.appendChild(trSpan);
+
+            const front = document.createElement("div");
+            front.className = "dict-front";
+            const enSpan = document.createElement("span");
+            enSpan.className = "dict-word";
+            enSpan.textContent = tw;
+            if (ja && word.kana) {
+                const kanaSpan = document.createElement("span");
+                kanaSpan.className = "dict-kana";
+                kanaSpan.textContent = word.kana;
+                front.appendChild(enSpan);
+                front.appendChild(kanaSpan);
+                if (word.romaji) {
+                    const romajiSpan = document.createElement("span");
+                    romajiSpan.className = "dict-tr";
+                    romajiSpan.textContent = word.romaji;
+                    front.appendChild(romajiSpan);
+                }
+            } else {
+                front.appendChild(enSpan);
+                if (word.tr) {
+                    const trSpan = document.createElement("span");
+                    trSpan.className = "dict-tr";
+                    trSpan.textContent = word.tr;
+                    front.appendChild(trSpan);
+                }
             }
+            const ruSpan = document.createElement("span");
+            ruSpan.className = "dict-translation";
+            ruSpan.textContent = nw;
+            front.appendChild(ruSpan);
+            item.appendChild(front);
+
+            const status = document.createElement("span");
+            status.className = "dict-status";
+            status.textContent = isLearned ? "♥" : "○";
+            item.appendChild(status);
+
+            frag.appendChild(item);
         }
-        const ruSpan = document.createElement("span");
-        ruSpan.className = "dict-translation";
-        ruSpan.textContent = nw;
-        front.appendChild(ruSpan);
-        item.appendChild(front);
-
-        const status = document.createElement("span");
-        status.className = "dict-status";
-        status.textContent = isLearned ? "♥" : "○";
-        item.appendChild(status);
-
-        frag.appendChild(item);
-    });
-    if (!shown) {
-        const empty = document.createElement("div");
-        empty.className = "dict-empty";
-        empty.textContent = "Ничего не найдено";
-        frag.appendChild(empty);
+        list.appendChild(frag);
+        if (to >= all.length) {
+            if (!shown) {
+                const empty = document.createElement("div");
+                empty.className = "dict-empty";
+                empty.textContent = "Ничего не найдено";
+                list.appendChild(empty);
+            }
+            return;
+        }
+        setTimeout(buildDictChunk, 0);
     }
-    list.appendChild(frag);
+    buildDictChunk();
 }
 
 /* ===== Выбор значения в настройках через модалку =====
    Нативный <select> остаётся в DOM и хранит значение — вся существующая логика
    (.value, onchange) работает без изменений, но сам он скрыт (.fs-native).
-   Строка показывает значение кнопкой на арте UI/Vipad_osnova.png; по тапу
-   открывается модалка на арте UI/Vipad_spisok.png. */
+   Строка показывает значение кнопкой на арте UI/Vipad_osnova.webp; по тапу
+   открывается модалка на арте UI/Vipad_spisok.webp. */
 const FANCY_SEL = [];
 let FS_MODAL = null;
 
@@ -4865,6 +5504,7 @@ async function resetAll() {
             "«ОК» — удалить всё, «Отмена» — оставить слова."
         );
     }
+    try { await CloudSync.wipe(); } catch (e) {} // чистим облако, чтобы прогресс не «воскрес» на других устройствах
     localStorage.removeItem("dictionaryGameState");
     if (wipeUserWords) {
         try { localStorage.removeItem(USER_WORDS_LS); } catch (e) {}
@@ -6455,7 +7095,14 @@ let lessonIndex = 0;
 let LESSON_TEST = null;
 
 function testForLesson(lesson) {
-    const tests = lessonsLevel === "b" ? (window.B1B2_TESTS || {}) : (window.A1A2_TESTS || {});
+    // Тесты разделены по языкам: EN — A1A2_TESTS/B1B2_TESTS, JA —
+    // JA_A1A2_TESTS/JA_B1B2_TESTS. Раньше все писали в один глобал, и
+    // коллизия id ("word-order" есть и в EN, и в JA) уводила EN уроки
+    // на японские тесты: ja-tests грузились последними и перезаписывали.
+    const ja = isJa();
+    const tests = lessonsLevel === "b"
+        ? (ja ? (window.JA_B1B2_TESTS || {}) : (window.B1B2_TESTS || {}))
+        : (ja ? (window.JA_A1A2_TESTS || {}) : (window.A1A2_TESTS || {}));
     return tests[lesson.id] || null;
 }
 
@@ -6993,6 +7640,7 @@ function restartLessonsTest() {
 
     document.addEventListener("DOMContentLoaded", () => {
         const hasData = loadData();
+        try { CloudSync.boot(hasData); } catch (e) {}
         rebuildActiveLanguage();
         migrateProgressKeys();
         seedAchievements();

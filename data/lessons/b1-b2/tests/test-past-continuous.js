@@ -16,7 +16,7 @@ window.B1B2_TESTS["past-continuous"] = {
             why: "С they — were + -ing: They were playing football."
         },
         {
-            q: "___ she working at that moment?",
+            q: "___ she working at that moment ?",
             options: ["Was", "Were", "Did", "Is"],
             correct: 0,
             why: "Вопрос с she — was на первое место: Was she working ...?"
@@ -40,10 +40,10 @@ window.B1B2_TESTS["past-continuous"] = {
             why: "Длительное действие прерывает короткое: was talking ... rang."
         },
         {
-            q: "What ___ you doing at 8 pm?",
+            q: "What ___ you doing at 8 pm ?",
             options: ["was", "were", "did", "are"],
             correct: 1,
-            why: "С you — were: What were you doing at 8 pm?"
+            why: "С you — were: What were you doing at 8 pm ?"
         },
         {
             q: "While I was studying, my brother ___ video games.",

@@ -11,7 +11,7 @@ const A1A2_LESSONS = [
             {
                 heading: "Прямой порядок слов",
                 paragraphs: [
-                    "Утвердительное предложение строится так: Подлежащее (кто?) → Сказуемое (что делает?) → Дополнение (что / кого?).",
+                    "Утвердительное предложение строится так: Подлежащее (кто ?) → Сказуемое (что делает ?) → Дополнение (что / кого ?).",
                     "Настоящее простое время (Present Simple) используем для регулярных действий, фактов и привычек."
                 ],
                 examples: [
@@ -41,8 +41,8 @@ const A1A2_LESSONS = [
                     "Наречия частотности (always, usually, often, never) ставятся перед основным глаголом."
                 ],
                 examples: [
-                    ["Do you play football?", "Ты играешь в футбол?"],
-                    ["Does she drink tea?", "Она пьёт чай?"],
+                    ["Do you play football ?", "Ты играешь в футбол ?"],
+                    ["Does she drink tea ?", "Она пьёт чай ?"],
                     ["She does not (doesn't) drink coffee.", "Она не пьёт кофе."],
                     ["I always drink tea in the morning.", "Я всегда пью чай утром."]
                 ]
@@ -92,9 +92,9 @@ const A1A2_LESSONS = [
                     "В вопросах форма am / is / are переезжает на первое место: Are you ...? Is she ...?"
                 ],
                 examples: [
-                    ["Are you ready?", "Ты готов?"],
-                    ["Is she a teacher?", "Она учительница?"],
-                    ["Are they at home?", "Они дома?"]
+                    ["Are you ready ?", "Ты готов ?"],
+                    ["Is she a teacher ?", "Она учительница ?"],
+                    ["Are they at home ?", "Они дома ?"]
                 ]
             }
         ],
@@ -161,7 +161,7 @@ const A1A2_LESSONS = [
         icon: "👤",
         title: "Личные и притяжательные местоимения",
         desc: "I / you / he / she / it, my / your / his — как не путать",
-        intro: "Местоимения заменяют существительные и помогают не повторять слова. Важно различать личные местоимения (кто?) и притяжательные (чей?).",
+        intro: "Местоимения заменяют существительные и помогают не повторять слова. Важно различать личные местоимения (кто ?) и притяжательные (чей ?).",
         sections: [
             {
                 heading: "Личные местоимения",
@@ -221,7 +221,7 @@ const A1A2_LESSONS = [
                 examples: [
                     ["I can swim.", "Я умею плавать."],
                     ["She can play guitar.", "Она умеет играть на гитаре."],
-                    ["Can you help me?", "Ты можешь мне помочь?"],
+                    ["Can you help me ?", "Ты можешь мне помочь ?"],
                     ["He can't drive.", "Он не умеет водить."]
                 ]
             },
@@ -270,22 +270,22 @@ const A1A2_LESSONS = [
                     "How может образовывать сочетания: How old (сколько лет), How many (сколько, с исчисляемыми), How much (сколько, с неисчисляемыми)."
                 ],
                 examples: [
-                    ["What is your name?", "Как тебя зовут?"],
-                    ["Where do you live?", "Где ты живёшь?"],
-                    ["When do you wake up?", "Когда ты встаёшь?"],
-                    ["Who is your teacher?", "Кто твой учитель?"]
+                    ["What is your name ?", "Как тебя зовут ?"],
+                    ["Where do you live ?", "Где ты живёшь ?"],
+                    ["When do you wake up ?", "Когда ты встаёшь ?"],
+                    ["Who is your teacher ?", "Кто твой учитель ?"]
                 ]
             },
             {
                 heading: "Порядок слов с Wh-словами",
                 paragraphs: [
                     "В вопросах с вопросительным словом порядок: Wh-слово → вспомогательный глагол (do/does/is/are) → подлежащее → основной глагол.",
-                    "Если вопрос к подлежащему (кто/что делает?), вспомогательный глагол не нужен: Who lives here?"
+                    "Если вопрос к подлежащему (кто/что делает ?), вспомогательный глагол не нужен: Who lives here ?"
                 ],
                 examples: [
-                    ["Why are you sad?", "Почему ты грустный?"],
-                    ["How do you go to work?", "Как ты добираешься на работу?"],
-                    ["Who lives here?", "Кто живёт здесь?"]
+                    ["Why are you sad ?", "Почему ты грустный ?"],
+                    ["How do you go to work ?", "Как ты добираешься на работу ?"],
+                    ["Who lives here ?", "Кто живёт здесь ?"]
                 ]
             },
             {
@@ -294,9 +294,9 @@ const A1A2_LESSONS = [
                     "How old — о возрасте, How many — с исчисляемыми существительными (книги, яблоки), How much — с неисчисляемыми (деньги, вода)."
                 ],
                 examples: [
-                    ["How old are you?", "Сколько тебе лет?"],
-                    ["How many books do you have?", "Сколько у тебя книг?"],
-                    ["How much money do you need?", "Сколько денег тебе нужно?"]
+                    ["How old are you ?", "Сколько тебе лет ?"],
+                    ["How many books do you have ?", "Сколько у тебя книг ?"],
+                    ["How much money do you need ?", "Сколько денег тебе нужно ?"]
                 ]
             }
         ],
@@ -330,13 +330,13 @@ const A1A2_LESSONS = [
                 heading: "Отрицание и вопросы",
                 paragraphs: [
                     "Отрицание — not после am/is/are: am not, isn't, aren't. Вопрос — форма to be на первое место.",
-                    "Маркеры времени: now (сейчас), at the moment (в данный момент), look! (смотри!)."
+                    "Маркеры времени: now (сейчас), at the moment (в данный момент), look ! (смотри !)."
                 ],
                 examples: [
                     ["I am not sleeping.", "Я не сплю."],
                     ["She isn't working today.", "Она сегодня не работает."],
-                    ["Are you listening to me?", "Ты слушаешь меня?"],
-                    ["Look! The dog is running.", "Смотри! Собака бежит."]
+                    ["Are you listening to me ?", "Ты слушаешь меня ?"],
+                    ["Look ! The dog is running.", "Смотри ! Собака бежит."]
                 ]
             },
             {
@@ -354,7 +354,7 @@ const A1A2_LESSONS = [
         ],
         summary: [
             "am / is / are + глагол с -ing — действие прямо сейчас.",
-            "Маркеры: now, at the moment, look!",
+            "Маркеры: now, at the moment, look !",
             "Глаголы состояния (know, like, want, need) — только Present Simple."
         ]
     },

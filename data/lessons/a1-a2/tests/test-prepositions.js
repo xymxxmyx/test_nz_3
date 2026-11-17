@@ -46,13 +46,13 @@ window.A1A2_TESTS["prepositions"] = {
             why: "Под — under: The cat is under the chair."
         },
         {
-            q: "«Я дома» — как сказать правильно?",
+            q: "«Я дома» — как сказать правильно ?",
             options: ["I am in home.", "I am at home.", "I am on home.", "I am into home."],
             correct: 1,
             why: "Дом — конкретная точка, поэтому at: at home."
         },
         {
-            q: "Что значит next to?",
+            q: "Что значит next to ?",
             options: ["далеко от", "рядом с", "напротив", "между"],
             correct: 1,
             why: "next to — рядом с: The bank is next to the shop."

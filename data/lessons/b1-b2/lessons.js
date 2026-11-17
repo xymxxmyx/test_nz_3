@@ -29,7 +29,7 @@ const B1B2_LESSONS = [
                 ],
                 examples: [
                     ["I have just finished the task.", "Я только что закончил задание."],
-                    ["Have you washed the dishes yet?", "Ты уже помыл посуду?"],
+                    ["Have you washed the dishes yet ?", "Ты уже помыл посуду ?"],
                     ["She has already left.", "Она уже ушла."],
                     ["He went to London in 2010.", "Он ездил в Лондон в 2010 году."]
                 ]
@@ -43,7 +43,7 @@ const B1B2_LESSONS = [
                 examples: [
                     ["I have lived here for five years.", "Я живу здесь пять лет."],
                     ["She has worked here since 2015.", "Она работает здесь с 2015 года."],
-                    ["Have you ever tried sushi?", "Ты когда-нибудь пробовал суши?"]
+                    ["Have you ever tried sushi ?", "Ты когда-нибудь пробовал суши ?"]
                 ]
             }
         ],
@@ -93,7 +93,7 @@ const B1B2_LESSONS = [
                 examples: [
                     ["At 9 o'clock we were still working.", "В девять мы всё ещё работали."],
                     ["While I was cooking, my sister was dancing.", "Пока я готовила, сестра танцевала."],
-                    ["What were you doing at 7 am?", "Что ты делал в семь утра?"]
+                    ["What were you doing at 7 am ?", "Что ты делал в семь утра ?"]
                 ]
             }
         ],
@@ -130,7 +130,7 @@ const B1B2_LESSONS = [
                 ],
                 examples: [
                     ["I'm going to study English next year.", "Я собираюсь учить английский в следующем году."],
-                    ["Look at those clouds! It's going to rain.", "Посмотри на те тучи! Будет дождь."],
+                    ["Look at those clouds ! It's going to rain.", "Посмотри на те тучи ! Будет дождь."],
                     ["We are going to visit our grandparents.", "Мы собираемся навестить бабушку с дедушкой."]
                 ]
             },

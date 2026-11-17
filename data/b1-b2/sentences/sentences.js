@@ -35,13 +35,13 @@ const B1B2_SENTENCES = [
         "We've known one another for ten years.", "We have been friends for ten years.",
         "We have known each other since ten years."
     ] },
-    { en: "Have you ever tried sushi?", ru: "Ты когда-нибудь пробовал суши?", altRu: [
-        "Вы когда-нибудь пробовали суши?", "Ты когда-либо пробовал суши?", "Вы когда-либо пробовали суши?",
-        "Ты когда-нибудь ел суши?", "Вы когда-нибудь ели суши?", "Пробовал ли ты когда-нибудь суши?",
-        "Пробовали ли вы когда-нибудь суши?", "Ты когда-нибудь пробовала суши?"
+    { en: "Have you ever tried sushi ?", ru: "Ты когда-нибудь пробовал суши ?", altRu: [
+        "Вы когда-нибудь пробовали суши ?", "Ты когда-либо пробовал суши ?", "Вы когда-либо пробовали суши ?",
+        "Ты когда-нибудь ел суши ?", "Вы когда-нибудь ели суши ?", "Пробовал ли ты когда-нибудь суши ?",
+        "Пробовали ли вы когда-нибудь суши ?", "Ты когда-нибудь пробовала суши ?"
     ], altEn: [
-        "Have you ever tried sushi before?", "Have you ever eaten sushi?", "Did you ever try sushi?",
-        "Have you at any time tried sushi?", "Ever tried sushi?"
+        "Have you ever tried sushi before ?", "Have you ever eaten sushi ?", "Did you ever try sushi ?",
+        "Have you at any time tried sushi ?", "Ever tried sushi ?"
     ] },
     { en: "I was watching TV when the phone rang.", ru: "Когда зазвонил телефон, я смотрел телевизор.", altRu: [
         "Я смотрел телевизор, когда зазвонил телефон.", "Телефон зазвонил, когда я смотрел телевизор.",
@@ -85,13 +85,13 @@ const B1B2_SENTENCES = [
         "I am planning to study English at university.", "I intend to study English at university.",
         "At university, I'm going to study English."
     ] },
-    { en: "Look at those clouds! It's going to rain.", ru: "Посмотри на эти тучи! Будет дождь.", altRu: [
-        "Посмотри на эти облака! Сейчас пойдёт дождь.", "Взгляни на эти тучи! Будет дождь.", "Посмотрите на эти тучи! Пойдёт дождь.",
-        "Глянь на эти тучи! Дождь собирается.", "Посмотри на те тучи! Сейчас начнётся дождь.", "Взгляни на эти облака! Дождик будет."
+    { en: "Look at those clouds ! It's going to rain.", ru: "Посмотри на эти тучи ! Будет дождь.", altRu: [
+        "Посмотри на эти облака ! Сейчас пойдёт дождь.", "Взгляни на эти тучи ! Будет дождь.", "Посмотрите на эти тучи ! Пойдёт дождь.",
+        "Глянь на эти тучи ! Дождь собирается.", "Посмотри на те тучи ! Сейчас начнётся дождь.", "Взгляни на эти облака ! Дождик будет."
     ], altEn: [
-        "Look at those clouds! It is going to rain.", "Look at those clouds! It's about to rain.",
-        "Look at that sky! It's going to rain.", "Look at those clouds. Rain is coming.",
-        "Look at those clouds! It's going to start raining."
+        "Look at those clouds ! It is going to rain.", "Look at those clouds ! It's about to rain.",
+        "Look at that sky ! It's going to rain.", "Look at those clouds. Rain is coming.",
+        "Look at those clouds ! It's going to start raining."
     ] },
     { en: "I'll call you as soon as I arrive.", ru: "Я позвоню тебе, как только приеду.", altRu: [
         "Я позвоню вам, как только приеду.", "Я сразу же позвоню тебе, как доеду.", "Как только доберусь, я тебе позвоню.",
@@ -270,13 +270,13 @@ const B1B2_SENTENCES = [
         "This evening at six I'm meeting my friends.", "I'm seeing my friends at six this evening.",
         "I have a meeting with my friends at six this evening."
     ] },
-    { en: "What were you doing at eight o'clock last night?", ru: "Что ты делал вчера в восемь вечера?", altRu: [
-        "Что вы делали вчера в восемь вечера?", "Что ты делал вчера в восемь часов?", "Чем ты занимался вчера вечером в восемь?",
-        "Что ты делал в восемь часов прошлым вечером?", "Чем вы занимались вчера в восемь вечера?", "Что ты делал прошлым вечером в восемь?"
+    { en: "What were you doing at eight o'clock last night ?", ru: "Что ты делал вчера в восемь вечера ?", altRu: [
+        "Что вы делали вчера в восемь вечера ?", "Что ты делал вчера в восемь часов ?", "Чем ты занимался вчера вечером в восемь ?",
+        "Что ты делал в восемь часов прошлым вечером ?", "Чем вы занимались вчера в восемь вечера ?", "Что ты делал прошлым вечером в восемь ?"
     ], altEn: [
-        "What were you doing at 8 o'clock last night?", "What were you doing at eight last evening?",
-        "What were you up to at eight o'clock last night?", "At 8 pm last night, what were you doing?",
-        "What were you doing yesterday evening at eight?"
+        "What were you doing at 8 o'clock last night ?", "What were you doing at eight last evening ?",
+        "What were you up to at eight o'clock last night ?", "At 8 pm last night, what were you doing ?",
+        "What were you doing yesterday evening at eight ?"
     ] },
     { en: "If you don't hurry, you will miss the train.", ru: "Если ты не поторопишься, ты опоздаешь на поезд.", altRu: [
         "Если вы не поторопитесь, вы опоздаете на поезд.", "Если не поторопишься, поезд уйдёт без тебя.", "Если ты не поспешишь, ты пропустишь поезд.",

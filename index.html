@@ -65,7 +65,10 @@
     </script>
 
     <!-- Шрифты: только локальный Nihon Zeno Plush из UI/*.ttf -->
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="favicon-128.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
 
     
 
@@ -772,10 +775,12 @@
 
                 <div class="setting-item">
                     <label for="uw-note">Заметка</label>
-                    <input type="text" id="uw-note" placeholder="пример или заметка" autocomplete="off">
+                    <input type="text" id="uw-note" placeholder="пример или заметка" maxlength="120" autocomplete="off">
                 </div>
 
                 <button class="check-btn uw-add-btn" onclick="addUserWord()"><img class="ico-png" src="UI/ICON/CHELCPLUSOM.webp" alt=""> Добавить слово</button>
+
+                <div id="uw-cap-line"></div>
             </div>
 
             <div class="uw-search-box">
@@ -1167,9 +1172,9 @@
 
 <script src="data/lessons/b1-b2/tests/test-reported-speech.js?v=20260941"></script>
 
-<script src="data/ja/tests/ja-tests-a1a2.js?v=20261115"></script>
+<script src="data/ja/tests/ja-tests-a1a2.js?v=20261116"></script>
 
-<script src="data/ja/tests/ja-tests-b1b2.js?v=20261115"></script>
+<script src="data/ja/tests/ja-tests-b1b2.js?v=20261116"></script>
 
 <script src="data/ja/a1-a2/words/other.js?v=20261024"></script>
 
@@ -1213,7 +1218,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.innerWidth <= MIN_W) {
-            document.write('<script src="script.js?v=20261164"><\/script>');
+            document.write('<script src="script.js?v=20261167"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');

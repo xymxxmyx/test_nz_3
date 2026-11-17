@@ -40,16 +40,16 @@ window.A1A2_TESTS["to-be"] = {
             why: "Отрицание с is — is not / isn't: He isn't a teacher."
         },
         {
-            q: "___ you hungry?",
+            q: "___ you hungry ?",
             options: ["Is", "Am", "Are", "Does"],
             correct: 2,
-            why: "В вопросе с you форма are уходит на первое место: Are you hungry?"
+            why: "В вопросе с you форма are уходит на первое место: Are you hungry ?"
         },
         {
-            q: "___ she happy?",
+            q: "___ she happy ?",
             options: ["Is", "Am", "Are", "Do"],
             correct: 0,
-            why: "В вопросе с she форма is на первом месте: Is she happy?"
+            why: "В вопросе с she форма is на первом месте: Is she happy ?"
         },
         {
             q: "I ___ tired. (я не устал)",

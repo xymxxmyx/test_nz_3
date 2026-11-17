@@ -16,7 +16,7 @@ window.B1B2_TESTS["present-perfect"] = {
             why: "С she используем has + третья форма: She has finished."
         },
         {
-            q: "Have you ever ___ to Japan?",
+            q: "Have you ever ___ to Japan ?",
             options: ["been", "gone", "being", "was"],
             correct: 0,
             why: "Вопрос об опыте: Have you ever been to ...? (быть = be → been)."
@@ -28,7 +28,7 @@ window.B1B2_TESTS["present-perfect"] = {
             why: "just ставится перед третьей формой: I have just found my keys."
         },
         {
-            q: "___ you done your homework yet?",
+            q: "___ you done your homework yet ?",
             options: ["Has", "Have", "Do", "Did"],
             correct: 1,
             why: "В вопросе с you — have: Have you done ...? (yet стоит в конце)."

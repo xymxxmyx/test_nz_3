@@ -10,13 +10,13 @@ window.A1A2_TESTS["pronouns"] = {
             why: "Его — his: This is his dog."
         },
         {
-            q: "Каким личным местоимением заменим «Mary»?",
+            q: "Каким личным местоимением заменим «Mary» ?",
             options: ["he", "she", "it", "they"],
             correct: 1,
             why: "Mary — это женщина, поэтому she."
         },
         {
-            q: "Каким местоимением заменим «you and me»?",
+            q: "Каким местоимением заменим «you and me» ?",
             options: ["they", "we", "you", "it"],
             correct: 1,
             why: "Я + ты = мы, поэтому we."
@@ -28,7 +28,7 @@ window.A1A2_TESTS["pronouns"] = {
             why: "Том — мужчина, его зовут Tom: His name is Tom."
         },
         {
-            q: "Какое притяжательное местоимение у «we»?",
+            q: "Какое притяжательное местоимение у «we» ?",
             options: ["their", "your", "our", "his"],
             correct: 2,
             why: "we → our (наш): our house."
@@ -46,13 +46,13 @@ window.A1A2_TESTS["pronouns"] = {
             why: "Анна — женщина, её имя: Her name is Anna."
         },
         {
-            q: "Каким местоимением назовём предмет «the book»?",
+            q: "Каким местоимением назовём предмет «the book» ?",
             options: ["he", "she", "it", "they"],
             correct: 2,
             why: "Предметы и вещи — it: It is a book."
         },
         {
-            q: "Как перевести «ты и вы» в английском?",
+            q: "Как перевести «ты и вы» в английском ?",
             options: ["thou и you", "you и you (одно слово)", "you и yours", "тебя нет в английском"],
             correct: 1,
             why: "В английском you значит и «ты», и «вы» — одно слово."

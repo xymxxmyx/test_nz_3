@@ -11,9 +11,9 @@ window.A1A2_TESTS["can-must"] = {
         },
         {
             q: "Выберите правильный вопрос: «Ты умеешь плавать?»",
-            options: ["You can swim?", "Can you swim?", "Do you can swim?", "Can swim you?"],
+            options: ["You can swim ?", "Can you swim ?", "Do you can swim ?", "Can swim you ?"],
             correct: 1,
-            why: "В вопросе can уходит на первое место: Can you swim?"
+            why: "В вопросе can уходит на первое место: Can you swim ?"
         },
         {
             q: "She ___ play chess.",
@@ -22,7 +22,7 @@ window.A1A2_TESTS["can-must"] = {
             why: "can не меняется по лицам и без to после себя: She can play chess."
         },
         {
-            q: "Как расшифровывается can't?",
+            q: "Как расшифровывается can't ?",
             options: ["can no", "cannot", "can go", "can't — does not can"],
             correct: 1,
             why: "can't — сокращение от cannot."
@@ -34,7 +34,7 @@ window.A1A2_TESTS["can-must"] = {
             why: "must + начальная форма глагола: You must wear a uniform."
         },
         {
-            q: "Что значит mustn't?",
+            q: "Что значит mustn't ?",
             options: ["не можешь", "не должен, запрещено", "может быть", "нужно"],
             correct: 1,
             why: "mustn't = must not — «нельзя, запрещено»."
@@ -47,12 +47,12 @@ window.A1A2_TESTS["can-must"] = {
         },
         {
             q: "Выберите правильный вопрос: «Мне идти?»",
-            options: ["Must I go?", "I must go?", "Do I must go?", "Must go I?"],
+            options: ["Must I go ?", "I must go ?", "Do I must go ?", "Must go I ?"],
             correct: 0,
-            why: "В вопросе must на первом месте: Must I go?"
+            why: "В вопросе must на первом месте: Must I go ?"
         },
         {
-            q: "He can swim very well. — Почему не «He can swims»?",
+            q: "He can swim very well. — Почему не «He can swims» ?",
             options: ["can всегда с начальной формой глагола", "-s не нужен после гласных", "swim — исключение", "в вопросах так нельзя"],
             correct: 0,
             why: "После модальных глаголов (can, must) глагол всегда в начальной форме: can swim."

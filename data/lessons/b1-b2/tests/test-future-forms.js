@@ -16,7 +16,7 @@ window.B1B2_TESTS["future-forms"] = {
             why: "План, принятый заранее, — be going to: We are going to buy a new car."
         },
         {
-            q: "Look at those clouds! It's ___ rain.",
+            q: "Look at those clouds ! It's ___ rain.",
             options: ["going to", "will be", "going", "goes to"],
             correct: 0,
             why: "Прогноз по увиденному — be going to: It's going to rain."
@@ -58,7 +58,7 @@ window.B1B2_TESTS["future-forms"] = {
             why: "Договорённость с указанным временем — Present Continuous: are meeting."
         },
         {
-            q: "— Why are you studying so hard?",
+            q: "— Why are you studying so hard ?",
             options: ["I'm going to take an exam next week.", "I'll take an exam next week.", "I take an exam next week.", "I'm taken an exam next week."],
             correct: 0,
             why: "Цель / план — be going to: I'm going to take an exam next week."

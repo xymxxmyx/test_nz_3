@@ -46,13 +46,13 @@ window.B1B2_TESTS["modal-deduction"] = {
             why: "Вывод по факту (есть яхта) — must: They must be very rich."
         },
         {
-            q: "It's green and talks! That ___ be a parrot.",
+            q: "It's green and talks ! That ___ be a parrot.",
             options: ["can't", "must", "mayn't", "would"],
             correct: 1,
             why: "Зелёное и говорит — уверенный вывод: That must be a parrot."
         },
         {
-            q: "— Where is Tom? — He ___ be in the kitchen. (возможно)",
+            q: "— Where is Tom ? — He ___ be in the kitchen. (возможно)",
             options: ["might", "must", "can't", "isn't"],
             correct: 0,
             why: "Неуверенное предположение — might: He might be in the kitchen."

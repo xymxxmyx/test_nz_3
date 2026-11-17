@@ -22,16 +22,16 @@ window.A1A2_TESTS["word-order"] = {
             why: "С I глагол без окончания: go."
         },
         {
-            q: "___ you have a car?",
+            q: "___ you have a car ?",
             options: ["Does", "Do", "Is", "Are"],
             correct: 1,
-            why: "В вопросе с you используем вспомогательный глагол do: Do you have a car?"
+            why: "В вопросе с you используем вспомогательный глагол do: Do you have a car ?"
         },
         {
-            q: "___ she like pizza?",
+            q: "___ she like pizza ?",
             options: ["Do", "Does", "Is", "Are"],
             correct: 1,
-            why: "С he / she / it в вопросе — does: Does she like pizza?"
+            why: "С he / she / it в вопросе — does: Does she like pizza ?"
         },
         {
             q: "He ___ tennis.",
@@ -46,22 +46,22 @@ window.A1A2_TESTS["word-order"] = {
             why: "С we глагол стоит без -s: play."
         },
         {
-            q: "Does he ___ English?",
+            q: "Does he ___ English ?",
             options: ["speak", "speaks", "speaking", "spoke"],
             correct: 0,
-            why: "После does глагол в начальной форме без -s: Does he speak English?"
+            why: "После does глагол в начальной форме без -s: Does he speak English ?"
         },
         {
-            q: "Где правильно стоит наречие частотности?",
+            q: "Где правильно стоит наречие частотности ?",
             options: ["I drink always tea.", "I always drink tea.", "Always I drink tea.", "I drink tea always in the morning."],
             correct: 1,
             why: "Наречия частотности (always) стоят перед основным глаголом: I always drink tea."
         },
         {
             q: "Выберите правильный вопрос: «Он работает в офисе?»",
-            options: ["He works in an office?", "Does he works in an office?", "Does he work in an office?", "Do he work in an office?"],
+            options: ["He works in an office ?", "Does he works in an office ?", "Does he work in an office ?", "Do he work in an office ?"],
             correct: 2,
-            why: "Вопрос с he: Does + подлежащее + начальная форма глагола: Does he work in an office?"
+            why: "Вопрос с he: Does + подлежащее + начальная форма глагола: Does he work in an office ?"
         }
     ]
 };
