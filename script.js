@@ -826,10 +826,9 @@ const CloudSync = (() => {
 
     let bootDone = false;
     let ready = false;
-    async function boot(hasLocal) {
+    async function runBoot(hasLocal) {
         if (bootDone) return;
         bootDone = true;
-        if (!cloudOK()) return;
         try {
             const remote = await readAll();
             const localTs = Number(state.savedAt) || 0;
@@ -855,6 +854,20 @@ const CloudSync = (() => {
             // при равенстве — облако уже записано этим же сохранением
         } catch (e) {}
         ready = true;
+    }
+    // telegram-web-app.js подключается async в head и на медленной сети может
+    // появиться ПОЗЖЕ script.js: boot раньше «сгорал» здесь навсегда
+    // (bootDone=true без retry) — синхронизация не работала до перезапуска
+    // приложения. Теперь ждём SDK до ~20 с и бустим boot, когда он появился.
+    function boot(hasLocal) {
+        if (bootDone) return;
+        if (cloudOK()) { runBoot(hasLocal); return; }
+        let tries = 0;
+        const iv = setInterval(() => {
+            if (bootDone) { clearInterval(iv); return; }
+            if (cloudOK()) { clearInterval(iv); runBoot(hasLocal); return; }
+            if (++tries >= 40) { clearInterval(iv); bootDone = true; }
+        }, 500);
     }
 
     // Полная очистка облака (полный сброс данных): пишем пустой конверт со

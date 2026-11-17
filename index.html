@@ -1218,7 +1218,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.innerWidth <= MIN_W) {
-            document.write('<script src="script.js?v=20261167"><\/script>');
+            document.write('<script src="script.js?v=20261168"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');
@@ -1279,7 +1279,7 @@
         show();
         window.addEventListener('load', show);
         // boot облака асинхронный — обновляем бейдж, пока статус не устаканится
-        [1500, 3000, 6000].forEach(function (d) { setTimeout(show, d); });
+        [1500, 3000, 6000, 10500, 16000, 22000].forEach(function (d) { setTimeout(show, d); });
     })();
     </script>
 
