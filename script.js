@@ -1448,8 +1448,28 @@ let dictBuildToken = 0;
     // расчёты — отступы рамки, --ui-fit, подложка — идут от «сцены», а не окна.
     const PHONE_STAGE_W = 420;
     const PHONE_STAGE_H = 940;
+    // Клавиатура сжимает innerHeight/dvh — держим сцену прежней высоты,
+    // пока клавиатура открыта, и возвращаем нормальный режим после её закрытия.
+    let stableVH = window.innerHeight;
+    let kbOpen = false;
+    try {
+        if (window.visualViewport) {
+            const vv = window.visualViewport;
+            const onVV = () => {
+                const h = vv.height || window.innerHeight;
+                const next = h < stableVH - 120;
+                if (next === kbOpen) return;
+                kbOpen = next;
+                if (!kbOpen) stableVH = window.innerHeight;
+                try { document.body.classList.toggle("kb-open", kbOpen); } catch (e) {}
+                try { if (window.__schedulePinFrame) window.__schedulePinFrame(); } catch (e) {}
+            };
+            vv.addEventListener("resize", onVV);
+        }
+    } catch (e) {}
+    window.addEventListener("resize", () => { if (!kbOpen) stableVH = window.innerHeight; });
     function stageRect() {
-        const iw = window.innerWidth, ih = window.innerHeight;
+        const iw = window.innerWidth, ih = kbOpen ? stableVH : window.innerHeight;
         // Фулскрин Telegram: плавающие кнопки («Закрыть», «∨ ⋮») и системные
         // полосы перекрывают края окна — сцена строится в оставшемся проёме.
         // На ПК и без Telegram оверлеи нулевые — поведение прежнее.
@@ -1674,7 +1694,8 @@ document.documentElement.style.setProperty('--ui-scale', String(k));
             if (bootBackdrop) {
                 // Фон и рамку для интро уже поставил __bootBackdrop:
                 // не трогаем их, только пересчитываем геометрию при ресайзе.
-                if (Math.abs(window.innerWidth - pinLast.w) > 1 || Math.abs(window.innerHeight - pinLast.h) > 1) placeFrame();
+                const curH = kbOpen ? stableVH : window.innerHeight;
+                if (Math.abs(window.innerWidth - pinLast.w) > 1 || Math.abs(curH - pinLast.h) > 1) placeFrame();
                 return;
             }
             topFrame.style.display = "none"; setBg(false); pinLast = { l: 0, t: 0, w: 0, h: 0 }; return;
@@ -1702,7 +1723,7 @@ document.documentElement.style.setProperty('--ui-scale', String(k));
             requestAnimationFrame(track);
             if (!topFrame || !document.body.contains(topFrame)) return;
             if (topFrame.style.display === "none") return;
-            const bx = window.innerWidth, by = window.innerHeight;
+            const bx = window.innerWidth, by = kbOpen ? stableVH : window.innerHeight;
             if (Math.abs(bx - pinLast.w) > 1 || Math.abs(by - pinLast.h) > 1) {
                 pin(currentScreen);
             }
