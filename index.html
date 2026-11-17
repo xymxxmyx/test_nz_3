@@ -1265,10 +1265,14 @@
             var jv = s ? (s.src.match(/v=([^&]+)/) || [, '?'])[1] : 'нет';
             var txt = 'CSS ' + v + ' | JS ' + jv;
             try {
-                var cs = window.CloudSync;
+                var cs = (typeof CloudSync !== 'undefined') ? CloudSync : null;
                 if (cs && cs.isCloud && cs.isCloud()) {
                     txt += (cs.booted && cs.booted()) ? ' | облако ✓' : ' | облако…';
-                } else txt += ' | облако: нет';
+                } else {
+                    var app = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+                    var why = !app ? 'вне TG' : (!app.CloudStorage || typeof app.CloudStorage.setItem !== 'function') ? 'нет CS' : 'tg ' + app.version;
+                    txt += ' | облако: нет (' + why + ')';
+                }
             } catch (e) { txt += ' | облако: ?'; }
             t.textContent = txt;
         }
