@@ -226,24 +226,9 @@ function renderUserWordsList() {
         return;
     }
     visible.slice().reverse().forEach((w, idx) => {
-        const tw = tgt(w);
-        const isLearned = state.learnedWords.includes(tw);
-        const isFav = state.favoriteWords.includes(tw);
         const item = document.createElement("div");
-        item.className = "dict-item user-word-item" + (isLearned ? " learned" : " unlearned");
+        item.className = "dict-item user-word-item";
         item.style.animationDelay = (Math.min(idx * 0.02, 0.5)) + "s";
-
-        //Та же структура, что у карточки словаря: динамик, звезда, слово+перевод, сердечко
-        const speakLang = (w.lang === "ja") ? "ja" : "en";
-        item.appendChild(makeSpeakBtn(w.en, speakLang));
-
-        const favBtn = document.createElement("button");
-        favBtn.type = "button";
-        favBtn.className = "fav-btn dict-fav" + (isFav ? " is-fav" : "");
-        favBtn.setAttribute("aria-label", "В избранное");
-        favBtn.addEventListener("click", () => { Sound.click(); toggleFav(tw); renderUserWordsList(); });
-        item.appendChild(favBtn);
-
         const front = document.createElement("div");
         front.className = "dict-front uw-main";
         const wordSpan = document.createElement("span");
@@ -265,11 +250,6 @@ function renderUserWordsList() {
         badge.textContent = (USER_LVL_LABELS[w.lvl] || w.lvl) + " · " + (USER_POS_LABELS[w.pos] || w.pos);
         front.appendChild(badge);
         item.appendChild(front);
-
-        const status = document.createElement("span");
-        status.className = "dict-status";
-        status.textContent = isLearned ? "♥" : "○";
-        item.appendChild(status);
 
         const del = document.createElement("button");
         del.type = "button";
