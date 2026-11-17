@@ -9163,41 +9163,38 @@ body[data-theme="plush"] #user-words-screen .uw-form .setting-item {
 body[data-theme="plush"] #user-words-screen .setting-item label {
     flex: 0 0 auto;
 }
+/* Поля «Моих слов» — такие же оранжевые кнопки, как контролы в Настройках
+   и как .fs-btn (UI/Vipad_osnova.webp), со светлым текстом. */
 body[data-theme="plush"] #user-words-screen .setting-item input[type="text"] {
     box-sizing: border-box;
     flex: 1 1 auto;
     width: auto;
     max-width: none;
-    min-width: 0;
     height: calc(28px * var(--ui-fit, 1));
+    min-width: calc(96px * var(--ui-fit, 1));
     margin: 0;
-    padding: 0 calc(6px * var(--ui-fit, 1));
+    padding: 0 calc(12px * var(--ui-fit, 1));
     border: 0;
-    border-image: none;
-    border-radius: calc(6px * var(--ui-fit, 1));
-    background: rgba(255, 246, 235, 0.14);
-    color: #2a0614;
-    caret-color: #2a0614;
+    border-radius: 0;
+    background: transparent url("UI/Vipad_osnova.webp") no-repeat center / 100% 100%;
+    color: #ffe4f2;
+    caret-color: #ffe4f2;
     font-family: inherit;
-    font-size: max(11px, calc(12px * var(--ui-fit, 1)));
+    font-size: calc(11px * var(--ui-fit, 1));
     line-height: 1.2;
     text-align: left;
+    text-shadow: 0 1px 3px rgba(25, 5, 45, 0.9);
     outline: none;
     box-shadow: none;
-    filter: none;
+    filter: drop-shadow(0 calc(3px * var(--ui-fit, 1)) calc(7px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.6));
 }
 body[data-theme="plush"] #user-words-screen .setting-item input[type="text"]::placeholder {
-    color: rgba(61, 10, 30, 0.58);
-    opacity: 1;
+    color: #d9b8cf;
+    opacity: 0.92;
 }
 body[data-theme="plush"] #user-words-screen .setting-item input[type="text"]:focus {
-    background: transparent;
+    filter: brightness(1.12) drop-shadow(0 calc(3px * var(--ui-fit, 1)) calc(7px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.6));
     box-shadow: none;
-}
-
-body[data-theme="plush"] #user-words-screen .setting-item:has(> input[type="text"]) input[type="text"] {
-    background: transparent;
-    border-radius: calc(6px * var(--ui-fit, 1));
 }
 body[data-theme="plush"] #user-words-screen .uw-form .uw-add-btn {
     width: 100%;
