@@ -1478,10 +1478,12 @@ let dictBuildToken = 0;
             return;
         }
         kbOpen = next;
+        try { window.__nzKbOpen = kbOpen; } catch (e) {}
         if (!kbOpen) stableVH = ih;
         applyVhVar();
+        // НЕ вызываем pin() при смене клавиатуры: он переставляет рамку.
+        // Позиция и размер остаются ровно теми, что были до её появления.
         try { document.body.classList.toggle("kb-open", kbOpen); } catch (e) {}
-        try { if (window.__schedulePinFrame) window.__schedulePinFrame(); } catch (e) {}
     }
     applyVhVar();
     window.addEventListener("resize", checkKeyboard);
@@ -1944,6 +1946,9 @@ const TG = (() => {
                 // проёме — рамка начинается ниже кнопок, а не под ними.
                 try {
                     const readTgInsets = function () {
+                        // Telegram шлёт viewportChanged при открытии клавиатуры —
+                        // не трогаем геометрию сцены, иначе рамка сдвигается.
+                        if (window.__nzKbOpen) return;
                         const sa = app.safeAreaInset || {};
                         const csa = app.contentSafeAreaInset || {};
                         const top = Math.max(0, sa.top || 0) + Math.max(0, csa.top || 0);
