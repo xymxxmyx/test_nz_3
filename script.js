@@ -7709,6 +7709,23 @@ function restartLessonsTest() {
         setTimeout(finish, 2500);
     }
 
+    // Картинки плашек и первого экрана догружаем ПОСЛЕ старта интерфейса:
+    // preload в <head> отбирал полосу у CSS/JS, и обе версии стали грузиться дольше.
+    let deferredPreloaded = false;
+    function deferPreloadImages() {
+        if (deferredPreloaded) return;
+        deferredPreloaded = true;
+        let ran = false;
+        const run = () => {
+            if (ran) return;
+            ran = true;
+            const paths = ["UI/BG_PIC.webp?v=blob3", "UI/main-frame-v3.webp?v=frame5", "MASKOT/LOGO.webp", "MASKOT/MASKOT_18_cut.webp", "UI/extracted/activ_bottom.webp", "UI/extracted/bottom_trim.webp", "UI/Vipad_osnova.webp", "UI/ICON/MEDAL.webp", "UI/ICON/ZAMOK.webp", "UI/ICON/STAR.webp", "UI/ICON/TARGET.webp", "UI/ICON/FIRE.webp", "UI/ICON/DIAMOND.webp", "UI/ICON/KNIGA_BLUE.webp", "UI/ICON/MOLNIA.webp", "UI/ICON/GROMOFON'.webp", "UI/ICON/KUBOK.webp", "UI/ICON/KOLOKOL.webp", "UI/ICON/DEKA.webp", "UI/ICON/GALKA.webp", "UI/ICON/LAMPA.webp", "UI/ICON/PALEC.webp", "UI/ICON/TRASH.webp", "UI/ICON/RECYCLE.webp", "UI/ICON/PALITRA.webp"];
+            paths.forEach(p => { try { const im = new Image(); im.src = p; } catch (e) {} });
+        };
+        if (document.readyState === "complete") run();
+        else { window.addEventListener("load", run, { once: true }); setTimeout(run, 2500); }
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
         const hasData = loadData();
         try { CloudSync.boot(hasData); } catch (e) {}
@@ -7737,6 +7754,7 @@ function restartLessonsTest() {
         // Интро играет при каждой загрузке приложения; по окончании или по тапу
         // переходим в меню. Если видео недоступно — входим без ожидания.
         playBootIntro(enter);
+        deferPreloadImages();
 
     refreshUserWords();
 
