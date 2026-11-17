@@ -9034,7 +9034,9 @@ body[data-theme="plush"] #dictionary-screen.active {
    поверх рамки — там feather остаётся только у внутренних списков. */
 /* #game-screen исключён: сердечки выведены за край своей области
    (bottom:100%), а маск делает всё за краем экрана прозрачным. */
-body[data-theme="plush"] .screen.active:not(#welcome-screen):not(#main-menu):not(#progress-screen):not(#game-screen),
+/* Мои слова исключены: там маск висит и на экране, и на списке —
+   двойное затухание гасит текст карточек. Оставляем только внутренний список. */
+body[data-theme="plush"] .screen.active:not(#welcome-screen):not(#main-menu):not(#progress-screen):not(#game-screen):not(#user-words-screen),
 body[data-theme="plush"] .updates-panel,
 body[data-theme="plush"] .fs-modal {
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 20px, #000 calc(100% - 28px), transparent);
@@ -11317,4 +11319,48 @@ body[data-theme="plush"] #battle-area .player-zone .option-card {
     max-height: none !important;
     overflow: visible !important;
     overflow-y: visible !important;
+}
+
+
+/* === МОИ СЛОВА: карточки своего слова ===
+   У .dict-item жёсткий aspect-ratio 2100/571 (две строки словаря). У своего
+   слова строк до четырёх — текст вылезал за плашку и обрезался. Даём своей
+   карточке собственную высоту по содержимому и мягкое переполнение. */
+body[data-theme="plush"] #user-words-screen .user-word-item {
+    aspect-ratio: auto !important;
+    min-height: calc(78px * var(--ui-fit, 1));
+    height: auto;
+    padding: calc(11px * var(--ui-fit, 1)) 4%;
+    box-sizing: border-box;
+    overflow: hidden;
+    contain: none;
+    content-visibility: visible;
+}
+body[data-theme="plush"] #user-words-screen .user-word-item .uw-main {
+    min-width: 0;
+    overflow: hidden;
+}
+body[data-theme="plush"] #user-words-screen .user-word-item .dict-word-uw,
+body[data-theme="plush"] #user-words-screen .user-word-item .uw-ru,
+body[data-theme="plush"] #user-words-screen .user-word-item .uw-note,
+body[data-theme="plush"] #user-words-screen .user-word-item .uw-badges {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+body[data-theme="plush"] #user-words-screen .user-word-item .dict-del {
+    flex: 0 0 auto;
+    width: calc(32px * var(--ui-fit, 1));
+    height: calc(32px * var(--ui-fit, 1));
+}
+/* Больше воздуха между карточками */
+body[data-theme="plush"] #user-words-screen .user-words-list {
+    gap: calc(14px * var(--ui-fit, 1));
+    padding: 4px 2px 10px;
+}
+/* Внутренний маск списка делаем почти незаметным, чтобы не гасить текст */
+body[data-theme="plush"] #user-words-screen .user-words-list {
+    -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 14px), transparent 100%) !important;
+    mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 14px), transparent 100%) !important;
 }
