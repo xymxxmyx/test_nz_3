@@ -11256,3 +11256,26 @@ body[data-theme="plush"] #input-area .hearts {
     justify-content: center;
     margin: calc(6px * var(--ui-fit, 1)) 0 calc(8px * var(--ui-fit, 1));
 }
+
+
+/* Иконки не должны вылезать за «подушку» кнопки: фон кнопки — картинка
+   с прозрачными полями внутри прямоугольного бокса, поэтому крупная иконка
+   оказывается выше видимой кромки. Ограничиваем относительно высоты кнопки. */
+body[data-theme="plush"] #mode-screen .menu-btn img.menu-ic,
+body[data-theme="plush"] #submode-screen .menu-btn img.menu-ic,
+body[data-theme="plush"] #category-screen .menu-btn img.menu-ic,
+body[data-theme="plush"] #level-screen .menu-btn img.menu-ic {
+    width: calc(var(--btn-h, 44px) * 0.42);
+    height: calc(var(--btn-h, 44px) * 0.42);
+    min-width: 0;
+    min-height: 0;
+    max-width: 22px;
+    max-height: 22px;
+    margin: 0;
+}
+body[data-theme="plush"] #mode-screen .menu-ic,
+body[data-theme="plush"] #submode-screen .menu-ic,
+body[data-theme="plush"] #category-screen .menu-ic,
+body[data-theme="plush"] #level-screen .menu-ic {
+    filter: drop-shadow(0 1px 2px rgba(24, 2, 40, 0.7));
+}
