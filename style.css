@@ -11437,3 +11437,52 @@ body[data-theme="plush"] #user-words-screen .user-word-item .uw-badges {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+
+/* === ТЕЛЕФОН: «Мои слова» — подпись НАД полем, как на скриншоте,
+   поле — оранжевая плашка, текст и плейсхолдер светлые, по центру. === */
+body.tg-mini-app[data-theme="plush"] #user-words-screen .uw-form .setting-item {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 2px;
+    padding: calc(8px * var(--ui-fit, 1)) calc(14px * var(--ui-fit, 1));
+    background: transparent url("UI/Plashka_nastroiki_fit.webp") no-repeat center / 100% 100%;
+}
+body.tg-mini-app[data-theme="plush"] #user-words-screen .setting-item label {
+    flex: 0 0 auto;
+    color: #3d0a1e;
+    font-size: calc(11px * var(--ui-fit, 1));
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+body.tg-mini-app[data-theme="plush"] #user-words-screen .setting-item input[type="text"] {
+    flex: 0 0 auto;
+    height: calc(26px * var(--ui-fit, 1));
+    min-width: 0;
+    width: 100%;
+    padding: 0 calc(8px * var(--ui-fit, 1));
+    text-align: left;
+    color: #3d0a1e;
+    caret-color: #3d0a1e;
+    background: rgba(255, 246, 235, 0.5);
+    border-radius: calc(5px * var(--ui-fit, 1));
+}
+body.tg-mini-app[data-theme="plush"] #user-words-screen .setting-item input[type="text"]::placeholder {
+    color: rgba(61, 10, 30, 0.62);
+    opacity: 1;
+}
+body.tg-mini-app[data-theme="plush"] #user-words-screen .setting-item input[type="text"]:focus {
+    background: rgba(255, 246, 235, 0.62);
+}
+/* Счётчик облака и поиск — тоже оранжевые плашки, текст по центру */
+body.tg-mini-app[data-theme="plush"] #uw-cap-line {
+    color: #3d0a1e !important;
+    font-size: calc(11px * var(--ui-fit, 1)) !important;
+    text-align: center !important;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.25);
+    margin: calc(6px * var(--ui-fit, 1)) 0 !important;
+}
