@@ -1218,7 +1218,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.innerWidth <= MIN_W) {
-            document.write('<script src="script.js?v=20261168"><\/script>');
+            document.write('<script src="script.js?v=20261169"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');
@@ -1268,6 +1268,8 @@
                 var cs = (typeof CloudSync !== 'undefined') ? CloudSync : null;
                 if (cs && cs.isCloud && cs.isCloud()) {
                     txt += (cs.booted && cs.booted()) ? ' | облако ✓' : ' | облако…';
+                    var bi = (cs.bootInfo && cs.bootInfo()) || '';
+                    if (bi) txt += ' · ' + bi;
                 } else {
                     var app = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
                     var why = !app ? 'вне TG' : (!app.CloudStorage || typeof app.CloudStorage.setItem !== 'function') ? 'нет CS' : 'tg ' + app.version;

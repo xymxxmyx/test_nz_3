@@ -720,7 +720,7 @@ const CloudSync = (() => {
         pendingEnv = null;
         if (flushTimer) { clearTimeout(flushTimer); flushTimer = null; }
         if (!env || !cloudOK()) return;
-        try { await writeAll(env); } catch (e) {}
+        try { writeOk = await writeAll(env); if (!writeOk) bootInfo = "ошибка записи"; } catch (e) { bootInfo = "ошибка записи"; }
     }
 
     async function readAll() {
@@ -826,6 +826,8 @@ const CloudSync = (() => {
 
     let bootDone = false;
     let ready = false;
+    let bootInfo = ""; // что сделал boot: из облака / отправка в облако / пусто / ошибка
+    let writeOk = null;
     async function runBoot(hasLocal) {
         if (bootDone) return;
         bootDone = true;
@@ -842,17 +844,20 @@ const CloudSync = (() => {
                         Object.keys(state.history || {}).length > 0 ||
                         (Number(state.xp) || 0) > 0 || (Number(state.score) || 0) > 0 ||
                         (USER_WORDS && USER_WORDS.length > 0);
-                    if (hasAny) { pendingEnv = pack(); flushSave(); }
-                }
+                    if (hasAny) { pendingEnv = pack(); flushSave(); bootInfo = "отправка в облако"; }
+                    else bootInfo = "облако пусто";
+                } else bootInfo = "нет данных";
             } else if (remoteTs > localTs) {
                 applyRemote(remote);
+                bootInfo = "из облака";
             } else if (remoteTs < localTs && hasLocal) {
                 // локальное свежее (играли офлайн) — выталкиваем его в облако
                 pendingEnv = pack();
                 flushSave();
-            }
+                bootInfo = "локаль новее";
+            } else bootInfo = "актуально";
             // при равенстве — облако уже записано этим же сохранением
-        } catch (e) {}
+        } catch (e) { bootInfo = "ошибка применения"; }
         ready = true;
     }
     // telegram-web-app.js подключается async в head и на медленной сети может
@@ -862,11 +867,12 @@ const CloudSync = (() => {
     function boot(hasLocal) {
         if (bootDone) return;
         if (cloudOK()) { runBoot(hasLocal); return; }
+        bootInfo = "ждёт SDK";
         let tries = 0;
         const iv = setInterval(() => {
             if (bootDone) { clearInterval(iv); return; }
             if (cloudOK()) { clearInterval(iv); runBoot(hasLocal); return; }
-            if (++tries >= 40) { clearInterval(iv); bootDone = true; }
+            if (++tries >= 40) { clearInterval(iv); bootDone = true; bootInfo = "SDK не появился"; }
         }, 500);
     }
 
@@ -955,6 +961,7 @@ const CloudSync = (() => {
         updateUwCapLine: updateUwCapLine,
         isCloud: cloudOK,
         booted: () => ready,
+        bootInfo: () => bootInfo,
         capLineSent: () => lastSyncSent,
         capFlags: () => CAP_TOASTED,
         // тест-хук: повторный прогон boot-логики в той же странице
