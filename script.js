@@ -7787,6 +7787,24 @@ function restartLessonsTest() {
         }
     });
 
+    // Мобильный чит-код: 5 тапов по 日本語 + 3 тапа по EN подряд.
+    // Как и клавиатурный, хранится XOR-маской, а не открытой последовательностью.
+    const _mk = 13;
+    const _ms = "GGGGGHHH"; // "JJJJJEEE" ^ 13
+    const _mt = _ms.replace(/./g, ch => String.fromCharCode(ch.charCodeAt(0) ^ _mk));
+    let tapCheatBuf = "";
+    document.addEventListener("click", (e) => {
+        const pick = e.target && e.target.closest
+            ? e.target.closest("#lang-pick-ja, #lang-pick-en") : null;
+        if (!pick || currentScreen !== "main-menu") { tapCheatBuf = ""; return; }
+        tapCheatBuf += pick.id === "lang-pick-ja" ? "J" : "E";
+        if (tapCheatBuf.length > _mt.length) tapCheatBuf = tapCheatBuf.slice(-_mt.length);
+        if (tapCheatBuf === _mt) {
+            tapCheatBuf = "";
+            cheatMaxProgress();
+        }
+    }, true);
+
     document.getElementById("player-name").addEventListener("keydown", (e) => {
         if (e.repeat) return;
         if (e.key === "Enter") startGame();
