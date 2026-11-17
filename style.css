@@ -11500,6 +11500,6 @@ body[data-theme="plush"] #user-words-screen .user-word-item .dict-del {
 body[data-theme="plush"] #user-words-screen .user-words-list {
     gap: calc(10px * var(--ui-fit, 1));
     padding: 0;
-    -webkit-mask-image: none !important;
-    mask-image: none !important;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 26px), transparent 100%) !important;
+    mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 26px), transparent 100%) !important;
 }
