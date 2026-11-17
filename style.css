@@ -11323,20 +11323,6 @@ body[data-theme="plush"] #battle-area .player-zone .option-card {
 }
 
 
-/* === МОИ СЛОВА: карточки своего слова ===
-   У .dict-item жёсткий aspect-ratio 2100/571 (две строки словаря). У своего
-   слова строк до четырёх — текст вылезал за плашку и обрезался. Даём своей
-   карточке собственную высоту по содержимому и мягкое переполнение. */
-body[data-theme="plush"] #user-words-screen .user-word-item {
-    aspect-ratio: auto !important;
-    min-height: calc(78px * var(--ui-fit, 1));
-    height: auto;
-    padding: calc(11px * var(--ui-fit, 1)) 4%;
-    box-sizing: border-box;
-    overflow: hidden;
-    contain: none;
-    content-visibility: visible;
-}
 body[data-theme="plush"] #user-words-screen .user-word-item .uw-main {
     min-width: 0;
     overflow: hidden;
@@ -11367,19 +11353,6 @@ body[data-theme="plush"] #user-words-screen .user-words-list {
 }
 
 
-/* Карточка своего слова — как у словаря: иконки по краям, центр гибкий,
-   кастомная высота (был жёсткий aspect-ratio словаря), текст не вылезает. */
-body[data-theme="plush"] #user-words-screen .user-word-item.dict-item {
-    aspect-ratio: auto !important;
-    height: auto;
-    min-height: calc(62px * var(--ui-fit, 1));
-    align-items: center;
-    gap: calc(8px * var(--ui-fit, 1));
-    padding: calc(8px * var(--ui-fit, 1)) 4%;
-    box-sizing: border-box;
-    contain: none;
-    content-visibility: visible;
-}
 body[data-theme="plush"] #user-words-screen .user-word-item .tts-btn,
 body[data-theme="plush"] #user-words-screen .user-word-item .dict-fav {
     flex: 0 0 auto;
@@ -11437,4 +11410,97 @@ body[data-theme="plush"] #user-words-screen .user-word-item .uw-badges {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+
+/* ================================================================
+   МОИ СЛОВА — скопировано 1:1 с Настроек и Словаря (без домыслов)
+   Форма = .settings-list .setting-item, кнопка = .fs-btn,
+   карточки = .dict-item (Baner_Slovar_fit.webp).
+   ================================================================ */
+/* Форма: та же плашка и размеры, что у строк Настроек */
+body[data-theme="plush"] #user-words-screen .uw-form .setting-item {
+    background: transparent url("UI/Plashka_nastroiki_fit.webp") no-repeat center / 100% 100%;
+    border: 0;
+    border-radius: 0;
+    aspect-ratio: 2013 / 319;
+    min-height: calc(46px * var(--ui-fit, 1));
+    margin-bottom: calc(10px * var(--ui-fit, 1));
+    padding: 0 calc(24px * var(--ui-fit, 1));
+    color: #fff;
+    filter: drop-shadow(0 calc(4px * var(--ui-fit, 1)) calc(10px * var(--ui-fit, 1)) rgba(20, 2, 36, 0.65));
+    gap: calc(8px * var(--ui-fit, 1));
+}
+body[data-theme="plush"] #user-words-screen .uw-form .setting-item label {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #3d0a1e;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.22);
+    font-size: 11px;
+}
+/* Кнопка «Добавить слово» = точная копия .fs-btn из Настроек */
+body[data-theme="plush"] #user-words-screen .uw-form .uw-add-btn {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: calc(28px * var(--ui-fit, 1));
+    min-width: calc(96px * var(--ui-fit, 1));
+    margin: calc(6px * var(--ui-fit, 1)) auto calc(4px * var(--ui-fit, 1));
+    padding: 0 calc(14px * var(--ui-fit, 1));
+    border: 0;
+    border-radius: 0;
+    background: transparent url("UI/Vipad_osnova.webp") no-repeat center / 100% 100%;
+    box-shadow: none;
+    color: #ffe4f2;
+    font-family: inherit;
+    font-size: calc(11px * var(--ui-fit, 1));
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    filter: drop-shadow(0 calc(4px * var(--ui-fit, 1)) calc(10px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.7));
+}
+/* Карточки своего слова = точная копия .dict-item Словаря */
+body[data-theme="plush"] #user-words-screen .user-word-item.dict-item {
+    gap: calc(10px * var(--ui-fit, 1));
+    padding: 0 4%;
+    margin-bottom: 0;
+    background: transparent url("UI/Baner_Slovar_fit.webp") no-repeat center / 100% 100%;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    transform-style: flat;
+    aspect-ratio: 2100 / 571;
+    container-type: normal;
+    position: relative;
+    filter: drop-shadow(0 calc(7px * var(--ui-fit, 1)) calc(5px * var(--ui-fit, 1)) rgba(14, 3, 26, 0.55));
+    align-items: center;
+    contain: none;
+    content-visibility: visible;
+}
+body[data-theme="plush"] #user-words-screen .user-word-item .dict-front {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0;
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    padding-left: calc(6px * var(--ui-fit, 1));
+}
+body[data-theme="plush"] #user-words-screen .user-word-item .dict-del {
+    flex: 0 0 auto;
+    width: calc(32px * var(--ui-fit, 1));
+    height: calc(32px * var(--ui-fit, 1));
+}
+body[data-theme="plush"] #user-words-screen .user-words-list {
+    gap: calc(10px * var(--ui-fit, 1));
+    padding: 0;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
 }
