@@ -9199,32 +9199,11 @@ body[data-theme="plush"] #user-words-screen .setting-item:has(> input[type="text
     background: transparent;
     border-radius: calc(6px * var(--ui-fit, 1));
 }
-/* «Добавить слово» — такой же .fs-btn, как «Англ→Рус» / «A1-A2»:
-   та же высота 28px и та же подложка Vipad_osnova. По ширине растягиваем
-   на всю строку, чтобы кнопка была заметной, но высота — одинаковая. */
 body[data-theme="plush"] #user-words-screen .uw-form .uw-add-btn {
-    display: block;
     width: 100%;
-    height: calc(28px * var(--ui-fit, 1));
-    min-height: calc(28px * var(--ui-fit, 1));
-    margin: calc(6px * var(--ui-fit, 1)) 0 calc(4px * var(--ui-fit, 1));
-    padding: 0 calc(14px * var(--ui-fit, 1));
-    border: 0;
-    border-radius: 0;
-    background: transparent url("UI/Vipad_osnova.webp") no-repeat center / 100% 100%;
-    box-shadow: none;
-    color: #ffe4f2;
-    font-family: inherit;
-    font-size: calc(11px * var(--ui-fit, 1));
-    line-height: 1.2;
-    text-shadow: 0 1px 3px rgba(25, 5, 45, 0.9);
-    cursor: pointer;
-    filter: drop-shadow(0 calc(4px * var(--ui-fit, 1)) calc(10px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.7));
-}
-body[data-theme="plush"] #user-words-screen .uw-form .uw-add-btn img.ico-png {
-    height: calc(14px * var(--ui-fit, 1));
-    margin-right: calc(4px * var(--ui-fit, 1));
-    vertical-align: -0.15em;
+    min-height: calc(46px * var(--ui-fit, 1));
+    margin-top: calc(2px * var(--ui-fit, 1));
+    font-size: max(11px, calc(12px * var(--ui-fit, 1)));
 }
 
 /* === Р’В«5 Р С” 1Р’В»: Р Р†Р ВµР ВµРЎР‚ 3 + 2 ===
@@ -11060,6 +11039,10 @@ body[data-theme="plush"] #settings-screen .danger-row .danger-btn img.ico-png {
     height: 1.4em;
 }
 
+body[data-theme="plush"] #user-words-screen .uw-form .uw-add-btn img.ico-png {
+    height: calc(20px * var(--ui-fit, 1));
+    filter: drop-shadow(0 calc(1px * var(--ui-fit, 1)) calc(1px * var(--ui-fit, 1)) rgba(60, 10, 40, 0.65));
+}
 /* ================================================================
    Волна правок по скриншотам 2026-11-14 (логотип, иконки, края)
    ================================================================ */
