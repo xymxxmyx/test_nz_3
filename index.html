@@ -1655,23 +1655,23 @@ body.nz-kb-open .screen.active{padding-bottom:calc(var(--kb-total-h,240px) + 24p
         if (layout !== 'num') k.setAttribute('data-base', ch);
         row.appendChild(k);
       });
-      if (withShift) row.appendChild(makeBack('w1'));
+      if (withShift || (layout === 'num' && ri === 2)) row.appendChild(makeBack('w1'));
       // ровно столько колонок, сколько клавиш — без пустых ячеек в конце ряда
       row.style.gridTemplateColumns = 'repeat(' + row.children.length + ',minmax(0,1fr))';
       rows.appendChild(row);
     });
     var ctrl = document.createElement('div');
     ctrl.className = 'nz-kb-row';
-    if (layout === 'en' || layout === 'ru') {
-      ctrl.appendChild(makeSwap('w2'));
-      ctrl.appendChild(makeKey('Пробел', 'space w7', function () { insert(' '); }));
-      ctrl.appendChild(makeKey('↵', 'enter w2', enter));
-    } else {
+    if (layout === 'jp') {
       ctrl.appendChild(makeShift('w2'));
       ctrl.appendChild(makeBack('w2'));
       ctrl.appendChild(makeKey('Пробел', 'space w3', function () { insert(' '); }));
       ctrl.appendChild(makeSwap('w2'));
       ctrl.appendChild(makeKey('Enter', 'enter w2', enter));
+    } else {
+      ctrl.appendChild(makeSwap('w2'));
+      ctrl.appendChild(makeKey('Пробел', 'space w7', function () { insert(' '); }));
+      ctrl.appendChild(makeKey('↵', 'enter w2', enter));
     }
     rows.appendChild(ctrl);
     return rows;
