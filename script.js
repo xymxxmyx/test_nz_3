@@ -4237,13 +4237,39 @@ function cardsLayout(force) {
         - (parseFloat(gcs.paddingRight) || 0));
     const gap = parseFloat(gcs.columnGap) || parseFloat(gcs.rowGap) || parseFloat(gcs.gap) || 0;
     const fcs = getComputedStyle(field);
-    // Поле — единственный контейнер сетки. Высота считается по content-box:
-    // рамка 9-slice и паддинги уже исключены из clientHeight.
-    const avail = Math.max(1, field.clientHeight
-        - (parseFloat(fcs.paddingTop) || 0)
-        - (parseFloat(fcs.paddingBottom) || 0));
     const fit = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--ui-fit")) || 1;
-    const maxW = 76 * Math.max(fit, 0.8);
+    const px = (v) => parseFloat(v) || 0;
+    // Поле больше не занимает всю высоту экрана: его высота = ряды карт +
+    // рамка 9-slice + небольшой воздух. Высота кладётся в --cards-field-h,
+    // а #cards-area центрирует всю группу (промпт → поле → отклик → кнопки),
+    // поэтому пустого фетра вокруг карт не остаётся.
+    const prompt = area.querySelector(".cards-prompt");
+    const feedback = document.getElementById("cards-feedback");
+    const controls = area.querySelector(".cards-controls");
+    const pcs = prompt ? getComputedStyle(prompt) : null;
+    const fbc = feedback ? getComputedStyle(feedback) : null;
+    const ccs = controls ? getComputedStyle(controls) : null;
+    const blockH = (el, cs) => el ? el.offsetHeight
+        + (cs ? px(cs.marginTop) + px(cs.marginBottom) : 0) : 0;
+    const frameH = px(fcs.borderTopWidth) + px(fcs.borderBottomWidth)
+        + px(fcs.paddingTop) + px(fcs.paddingBottom);
+    const extra = 20 * fit;
+    const fieldMargin = px(fcs.marginTop) + px(fcs.marginBottom);
+    const areaH = area.clientHeight;
+    const areaFieldMax = Math.max(1, areaH
+        - blockH(prompt, pcs)
+        - blockH(feedback, fbc)
+        - blockH(controls, ccs)
+        - fieldMargin - 4);
+    const maxFieldH = Math.max(1, Math.min(430 * fit, areaFieldMax));
+    const minFieldH = Math.min(280 * fit, maxFieldH);
+    // Сетке доступна высота поля минус рамка и внутренний воздух.
+    const avail = Math.max(1, maxFieldH - frameH - 2 * extra);
+    // Стартуем от ширины поля, а не от жёстких 76px: на узком экране
+    // подборщик сам найдёт максимальный размер, при котором ряды влезают.
+    // Потолок 100px·fit не даёт коротким наборам (4 карты) раздуться в
+    // огромные плитки с крошечным текстом.
+    const maxW = Math.min(W, 100 * fit);
     // Не в 2 ряда: разрешаем три ряда всем наборам. Подборщик ищет самый
     // крупный размер карт, при котором всё влезает в поле, поэтому длинные
     // наборы получают 4 колонки × 3 ряда крупной плитки вместо крошечной
@@ -4261,21 +4287,25 @@ function cardsLayout(force) {
         if (gRows > 1 && n - (gRows - 1) * gCols === 1) continue;
         const total = gRows * cardH(w) + (gRows - 1) * gap;
         if (total <= avail) {
-            best = { w, gCols };
+            best = { w, gCols, gRows };
             break;
         }
     }
     if (!best) {
         const w = 16;
         const gCols = Math.max(1, Math.min(n, Math.floor((W + gap) / (w + gap))));
-        best = { w, gCols };
+        best = { w, gCols, gRows: Math.ceil(n / gCols) };
     }
-    const key = [n, W.toFixed(1), avail.toFixed(1),
-        gap.toFixed(1), best.w.toFixed(2), best.gCols,
-        fit.toFixed(3)].join("|");
+    const contentH = best.gRows * cardH(best.w) + (best.gRows - 1) * gap;
+    const fieldH = Math.min(maxFieldH,
+        Math.max(minFieldH, contentH + frameH + 2 * extra));
+    const key = [n, W.toFixed(1), avail.toFixed(1), areaH.toFixed(1),
+        gap.toFixed(1), best.w.toFixed(2), best.gCols, best.gRows,
+        fieldH.toFixed(1), fit.toFixed(3)].join("|");
     if (!force && area.dataset.layoutKey === key) return;
     area.dataset.layoutKey = key;
     area.style.setProperty("--card-w", best.w.toFixed(2) + "px");
+    area.style.setProperty("--cards-field-h", fieldH.toFixed(1) + "px");
     grid.style.setProperty("--card-cols", String(best.gCols));
     grid.querySelectorAll(".cards-word").forEach(card => {
         const ci = card.querySelector(".card-inner");

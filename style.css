@@ -10014,6 +10014,10 @@ body.tg-mini-app[data-theme="plush"] #game-screen #cards-area {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
+    /* Поле карт больше не растягивается на всю высоту: его высоту задаёт
+       cardsLayout() (--cards-field-h), а свободное место делится поровну
+       над и под всей группой «промпт → поле → отклик → кнопки». */
+    justify-content: center;
     min-height: 0;
     /* Тени нижнего ряда: контейнер кончается ровно на низу кнопок,
        поэтому границу обрезки продлеваем на 14px наружу (clip + clip-margin).
@@ -10165,14 +10169,16 @@ body.tg-mini-app[data-theme="plush"] #cards-area .cards-field {
     overflow: hidden;
 }
 
-/* Сетка карт: ширина карты приходит из cardsLayout() в --card-w. */
+/* Сетка карт: ширина карты приходит из cardsLayout() в --card-w.
+   Раскладка — flex с переносом, а не grid: последний неполный ряд
+   центрируется (при 7 картах 4+3, а не 4+3 с дырой справа). */
 body.tg-mini-app[data-theme="plush"] #cards-area .cards-grid {
     flex: 1 1 auto;
-    display: grid;
-    grid-template-columns: repeat(var(--card-cols, 1), var(--card-w, calc(52px * var(--ui-fit, 1))));
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: center;
     align-content: center;
-    justify-items: center;
     align-items: center;
     gap: calc(6px * var(--ui-fit, 1));
     width: 100%;
@@ -10276,7 +10282,9 @@ body.cards-dragging * {
 }
 
 body.tg-mini-app[data-theme="plush"] #cards-area .cards-grid .option-card {
-    width: 100%;
+    /* В flex-раскладке ширину держит flex-basis; --card-w приходит из JS. */
+    flex: 0 0 var(--card-w, calc(52px * var(--ui-fit, 1)));
+    width: var(--card-w, calc(52px * var(--ui-fit, 1)));
     max-width: var(--card-w, calc(52px * var(--ui-fit, 1)));
     min-width: 0;
     height: auto;
@@ -10308,7 +10316,9 @@ body.tg-mini-app[data-theme="plush"] #cards-area .cards-grid .cards-word.bad .ca
 }
 
 body.tg-mini-app[data-theme="plush"] #cards-area .cards-grid .option-card .opt-text {
-    font-size: clamp(8px, calc(11px * var(--ui-fit, 1)), 12px);
+    /* Кегль растёт вместе с картой: на крупных плитках (4 карты) слово
+       больше не выглядит потерянным, на мелких (7+ карт) остаётся 9px. */
+    font-size: clamp(9px, calc(var(--card-w, calc(52px * var(--ui-fit, 1))) * 0.14), 18px);
     line-height: 1.15;
     /* Длинные слова в узких картах переносятся по слогам, а не по буквам. */
     hyphens: auto;
@@ -10432,22 +10442,23 @@ body[data-theme="plush"] #game-screen .game-header > .back-btn.is-pressing {
 
 /* ===== ПОЛЕ «СОБЕРИ ПРЕДЛОЖЕНИЕ»: арт Pole_Sob_pred.png как 9-slice =====
    Арт пользователя 1212×1696: рамка ≈44 ар-px (11px CSS @4×) со всех
-   сторон, дальше — фетр со звёздами у углов. Плашка «слишком растянуло»:
-   свободное место колонки снова забирает ПОЛЕ (flex 1 1 auto), а арт
-   нарезается border-image 9-slice (slice 44 fill / 11px·fit) — рамка,
-   Скругления и угловые звёзды не зависят от высоты бокса, тянется
-   только фактура фетра. Бонус: поле выше ⇒ сетка карт получает больше
-   рядов по высоте ⇒ плитки крупнее (cardsLayout ищет максимальный
-   размер). min-height 424·fit не даёт полю сжаться ниже нативного арта.
+   сторон, дальше — фетр со звёздами у углов. Высоту поля задаёт
+   cardsLayout() через --cards-field-h: это высота рядов карт + рамка +
+   воздух, поэтому вокруг карт нет пустого фетра. Арт нарезается
+   border-image 9-slice (slice 44 fill / 11px·fit) — рамка, скругления и
+   угловые звёзды не зависят от высоты бокса, тянется только фактура.
    Отступ сетки: рамка 11px + padding 4-5px (правила Pole_2 выше) ≈ 16px,
    как было. Хвост тени и клипы не тронуты — работают правила выше.
    Расстояния неизменны и константны: плашка → аудио 4px·fit (row-gap),
    аудио-ряд → поле 6px·fit (промпт margin-bottom), рамка поля → кнопки
    ~17px; плашка предложения — по содержимому. */
 body[data-theme="plush"] #game-screen #cards-area .cards-field {
-    flex: 1 1 auto;
-    height: auto;
-    min-height: calc(424px * var(--ui-fit, 1));
+    /* Высота поля — по картам, а не «на весь экран»: cardsLayout() кладёт
+       в --cards-field-h сумму высоты рядов, рамки и воздуха. Группа целиком
+       центрируется в #cards-area, поэтому поле больше не пустует. */
+    flex: 0 0 auto;
+    height: var(--cards-field-h, calc(300px * var(--ui-fit, 1)));
+    min-height: 0;
     margin: 0 0 calc(4px * var(--ui-fit, 1));
     border-image: url("UI/Pole_Sob_pred.webp?v=pole1") 44 fill / calc(11px * var(--ui-fit, 1)) stretch;
     background: rgba(26, 10, 46, 0.55);
