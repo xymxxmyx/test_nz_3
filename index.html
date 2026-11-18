@@ -1316,8 +1316,7 @@
 .nz-kb .nz-kb-key:hover{transform:scale(1.06) translateY(-2px);z-index:2}
 .nz-kb .nz-kb-key:active{opacity:1 !important;z-index:3}
 @keyframes kbBounce{0%{transform:scale(1)}38%{transform:scale(0.955)}70%{transform:scale(1.025)}100%{transform:scale(1)}}
-.nz-kb-key.press{animation:kbBounce 0.26s cubic-bezier(0.16,1,0.3,1) !important;animation-delay:0s !important;opacity:1 !important;z-index:3}
-.nz-kb-bar button:active,.nz-kb-bar button.press{animation:kbBarBounce 0.26s cubic-bezier(0.16,1,0.3,1) !important;animation-delay:0s !important;opacity:1 !important}
+.nz-kb-bar button:active{opacity:1 !important}
 @keyframes kbBarBounce{0%{transform:scale(1)}45%{transform:scale(0.97)}100%{transform:scale(1)}}
 .nz-kb .nz-kb-key:hover{background-image:url("UI/klava_key.webp") !important}
 .nz-kb .nz-kb-key.ctrl:hover{background-image:url("UI/klava_key_pink.webp") !important}
@@ -1521,10 +1520,14 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
       ev.preventDefault();
       ev.stopPropagation();
       tap();
-      b.classList.remove('press');
-      void b.offsetWidth;
-      b.classList.add('press');
-      setTimeout(function () { b.classList.remove('press'); }, 250);
+      if (b.animate) {
+        b.animate([
+          { transform: 'scale(1)' },
+          { transform: 'scale(0.93)', offset: 0.35 },
+          { transform: 'scale(1.05)', offset: 0.7 },
+          { transform: 'scale(1)' }
+        ], { duration: 220, easing: 'cubic-bezier(0.16,1,0.3,1)' });
+      }
       handler(b);
     });
     return b;
@@ -1541,10 +1544,13 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
       b.style.animationDelay = (i * 0.03).toFixed(3) + 's';
       b.addEventListener('pointerdown', function (ev) {
         ev.preventDefault(); ev.stopPropagation();
-        b.classList.remove('press');
-        void b.offsetWidth;
-        b.classList.add('press');
-        setTimeout(function () { b.classList.remove('press'); }, 260);
+        if (b.animate) {
+          b.animate([
+            { transform: 'scale(1)' },
+            { transform: 'scale(0.96)', offset: 0.45 },
+            { transform: 'scale(1)' }
+          ], { duration: 200, easing: 'cubic-bezier(0.16,1,0.3,1)' });
+        }
         if (switching || id === layout) return;
         switching = true;
         tap();
