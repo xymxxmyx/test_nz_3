@@ -1301,12 +1301,11 @@
 .nz-kb-rows.ready{opacity:1;transform:translateY(0)}
 .nz-kb-rows.enter{position:absolute;left:0;right:0;top:0}
 .nz-kb-bar button{opacity:1 !important;visibility:visible !important}
-@keyframes kbKeyIn{from{opacity:0;transform:translateY(12px) scale(0.9)}to{opacity:1;transform:translateY(0) scale(1)}}
 .nz-kb-row{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:4px}
-.nz-kb-key{min-width:0;height:var(--kb-key-h,38px);padding:0;border:0;border-radius:0;background:transparent url("UI/klava_key_tall.webp") center/100% 100% no-repeat;color:#fff0fa;font:700 13px/1 system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 2px rgba(30,4,50,.85);position:relative;overflow:visible;transition:transform 0.26s cubic-bezier(0.16,1,0.3,1)}
-.nz-kb-key.ctrl{background-image:url("UI/klava_key_pink.webp");font-size:11px}
-.nz-kb-key.space{background-image:url("UI/klava_key_space.webp")}
-.nz-kb-key.enter{background-image:url("UI/klava_key_green.webp")}
+.nz-kb-key{min-width:0;height:var(--kb-key-h,38px);padding:0;border:0;border-radius:0;background:transparent url("UI/klava_key_tall.webp") center/100% 100% no-repeat;color:#fff0fa;font:700 13px/1 system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 2px rgba(30,4,50,.85);position:relative;overflow:visible;transition:filter 0.12s ease !important}
+.nz-kb-key.ctrl{background-image:url("UI/klava_key_ctrl_tall.webp");font-size:11px}
+.nz-kb-key.space{background-image:url("UI/klava_key_space_tall.webp")}
+.nz-kb-key.enter{background-image:url("UI/klava_key_enter_tall.webp")}
 .nz-kb-key.w2{grid-column:span 2}
 .nz-kb-key.w3{grid-column:span 3}
 .nz-kb-key.w4{grid-column:span 4}
@@ -1317,13 +1316,11 @@
 .nz-kb .nz-kb-key:active{opacity:1 !important;z-index:3}
 .nz-kb button{transition:filter 0.12s ease !important}
 .nz-kb .nz-kb-key.press,.nz-kb-bar button.press{filter:brightness(1.35) !important}
-@keyframes kbBounce{0%{transform:scale(1)}38%{transform:scale(0.955)}70%{transform:scale(1.025)}100%{transform:scale(1)}}
 .nz-kb-bar button:active{opacity:1 !important}
-@keyframes kbBarBounce{0%{transform:scale(1)}45%{transform:scale(0.97)}100%{transform:scale(1)}}
 .nz-kb .nz-kb-key:hover{background-image:url("UI/klava_key_tall.webp") !important}
-.nz-kb .nz-kb-key.ctrl:hover{background-image:url("UI/klava_key_pink.webp") !important}
-.nz-kb .nz-kb-key.space:hover{background-image:url("UI/klava_key_space.webp") !important}
-.nz-kb .nz-kb-key.enter:hover{background-image:url("UI/klava_key_green.webp") !important}
+.nz-kb .nz-kb-key.ctrl:hover{background-image:url("UI/klava_key_ctrl_tall.webp") !important}
+.nz-kb .nz-kb-key.space:hover{background-image:url("UI/klava_key_space_tall.webp") !important}
+.nz-kb .nz-kb-key.enter:hover{background-image:url("UI/klava_key_enter_tall.webp") !important}
 .nz-kb-bar button:hover{background-image:url("UI/klava_key_pink_small.webp") !important}
 .nz-kb-bar button.on:hover,.nz-kb-bar button.done:hover{background-image:url("UI/klava_key_green.webp") !important}
 body.nz-kb-open .screen.active{padding-bottom:230px}
