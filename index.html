@@ -1468,6 +1468,28 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
     var kh = Math.max(22, Math.min(34, Math.round(kw)));
     document.documentElement.style.setProperty('--kb-key-h', kh + 'px');
   }
+  // плавное появление: панель выезжает, клавиши проявляются каскадом.
+  // БЕЗ scale() — арт не может обрезаться или выйти за границы кнопки.
+  function animateOpen() {
+    try {
+      if (kb.animate) {
+        kb.getAnimations().forEach(function (a) { a.cancel(); });
+        kb.animate([
+          { transform: 'translateY(100%)', opacity: 0 },
+          { transform: 'translateY(0)', opacity: 1 }
+        ], { duration: 300, easing: 'cubic-bezier(0.16,1,0.3,1)' });
+      }
+      var keys = kb.querySelectorAll('.nz-kb-key, .nz-kb-bar button');
+      keys.forEach(function (k, i) {
+        if (!k.animate) return;
+        k.animate([
+          { opacity: 0, transform: 'translateY(8px)' },
+          { opacity: 1, transform: 'translateY(0)' }
+        ], { duration: 260, delay: 60 + i * 7, easing: 'cubic-bezier(0.16,1,0.3,1)', fill: 'backwards' });
+      });
+    } catch (e) {}
+  }
+
   function open(el) {
     active = el;
     fitKeyboard();
@@ -1486,8 +1508,10 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
       var bb = bar.querySelector('button[data-id="' + id + '"]');
       if (bb) bb.style.display = (!need || id === need) ? '' : 'none';
     });
+    var wasOpen = kb.classList.contains('open');
     kb.classList.add('open');
     document.body.classList.add('nz-kb-open');
+    if (!wasOpen) animateOpen();
     tgHide();
   }
 
