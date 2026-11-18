@@ -11546,40 +11546,161 @@ body[data-theme="plush"] #battle-area .player-zone .option-card {
     flex: 0 0 auto !important;
 }
 
-/* /* card_shadow_fix_v2 === Мягкая размытая тень под картой на телефоне ===
-   На тач-устройствах :hover/:active «залипают»: раньше под картой
-   оставалась чёткая тёмная полоса. Заменяем её на широкую размытую
-   тень с низкой непрозрачностью — мягкий след без резких краёв. */
-body.tg-mini-app #battle-area .player-zone .option-card .card-inner,
-body.tg-mini-app #cards-drag-layer .option-card .card-inner {
+/* /* /* card_shadow_remove_v1 === Тёмная тень под картами убрана везде (ПК + телефон) ===
+   У карт игрока, в «Собери предложение» и у перетаскиваемой копии
+   убираем тёмную box-shadow/drop-shadow. Светлые ореолы состояний
+   (selected/correct/wrong/ok/bad) остаются через border-color и фон. */
+.option-card .card-inner,
+.player-zone .option-card .card-inner,
+#battle-area .player-zone .option-card .card-inner,
+#cards-area .cards-grid .option-card .card-inner,
+.cards-word .card-inner,
+.cards-drag-ghost .card-inner {
+    box-shadow: none !important;
     filter: none !important;
-    box-shadow: 0 calc(6px * var(--ui-fit, 1)) calc(24px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.2),
-                inset 0 0 18px rgba(255, 183, 197, 0.1) !important;
 }
-body.tg-mini-app #cards-area .cards-grid .option-card .card-inner {
-    box-shadow: 0 calc(4px * var(--ui-fit, 1)) calc(16px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.18),
-                inset 0 0 18px rgba(255, 183, 197, 0.1) !important;
+.cards-drag-ghost,
+#cards-drag-layer .cards-drag-ghost,
+#cards-area .cards-drag-ghost {
+    filter: none !important;
 }
-/* Состояния карты: та же мягкая тень плюс светлый ореол обратной связи. */
-body.tg-mini-app #battle-area .player-zone .option-card.selected .card-inner,
-body.tg-mini-app #battle-area .player-zone .option-card:hover:not(:disabled) .card-inner {
-    box-shadow: 0 calc(8px * var(--ui-fit, 1)) calc(30px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.22),
-                inset 0 0 30px rgba(255, 154, 162, 0.22),
-                0 0 34px rgba(255, 183, 197, 0.3) !important;
+
+/* card_button_bg_v1 === Тёмный квадрат под картой при наведении ===
+   Кнопка .option-card в :hover получала тёмный фон rgb(42,26,46).
+   Картинка карты (.card-inner) при этом поднимается выше самой кнопки,
+   и тёмный фон выглядывал снизу чёрным прямоугольником. */
+.option-card,
+.option-card:hover:not(:disabled),
+.option-card:active:not(:disabled),
+.option-card:focus-visible,
+.option-card.selected,
+.option-card.correct,
+.option-card.wrong {
+    background: transparent !important;
 }
-body.tg-mini-app #battle-area .player-zone .option-card.correct .card-inner {
-    box-shadow: 0 calc(8px * var(--ui-fit, 1)) calc(30px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.22),
-                inset 0 0 30px rgba(74, 222, 128, 0.24),
-                0 0 38px rgba(74, 222, 128, 0.42) !important;
+
+/* /* /* /* card_borders_off_v4 === Форма карты сохранена, обводка невидима ===
+   Оставляем исходную толщину border (она задаёт форму/размер карты),
+   но делаем её прозрачной и не рисуем под ней фон карты:
+   сквозь прозрачный border виден стол, а не заливка самой карты. */
+.card-inner,
+.option-card,
+.cards-word,
+.card-face,
+.card-front,
+.card-inner::after {
+    border-color: transparent !important;
+    background-clip: padding-box !important;
+    outline: none !important;
 }
-body.tg-mini-app #battle-area .player-zone .option-card.wrong .card-inner {
-    box-shadow: 0 calc(8px * var(--ui-fit, 1)) calc(30px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.22),
-                inset 0 0 24px rgba(248, 113, 113, 0.18) !important;
+/* Пунктирная рамка внутри карты — оставляем как была */
+.card-inner::before {
+    border: 2px dashed rgba(255, 220, 200, 0.35) !important;
 }
-/* Копия карты при обмене: размытая тень вместо чёткой. */
-body.tg-mini-app .cards-drag-ghost {
-    filter: drop-shadow(0 calc(8px * var(--ui-fit, 1)) calc(26px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.22)) !important;
+
+/* bot_card_soft_shadow_v1 === Мягкая размытая тень под картой бота === */
+.bot-card-wrap .battle-card,
+body[data-theme="plush"] .bot-card-wrap .battle-card {
+    box-shadow: 0 calc(8px * var(--ui-fit, 1)) calc(28px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.32) !important;
 }
-body.tg-mini-app .cards-drag-ghost.over-target {
-    filter: drop-shadow(0 0 calc(12px * var(--ui-fit, 1)) rgba(255, 255, 255, 0.35)) !important;
+/* При растворении тень гасится, чтобы не висел прямоугольник */
+body .bot-card-wrap .battle-card.plasma-dissolving,
+body .bot-card-wrap .battle-card.dissolving {
+    box-shadow: 0 0 0 rgba(24, 2, 40, 0) !important;
 }
+
+/* card_glow_overlay_v1 === Светлый ореол поверх рубашки карты ===
+   Глоу рисуется отдельным слоем поверх картинки карты, а не под ней. */
+.option-card .card-inner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    box-shadow: inset 0 0 calc(18px * var(--ui-fit, 1)) rgba(255, 183, 197, 0.55);
+    transition: opacity 0.2s ease;
+}
+.option-card:hover:not(:disabled) .card-inner::after,
+.option-card.selected .card-inner::after,
+.option-card.correct .card-inner::after {
+    opacity: 1 !important;
+}
+
+/* hover_gap_fix_v1 === Убираём тёмную полосу под картой при наведении ===
+   Кнопка поднимается на 6px, а .card-inner дополнительно на 8px внутри неё:
+   под картой оставалась пустая зона, сквозь которую виден тёмный стол.
+   При наведении внутренняя карта движется вместе с кнопкой. */
+.option-card:hover:not(:disabled) .card-inner,
+.player-zone .option-card:hover:not(:disabled) .card-inner {
+    transform: none !important;
+}
+
+/* hover_button_glow_fix_v1 === Прямоугольный ореол кнопки при наведении ===
+   Глобальное правило button:hover даёт кнопке-карте прямоугольный
+   box-shadow (0 0 20px rgba(255,183,197,.2)) — он выглядит квадратом
+   рядом с картой. Оставляем мягкий глоу поверх рубашки (::after). */
+.option-card:hover:not(:disabled),
+.player-zone .option-card:hover:not(:disabled),
+.option-card.selected,
+.option-card.correct,
+.option-card.wrong {
+    box-shadow: none !important;
+}
+
+/* ach_toast_top_v1 === Плашка достижения вылетает сверху === */
+#ach-toasts {
+    top: calc(var(--app-stage-yt, 0px) + var(--frame-t-px, 24px) + 8px);
+    bottom: auto;
+}
+.ach-toast,
+body[data-theme="plush"] .ach-toast {
+    transform: translateY(calc(-100% - 200px));
+}
+.ach-toast.show,
+body[data-theme="plush"] .ach-toast.show {
+    transform: translateY(0);
+}
+.ach-toast.out,
+body[data-theme="plush"] .ach-toast.out {
+    transform: translateY(calc(-100% - 200px));
+}
+body[data-theme="plush"] #ach-toasts {
+    clip-path: inset(0 -9999px -9999px -9999px);
+}
+
+/* ach_toast_top_v2 === Плашка выезжает прямо из-под верхнего канта рамки ===
+   Хост прижат к самой верхней кромке сцены: рамка (z-index 100000) закрывает
+   плашку (z-index 99999), пока та не выедет из-под её верхнего канта. */
+#ach-toasts,
+body[data-theme="plush"] #ach-toasts {
+    top: calc(var(--app-stage-yt, 0px) - 4px);
+    bottom: auto;
+}
+
+/* ach_toast_top_v3 === Плашка чуть ниже верхнего канта рамки === */
+#ach-toasts,
+body[data-theme="plush"] #ach-toasts {
+    top: calc(var(--app-stage-yt, 0px) + 20px);
+    bottom: auto;
+}
+
+/* ach_toast_top_v4 === Плашка ещё чуть ниже === */
+#ach-toasts,
+body[data-theme="plush"] #ach-toasts {
+    top: calc(var(--app-stage-yt, 0px) + 40px);
+    bottom: auto;
+}
+
+/* settings_anim_fix_v1 === Общая волна анимации для всех строк настроек ===
+   Между строками стоит .tts-warn, из-за чего «Читать вопрос автоматически»
+   оказалась 7-м ребёнком, а задержки для 6-7 не были заданы — строка
+   появлялась без общей анимации. Догоняем всю последовательность. */
+.screen.active .settings-list > .setting-item:nth-child(6) { animation-delay: 0.42s !important; }
+.screen.active .settings-list > .setting-item:nth-child(7) { animation-delay: 0.48s !important; }
+.screen.active .settings-list > .setting-item:nth-child(8) { animation-delay: 0.54s !important; }
+.screen.active .settings-list > .setting-item:nth-child(9) { animation-delay: 0.60s !important; }
+.screen.active .settings-list > .setting-item:nth-child(10) { animation-delay: 0.66s !important; }
+.screen.active .settings-list > .setting-item:nth-child(11) { animation-delay: 0.72s !important; }
+.screen.active .settings-list > .setting-item:nth-child(12) { animation-delay: 0.78s !important; }

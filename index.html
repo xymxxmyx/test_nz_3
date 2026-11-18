@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="ru">
 
@@ -34,7 +34,7 @@
 
     </script>
 
-    <link rel="stylesheet" href="style.css?v=20261205">
+    <link rel="stylesheet" href="style.css?v=20261220">
 
     <script>
     /* Режим «только рамка» (?frameonly=1): рисуем одно кольцо по экрану,
@@ -1217,7 +1217,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.innerWidth <= MIN_W) {
-            document.write('<script src="script.js?v=20261192"><\/script>');
+            document.write('<script src="script.js?v=20261194"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');
@@ -1284,6 +1284,211 @@
     })();
     </script>
 
+
+
+<!-- === СВОЯ КЛАВИАТУРА (EN / RU / JP / ЦИФРЫ) — только на мобильных === -->
+<style id="nz-kb-css">
+.nz-kb{position:fixed;left:0;right:0;bottom:0;z-index:100000;box-sizing:border-box;padding:5px 5px calc(5px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,rgba(52,22,86,.98),rgba(22,7,38,.99));border-top:2px solid #ff9aa2;display:none;font-family:inherit;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.nz-kb.open{display:block}
+.nz-kb-bar{display:flex;align-items:center;gap:4px;margin-bottom:5px}
+.nz-kb-bar button{flex:1;min-width:0;padding:5px 2px;border-radius:6px;border:1px solid #8a5a6a;background:#3a1c52;color:#ffe9f7;font:600 11px/1 system-ui,sans-serif;cursor:pointer}
+.nz-kb-bar button.on{background:#b0496f;border-color:#ffd0da}
+.nz-kb-bar button.done{background:#2e9a55;border-color:#7ee2a8}
+.nz-kb-rows{display:flex;flex-direction:column;gap:4px}
+.nz-kb-row{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px}
+.nz-kb-key{min-width:0;height:34px;padding:0;border-radius:7px;border:1px solid #8a5a6a;background:linear-gradient(180deg,#5a2b7a,#361650);color:#fff0fa;font:600 13px/1 system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.nz-kb-key.ctrl{background:linear-gradient(180deg,#7a3a58,#4a1c38);font-size:11px}
+.nz-kb-key.w2{grid-column:span 2}
+.nz-kb-key.w3{grid-column:span 3}
+.nz-kb-key.w4{grid-column:span 4}
+body.nz-kb-open .screen.active{padding-bottom:230px}
+</style>
+<script>
+(function () {
+  if (window.self === window.top && document.getElementById('phone-frame')) return;
+  if (document.getElementById('nz-kb')) return;
+
+  var LAYOUTS = {
+    en: [
+      ['q','w','e','r','t','y','u','i','o','p'],
+      ['a','s','d','f','g','h','j','k','l',''],
+      ['z','x','c','v','b','n','m',',','.','?']
+    ],
+    ru: [
+      ['й','ц','у','к','е','н','г','ш','щ','з'],
+      ['ф','ы','в','а','п','р','о','л','д','ь'],
+      ['я','ч','с','м','и','т','ь','б','ю','/']
+    ],
+    jp: [
+      ['あ','い','う','え','お','か','き','く','け','こ'],
+      ['さ','し','す','せ','そ','た','ち','つ','て','と'],
+      ['な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ'],
+      ['ま','み','む','め','も','や','ゆ','よ','わ','を'],
+      ['ん','。','、','！','？','「','」','・','ー','']
+    ],
+    num: [
+      ['1','2','3','4','5','6','7','8','9','0'],
+      ['-','=','+','/','*','(',')','[',']','{'],
+      ['.',',',':',';','"',"'",'!','?','@','#']
+    ]
+  };
+  var ORDER = ['en','ru','jp','num'];
+  var NAMES = { en:'EN', ru:'RU', jp:'JP', num:'123' };
+
+  var kb = document.createElement('div');
+  kb.id = 'nz-kb';
+  kb.className = 'nz-kb';
+  document.body.appendChild(kb);
+
+  var active = null;
+  var layout = 'en';
+  var shift = false;
+
+  function tgHide() {
+    try {
+      var W = window.Telegram && window.Telegram.WebApp;
+      if (W && typeof W.hideKeyboard === 'function') W.hideKeyboard();
+    } catch (e) {}
+  }
+  function tap() {
+    try {
+      var W = window.Telegram && window.Telegram.WebApp;
+      if (W && W.HapticFeedback && typeof W.HapticFeedback.impactOccurred === 'function') {
+        W.HapticFeedback.impactOccurred('light');
+      }
+    } catch (e) {}
+  }
+  function fireInput(el) { el.dispatchEvent(new Event('input', { bubbles: true })); }
+  function insert(text) {
+    if (!active) return;
+    var s = active.selectionStart == null ? active.value.length : active.selectionStart;
+    var e = active.selectionEnd == null ? s : active.selectionEnd;
+    active.setRangeText(text, s, e, 'end');
+    fireInput(active);
+    active.focus();
+  }
+  function backspace() {
+    if (!active) return;
+    var s = active.selectionStart == null ? active.value.length : active.selectionStart;
+    var e = active.selectionEnd == null ? s : active.selectionEnd;
+    if (e > s) active.setRangeText('', s, e, 'start');
+    else if (s > 0) active.setRangeText('', s - 1, s, 'start');
+    fireInput(active);
+    active.focus();
+  }
+  function enter() {
+    if (!active) return;
+    ['keydown','keyup'].forEach(function (type) {
+      active.dispatchEvent(new KeyboardEvent(type, { key:'Enter', code:'Enter', bubbles:true }));
+    });
+    tap();
+  }
+  function close() {
+    kb.classList.remove('open');
+    document.body.classList.remove('nz-kb-open');
+    active = null;
+    tgHide();
+  }
+  function open(el) {
+    active = el;
+    el.setAttribute('inputmode', 'none');
+    kb.classList.add('open');
+    document.body.classList.add('nz-kb-open');
+    tgHide();
+  }
+
+  function makeKey(label, cls, handler) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'nz-kb-key ' + (cls || '');
+    b.textContent = label;
+    b.addEventListener('pointerdown', function (ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      tap();
+      handler();
+    });
+    return b;
+  }
+
+  function render() {
+    kb.innerHTML = '';
+    var bar = document.createElement('div');
+    bar.className = 'nz-kb-bar';
+    ORDER.forEach(function (id) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = NAMES[id];
+      if (id === layout) b.className = 'on';
+      b.addEventListener('pointerdown', function (ev) {
+        ev.preventDefault(); ev.stopPropagation();
+        layout = id; shift = false; tap(); render();
+      });
+      bar.appendChild(b);
+    });
+    var done = document.createElement('button');
+    done.type = 'button';
+    done.className = 'done';
+    done.textContent = 'Готово';
+    done.addEventListener('pointerdown', function (ev) { ev.preventDefault(); ev.stopPropagation(); close(); });
+    bar.appendChild(done);
+    kb.appendChild(bar);
+
+    var rows = document.createElement('div');
+    rows.className = 'nz-kb-rows';
+    LAYOUTS[layout].forEach(function (chars) {
+      var row = document.createElement('div');
+      row.className = 'nz-kb-row';
+      chars.forEach(function (ch) {
+        if (!ch) { row.appendChild(document.createElement('span')); return; }
+        var out = ch;
+        if (shift && layout === 'en') out = ch.toUpperCase();
+        if (shift && layout === 'ru') out = ch.toUpperCase();
+        if (shift && layout === 'jp') out = String.fromCharCode(ch.charCodeAt(0) + 0x60);
+        row.appendChild(makeKey(out, '', function () { insert(out); }));
+      });
+      rows.appendChild(row);
+    });
+
+    var ctrl = document.createElement('div');
+    ctrl.className = 'nz-kb-row';
+    var shiftLabel = layout === 'jp' ? (shift ? 'カナ' : 'かな') : (shift ? 'ABC' : 'abc');
+    ctrl.appendChild(makeKey(shiftLabel, 'ctrl w2', function () { shift = !shift; render(); }));
+    ctrl.appendChild(makeKey('⌫', 'ctrl w2', backspace));
+    ctrl.appendChild(makeKey('Пробел', 'ctrl w4', function () { insert(' '); }));
+    ctrl.appendChild(makeKey('Enter', 'ctrl w2', enter));
+    rows.appendChild(ctrl);
+    kb.appendChild(rows);
+  }
+
+  document.querySelectorAll('input[type="text"], textarea').forEach(function (el) {
+    el.setAttribute('inputmode', 'none');
+    el.setAttribute('autocomplete', 'off');
+    el.addEventListener('focus', function () { open(el); });
+    el.addEventListener('pointerdown', function () { open(el); });
+  });
+  document.addEventListener('focusin', function (ev) {
+    var t = ev.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) {
+      t.setAttribute('inputmode', 'none');
+      if (t !== active) open(t);
+    }
+  }, true);
+  document.addEventListener('pointerdown', function (ev) {
+    if (!kb.classList.contains('open')) return;
+    if (kb.contains(ev.target)) return;
+    if (ev.target === active) return;
+    var t = ev.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+    close();
+  }, true);
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape' && kb.classList.contains('open')) close();
+  });
+
+  render();
+})();
+</script>
 </body>
 
 </html>

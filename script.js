@@ -2146,6 +2146,24 @@ function normalizeText(t) {
 
 // Сравнение ответа с предложением: без знаков препинания и лишних пробелов,
 // с учётом допустимых вариантов перевода (altRu / altEn)
+// РџСЂРёРЅРёРјР°РµРј Р»СЋР±РѕР№ РёР· РІР°СЂРёР°РЅС‚РѕРІ РїРµСЂРµРІРѕРґР°, Р±РµР· СѓС‡С‘С‚Р° СЂРµРіРёСЃС‚СЂР° Рё С‘/Р•
+function wordAnswerMatches(answer, correct, word, direction) {
+    const variants = [correct];
+    if (word) {
+        const extra = direction === "en-ru" ? (word.altRu || []) : (word.altEn || []);
+        extra.forEach(function (v) { variants.push(v); });
+    }
+    const parts = [];
+    variants.forEach(function (v) {
+        String(v).split(/[,;\/]| РёР»Рё /i).forEach(function (p) { parts.push(p); });
+    });
+    parts.slice().forEach(function (p) {
+        var stripped = String(p).replace(/\([^)]*\)/g, "").trim();
+        if (stripped) parts.push(stripped);
+    });
+    const n = normalizeText(answer);
+    return parts.some(function (p) { return normalizeText(p) === n; });
+}
 function sentenceMatches(input, s, direction) {
     const n = normalizeText(input);
     const variants = direction === "en-ru"
@@ -4036,7 +4054,7 @@ function checkAnswer(forced) {
 
     const isCorrect = !forced && (isSentenceMode()
         ? sentenceMatches(answer, word, state.direction)
-        : answer === correctAnswer.toLowerCase());
+        : wordAnswerMatches(answer, correctAnswer, word, state.direction));
     const feedback = document.getElementById("feedback");
 
     if (isCorrect) {
