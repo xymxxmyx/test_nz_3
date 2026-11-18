@@ -1435,7 +1435,6 @@ body.nz-kb-open .screen.active{max-height:calc(var(--app-stage-h,var(--app-vh,10
     document.body.classList.remove('nz-kb-open');
     active = null;
     liftPanel(scr, 0);
-    if (scr) { try { scr.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {} }
     tgHide();
   }
   function enter() {
@@ -1521,12 +1520,9 @@ body.nz-kb-open .screen.active{max-height:calc(var(--app-stage-h,var(--app-vh,10
       var ref = scr.querySelector('#game-card') || el;
       var r = ref.getBoundingClientRect();
       var delta = r.bottom - (kbTop - 20);
-      if (delta <= 4) { liftPanel(scr, 0); return; }
-      // сначала скроллим экран, затем поднимаем сам контент на остаток
-      var max = Math.max(0, scr.scrollHeight - scr.clientHeight);
-      var scrolled = Math.min(max, Math.max(0, delta));
-      if (scrolled > 1) scr.scrollTo({ top: scr.scrollTop + scrolled, behavior: 'smooth' });
-      liftPanel(scr, delta - scrolled);
+      // не скроллим экран: иначе обрезается шапка с прогрессом и сердечками.
+      // поднимаем только карточку, шапка остаётся на месте.
+      liftPanel(scr, delta > 4 ? delta : 0);
     } catch (e) {}
   }
 
