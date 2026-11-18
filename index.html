@@ -1314,10 +1314,10 @@
 .nz-kb-key.w7{grid-column:span 7}
 .nz-kb button:hover,.nz-kb button:active,.nz-kb button:focus{background-color:transparent !important;box-shadow:none !important;border:0 !important;transform:translateY(0);outline:none !important}
 .nz-kb .nz-kb-key:hover{transform:scale(1.06) translateY(-2px);z-index:2}
-.nz-kb .nz-kb-key:active{animation:kbBounce 0.3s cubic-bezier(0.16,1,0.3,1) !important;animation-delay:0s !important;opacity:1 !important;z-index:3}
+.nz-kb .nz-kb-key:active{opacity:1 !important;z-index:3}
 @keyframes kbBounce{0%{transform:scale(1)}38%{transform:scale(0.955)}70%{transform:scale(1.025)}100%{transform:scale(1)}}
-.nz-kb-key.press{animation:kbBounce 0.24s cubic-bezier(0.16,1,0.3,1);animation-delay:0s !important;opacity:1 !important;z-index:3}
-.nz-kb-bar button:active{animation:kbBarBounce 0.26s cubic-bezier(0.16,1,0.3,1);animation-delay:0s !important;opacity:1 !important}
+.nz-kb-key.press{animation:kbBounce 0.26s cubic-bezier(0.16,1,0.3,1) !important;animation-delay:0s !important;opacity:1 !important;z-index:3}
+.nz-kb-bar button:active,.nz-kb-bar button.press{animation:kbBarBounce 0.26s cubic-bezier(0.16,1,0.3,1) !important;animation-delay:0s !important;opacity:1 !important}
 @keyframes kbBarBounce{0%{transform:scale(1)}45%{transform:scale(0.97)}100%{transform:scale(1)}}
 .nz-kb .nz-kb-key:hover{background-image:url("UI/klava_key.webp") !important}
 .nz-kb .nz-kb-key.ctrl:hover{background-image:url("UI/klava_key_pink.webp") !important}
@@ -1541,6 +1541,10 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
       b.style.animationDelay = (i * 0.03).toFixed(3) + 's';
       b.addEventListener('pointerdown', function (ev) {
         ev.preventDefault(); ev.stopPropagation();
+        b.classList.remove('press');
+        void b.offsetWidth;
+        b.classList.add('press');
+        setTimeout(function () { b.classList.remove('press'); }, 260);
         if (switching || id === layout) return;
         switching = true;
         tap();
