@@ -1510,10 +1510,6 @@ body.nz-kb-open .screen.active{padding-bottom:calc(var(--kb-total-h,240px) + 24p
       markBar();
       rebuildNow();
     }
-    ORDER.forEach(function (id) {
-      var bb = bar.querySelector('button[data-id="' + id + '"]');
-      if (bb) bb.style.display = (!need || id === need) ? '' : 'none';
-    });
     var wasOpen = kb.classList.contains('open');
     kb.classList.add('open');
     document.body.classList.add('nz-kb-open');
