@@ -11516,22 +11516,21 @@ body[data-theme="plush"] #battle-area .player-zone .option-card.drag-origin .car
 /* Карты игрока = ТОЧНАЯ копия размеров карты бота:
    --bot-card-w = min(132*fit, max(120*fit, 20%-4*fit)), карта = 100% этой ширины.
    У игрока нет обёртки .bot-card-wrap, поэтому задаём ширину напрямую. */
-body[data-theme="plush"] #battle-area .player-zone .option-card {
-    flex: 0 0 auto;
-    width: min(calc(132px * var(--ui-fit, 1)), max(calc(120px * var(--ui-fit, 1)), calc(20% - 4px * var(--ui-fit, 1))));
-    height: calc(min(calc(132px * var(--ui-fit, 1)), max(calc(120px * var(--ui-fit, 1)), calc(20% - 4px * var(--ui-fit, 1)))) * 1.27);
-    aspect-ratio: auto;
-    max-height: none;
-}
+
 
 
 /* === ФИНАЛЬНЫЙ размер карт игрока = точная формула --bot-card-w карты бота === */
 body[data-theme="plush"] #battle-area .player-zone .option-card {
-    width: min(calc(132px * var(--ui-fit, 1)), max(calc(120px * var(--ui-fit, 1)), calc(20% - 4px * var(--ui-fit, 1)))) !important;
-    height: calc(min(calc(132px * var(--ui-fit, 1)), max(calc(120px * var(--ui-fit, 1)), calc(20% - 4px * var(--ui-fit, 1)))) * 1.27) !important;
+    /* Ширина — ровно как у карты бота (--bot-card-w с .battle-table).
+       Высота — через aspect-ratio, как у .bot-card-wrap (1 / 1.4).
+       ВАЖНО: процент внутри height (20%) невалиден — он считается от высоты
+       родителя, а она не определена; из-за этого height:auto схлопывал карту
+       в полоску и она выглядела растянутой. */
+    width: var(--bot-card-w, calc(120px * var(--ui-fit, 1))) !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1.4 !important;
     max-width: none !important;
     max-height: none !important;
     min-width: 0 !important;
-    aspect-ratio: auto !important;
     flex: 0 0 auto !important;
 }
