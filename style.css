@@ -4100,7 +4100,7 @@ body.tg-light {
     left: calc(var(--app-stage-x, 0px) + var(--bg-l-px, 0px));
     z-index: -1;
     border-radius: 4%;
-    background: url("UI/BG_PIC.webp?v=blob3") no-repeat center / 100% 100%;
+    background: url("UI/BG_PIC_STR.webp?v=bgstr2") no-repeat center / 100% 100%;
     filter: blur(2px);
     box-shadow: inset 0 calc(10px * var(--ui-fit, 1)) calc(22px * var(--ui-fit, 1)) rgba(16, 2, 30, 0.55);
 }
@@ -4381,7 +4381,7 @@ body .menu-panel > .frame-overlay {
     border-radius: 4%;
     box-shadow: inset 0 calc(10px * var(--ui-fit, 1)) calc(22px * var(--ui-fit, 1)) rgba(16, 2, 30, 0.55);
     filter: blur(2px);
-    background: url("UI/BG_PIC.webp?v=blob3") no-repeat center / 100% 100%;
+    background: url("UI/BG_PIC_STR.webp?v=bgstr2") no-repeat center / 100% 100%;
     animation: bgFloat 22s ease-in-out infinite;
 }
 /* Р СџР С•Р С”Р В° Р С‘Р С–РЎР‚Р В°Р ВµРЎвЂљ Р С‘Р Р…РЎвЂљРЎР‚Р С•, РЎвЂћР С•Р Р… РЎРѓРЎвЂљР В°РЎвЂљР С‘РЎвЂЎР ВµР Р…: Р С‘Р Р…Р В°РЎвЂЎР Вµ Р С” Р СР С•Р СР ВµР Р…РЎвЂљРЎС“ Р С—Р С•Р С”Р В°Р В·Р В° Р СР ВµР Р…РЎР‹ bgFloat
@@ -11704,3 +11704,12 @@ body[data-theme="plush"] #ach-toasts {
 .screen.active .settings-list > .setting-item:nth-child(10) { animation-delay: 0.66s !important; }
 .screen.active .settings-list > .setting-item:nth-child(11) { animation-delay: 0.72s !important; }
 .screen.active .settings-list > .setting-item:nth-child(12) { animation-delay: 0.78s !important; }
+
+/* gap_hearts_card_v1 === Меньше зазор между сердечками и игровым полем === */
+body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .hearts {
+    margin-top: calc(2px * var(--ui-fit, 1)) !important;
+    margin-bottom: 0 !important;
+}
+body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #game-card {
+    padding-top: calc(16px * var(--ui-fit, 1)) !important;
+}

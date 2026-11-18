@@ -34,7 +34,7 @@
 
     </script>
 
-    <link rel="stylesheet" href="style.css?v=20261220">
+    <link rel="stylesheet" href="style.css?v=20261223">
 
     <script>
     /* Режим «только рамка» (?frameonly=1): рисуем одно кольцо по экрану,
@@ -1217,7 +1217,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.innerWidth <= MIN_W) {
-            document.write('<script src="script.js?v=20261194"><\/script>');
+            document.write('<script src="script.js?v=20261196"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');
@@ -1289,35 +1289,69 @@
 <!-- === СВОЯ КЛАВИАТУРА (EN / RU / JP / ЦИФРЫ) — только на мобильных === -->
 <style id="nz-kb-css">
 .nz-kb{position:fixed;left:0;right:0;bottom:0;z-index:100000;box-sizing:border-box;padding:5px 5px calc(5px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,rgba(52,22,86,.98),rgba(22,7,38,.99));border-top:2px solid #ff9aa2;display:none;font-family:inherit;user-select:none;-webkit-user-select:none;touch-action:manipulation}
-.nz-kb.open{display:block}
+.nz-kb.open{display:block;animation:kbIn 0.34s cubic-bezier(0.16,1,0.3,1) both}
+@keyframes kbIn{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
 .nz-kb-bar{display:flex;align-items:center;gap:4px;margin-bottom:5px}
-.nz-kb-bar button{flex:1;min-width:0;padding:5px 2px;border-radius:6px;border:1px solid #8a5a6a;background:#3a1c52;color:#ffe9f7;font:600 11px/1 system-ui,sans-serif;cursor:pointer}
-.nz-kb-bar button.on{background:#b0496f;border-color:#ffd0da}
-.nz-kb-bar button.done{background:#2e9a55;border-color:#7ee2a8}
-.nz-kb-rows{display:flex;flex-direction:column;gap:4px}
-.nz-kb-row{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px}
-.nz-kb-key{min-width:0;height:34px;padding:0;border-radius:7px;border:1px solid #8a5a6a;background:linear-gradient(180deg,#5a2b7a,#361650);color:#fff0fa;font:600 13px/1 system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.nz-kb-key.ctrl{background:linear-gradient(180deg,#7a3a58,#4a1c38);font-size:11px}
+.nz-kb-bar button{flex:1;min-width:0;height:28px;padding:0;border:0;border-radius:0;background:transparent url("UI/klava_key_pink_small.webp") center/100% 100% no-repeat;color:#fff0fa;font:700 11px/1 system-ui,sans-serif;cursor:pointer;text-shadow:0 1px 2px rgba(30,4,50,.85)}
+.nz-kb-bar button.on,.nz-kb-bar button.done{background-image:url("UI/klava_key_green.webp")}
+.nz-kb-rows-wrap{position:relative;transition:height 0.32s cubic-bezier(0.16,1,0.3,1)}
+.nz-kb-rows{display:flex;flex-direction:column;gap:4px;opacity:0;transform:translateY(8px);transition:opacity 0.32s cubic-bezier(0.16,1,0.3,1),transform 0.32s cubic-bezier(0.16,1,0.3,1)}
+.nz-kb-rows.ready{opacity:1;transform:translateY(0)}
+.nz-kb-rows.enter{position:absolute;left:0;right:0;top:0}
+.nz-kb-bar button{opacity:1 !important;visibility:visible !important}
+@keyframes kbKeyIn{from{opacity:0;transform:translateY(12px) scale(0.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+.nz-kb-row{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:4px}
+.nz-kb-key{min-width:0;height:38px;padding:0;border:0;border-radius:0;background:transparent url("UI/klava_key.webp") center/100% 100% no-repeat;color:#fff0fa;font:700 13px/1 system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 2px rgba(30,4,50,.85);position:relative;overflow:visible;transition:transform 0.26s cubic-bezier(0.16,1,0.3,1)}
+.nz-kb-key.ctrl{background-image:url("UI/klava_key_pink.webp");font-size:11px}
+.nz-kb-key.space{background-image:url("UI/klava_key_space.webp")}
+.nz-kb-key.enter{background-image:url("UI/klava_key_green.webp")}
 .nz-kb-key.w2{grid-column:span 2}
 .nz-kb-key.w3{grid-column:span 3}
 .nz-kb-key.w4{grid-column:span 4}
+.nz-kb button:hover,.nz-kb button:active,.nz-kb button:focus{background-color:transparent !important;box-shadow:none !important;border:0 !important;transform:translateY(0);outline:none !important}
+.nz-kb .nz-kb-key:hover{transform:scale(1.06) translateY(-2px);z-index:2}
+.nz-kb .nz-kb-key:active{animation:kbBounce 0.3s cubic-bezier(0.16,1,0.3,1) !important;animation-delay:0s !important;opacity:1 !important;z-index:3}
+@keyframes kbBounce{0%{transform:scale(1)}38%{transform:scale(0.955)}70%{transform:scale(1.025)}100%{transform:scale(1)}}
+.nz-kb-bar button:active{animation:kbBarBounce 0.26s cubic-bezier(0.16,1,0.3,1);animation-delay:0s !important;opacity:1 !important}
+@keyframes kbBarBounce{0%{transform:scale(1)}45%{transform:scale(0.97)}100%{transform:scale(1)}}
+.nz-kb .nz-kb-key:hover{background-image:url("UI/klava_key.webp") !important}
+.nz-kb .nz-kb-key.ctrl:hover{background-image:url("UI/klava_key_pink.webp") !important}
+.nz-kb .nz-kb-key.space:hover{background-image:url("UI/klava_key_space.webp") !important}
+.nz-kb .nz-kb-key.enter:hover{background-image:url("UI/klava_key_green.webp") !important}
+.nz-kb-bar button:hover{background-image:url("UI/klava_key_pink_small.webp") !important}
+.nz-kb-bar button.on:hover,.nz-kb-bar button.done:hover{background-image:url("UI/klava_key_green.webp") !important}
 body.nz-kb-open .screen.active{padding-bottom:230px}
 </style>
 <script>
 (function () {
+  function isMobileDevice() {
+    try {
+      var W = window.Telegram && window.Telegram.WebApp;
+      var plat = W && W.platform ? String(W.platform).toLowerCase() : '';
+      if (plat && /tdesktop|macos|weba|webk|unigram/.test(plat)) return false;
+      if (plat && /android|ios|iphone|ipad|mobile/.test(plat)) return true;
+      var ua = String(navigator.userAgent || '');
+      if (/android|iphone|ipad|ipod|mobile|windows phone|webos|blackberry/i.test(ua)) return true;
+      if ((navigator.maxTouchPoints || 0) > 0 && Math.min(screen.width, screen.height) > 900) return false;
+      if ((navigator.maxTouchPoints || 0) > 1 && Math.min(screen.width, screen.height) < 900) return true;
+    } catch (e) {}
+    return false;
+  }
+  window.NZ_KB_IS_MOBILE = isMobileDevice;
+  if (!isMobileDevice()) return;
   if (window.self === window.top && document.getElementById('phone-frame')) return;
   if (document.getElementById('nz-kb')) return;
 
   var LAYOUTS = {
     en: [
-      ['q','w','e','r','t','y','u','i','o','p'],
-      ['a','s','d','f','g','h','j','k','l',''],
-      ['z','x','c','v','b','n','m',',','.','?']
+      ['q','w','e','r','t','y','u','i','o','p',''],
+      ['a','s','d','f','g','h','j','k','l','',''],
+      ['z','x','c','v','b','n','m',',','.']
     ],
     ru: [
-      ['й','ц','у','к','е','н','г','ш','щ','з'],
-      ['ф','ы','в','а','п','р','о','л','д','ь'],
-      ['я','ч','с','м','и','т','ь','б','ю','/']
+      ['й','ц','у','к','е','н','г','ш','щ','з','х'],
+      ['ф','ы','в','а','п','р','о','л','д','ж','э'],
+      ['я','ч','с','м','и','т','ь','б','ю']
     ],
     jp: [
       ['あ','い','う','え','お','か','き','く','け','こ'],
@@ -1340,9 +1374,17 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
   kb.className = 'nz-kb';
   document.body.appendChild(kb);
 
+  var bar = document.createElement('div');
+  bar.className = 'nz-kb-bar';
+  kb.appendChild(bar);
+  var wrap = document.createElement('div');
+  wrap.className = 'nz-kb-rows-wrap';
+  kb.appendChild(wrap);
+
   var active = null;
   var layout = 'en';
   var shift = false;
+  var switching = false;
 
   function tgHide() {
     try {
@@ -1376,27 +1418,89 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
     fireInput(active);
     active.focus();
   }
-  function enter() {
-    if (!active) return;
-    ['keydown','keyup'].forEach(function (type) {
-      active.dispatchEvent(new KeyboardEvent(type, { key:'Enter', code:'Enter', bubbles:true }));
-    });
-    tap();
-  }
   function close() {
     kb.classList.remove('open');
     document.body.classList.remove('nz-kb-open');
     active = null;
     tgHide();
   }
+  function enter() {
+    if (!active) return;
+    ['keydown','keyup'].forEach(function (type) {
+      active.dispatchEvent(new KeyboardEvent(type, { key:'Enter', code:'Enter', bubbles:true }));
+    });
+    tap();
+    close();
+  }
+  function expectedLang(el) {
+    try {
+      if (typeof state === 'undefined' || !state || !state.playMode) return null;
+      var gs = document.getElementById('game-screen');
+      if (!gs || gs.classList.contains('hidden')) return null;
+      var id = el && el.id;
+      if (id === 'uw-en' || id === 'uw-ru' || id === 'uw-note' || id === 'dict-search' || id === 'uw-search') return null;
+      if (state.playMode === 'listening') return (typeof isJa === 'function' && isJa()) ? 'jp' : 'en';
+      if (typeof isTargetToNative === 'function' && isTargetToNative()) return 'ru';
+      return (typeof isJa === 'function' && isJa()) ? 'jp' : 'en';
+    } catch (e) { return null; }
+  }
+  function rebuildNow() {
+    var old = wrap.lastChild;
+    if (old) old.remove();
+    var rows = buildRows();
+    wrap.appendChild(rows);
+    stagger(rows);
+    rows.classList.add('ready');
+    wrap.style.transition = 'none';
+    wrap.style.height = rows.getBoundingClientRect().height + 'px';
+    setTimeout(function () { wrap.style.transition = ''; }, 20);
+  }
   function open(el) {
     active = el;
     el.setAttribute('inputmode', 'none');
+    var need = expectedLang(el);
+    if (need && need !== layout) {
+      layout = need;
+      shift = false;
+      ORDER.forEach(function (id) {
+        var bb = bar.querySelector('button[data-id="' + id + '"]');
+        if (bb) bb.classList.toggle('on', id === layout);
+      });
+      rebuildNow();
+    }
+    ORDER.forEach(function (id) {
+      var bb = bar.querySelector('button[data-id="' + id + '"]');
+      if (bb) bb.style.display = (!need || id === need) ? '' : 'none';
+    });
     kb.classList.add('open');
     document.body.classList.add('nz-kb-open');
+    var rows = wrap.lastChild;
+    if (rows) {
+      wrap.style.transition = 'none';
+      wrap.style.height = rows.getBoundingClientRect().height + 'px';
+    }
     tgHide();
   }
 
+  function charFor(k) {
+    var base = k.getAttribute('data-base');
+    if (!base) return k.textContent;
+    if (layout === 'jp' && shift) return String.fromCharCode(base.charCodeAt(0) + 0x60);
+    if (shift && (layout === 'en' || layout === 'ru')) return base.toUpperCase();
+    return base;
+  }
+  function initialChar(ch) {
+    if (layout === 'jp' && shift) return String.fromCharCode(ch.charCodeAt(0) + 0x60);
+    if (shift && (layout === 'en' || layout === 'ru')) return ch.toUpperCase();
+    return ch;
+  }
+  function applyShift() {
+    wrap.querySelectorAll('.nz-kb-key[data-base]').forEach(function (k) {
+      k.textContent = charFor(k);
+    });
+    var b = wrap.querySelector('.nz-kb-key.shift');
+    if (b) b.textContent = layout === 'jp' ? (shift ? 'カナ' : 'かな') : '⇧ Shift';
+  }
   function makeKey(label, cls, handler) {
     var b = document.createElement('button');
     b.type = 'button';
@@ -1406,60 +1510,114 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
       ev.preventDefault();
       ev.stopPropagation();
       tap();
-      handler();
+      handler(b);
     });
     return b;
   }
 
-  function render() {
-    kb.innerHTML = '';
-    var bar = document.createElement('div');
-    bar.className = 'nz-kb-bar';
-    ORDER.forEach(function (id) {
+  function renderBar() {
+    bar.innerHTML = '';
+    ORDER.forEach(function (id, i) {
       var b = document.createElement('button');
       b.type = 'button';
       b.textContent = NAMES[id];
+      b.setAttribute('data-id', id);
       if (id === layout) b.className = 'on';
+      b.style.animationDelay = (i * 0.03).toFixed(3) + 's';
       b.addEventListener('pointerdown', function (ev) {
         ev.preventDefault(); ev.stopPropagation();
-        layout = id; shift = false; tap(); render();
+        if (switching || id === layout) return;
+        switching = true;
+        tap();
+        layout = id; shift = false;
+        ORDER.forEach(function (other) {
+          var bb = bar.querySelector('button[data-id="' + other + '"]');
+          if (bb) bb.classList.toggle('on', other === id);
+        });
+        var old = wrap.lastChild;
+        var next = buildRows();
+        next.classList.add('enter');
+        wrap.appendChild(next);
+        stagger(next);
+        if (old) old.classList.add('enter');
+        wrap.style.transition = '';
+        wrap.style.height = next.getBoundingClientRect().height + 'px';
+        setTimeout(function () {
+          next.classList.add('ready');
+          if (old) old.classList.remove('ready');
+        }, 20);
+        setTimeout(function () {
+          if (old && old.parentNode) old.remove();
+          next.classList.remove('enter');
+          wrap.style.height = next.getBoundingClientRect().height + 'px';
+          switching = false;
+        }, 380);
       });
       bar.appendChild(b);
     });
-    var done = document.createElement('button');
-    done.type = 'button';
-    done.className = 'done';
-    done.textContent = 'Готово';
-    done.addEventListener('pointerdown', function (ev) { ev.preventDefault(); ev.stopPropagation(); close(); });
-    bar.appendChild(done);
-    kb.appendChild(bar);
+  }
 
+  function makeShift(w) {
+    return makeKey(layout === 'jp' ? (shift ? 'カナ' : 'かな') : '⇧ Shift', 'ctrl ' + (w || 'w2') + ' shift', function () {
+      shift = !shift;
+      applyShift();
+    });
+  }
+  function makeBack(w) {
+    return makeKey('⌫', 'ctrl ' + (w || 'w2'), backspace);
+  }
+  function buildRows() {
     var rows = document.createElement('div');
     rows.className = 'nz-kb-rows';
-    LAYOUTS[layout].forEach(function (chars) {
+    LAYOUTS[layout].forEach(function (chars, ri) {
       var row = document.createElement('div');
       row.className = 'nz-kb-row';
+      var withShift = (layout === 'en' || layout === 'ru') && ri === 2;
+      if (withShift) row.appendChild(makeShift('w1'));
       chars.forEach(function (ch) {
         if (!ch) { row.appendChild(document.createElement('span')); return; }
-        var out = ch;
-        if (shift && layout === 'en') out = ch.toUpperCase();
-        if (shift && layout === 'ru') out = ch.toUpperCase();
-        if (shift && layout === 'jp') out = String.fromCharCode(ch.charCodeAt(0) + 0x60);
-        row.appendChild(makeKey(out, '', function () { insert(out); }));
+        var k = makeKey(initialChar(ch), '', function () { insert(charFor(k)); });
+        if (layout !== 'num') k.setAttribute('data-base', ch);
+        row.appendChild(k);
       });
+      if (withShift) row.appendChild(makeBack('w1'));
       rows.appendChild(row);
     });
-
     var ctrl = document.createElement('div');
     ctrl.className = 'nz-kb-row';
-    var shiftLabel = layout === 'jp' ? (shift ? 'カナ' : 'かな') : (shift ? 'ABC' : 'abc');
-    ctrl.appendChild(makeKey(shiftLabel, 'ctrl w2', function () { shift = !shift; render(); }));
-    ctrl.appendChild(makeKey('⌫', 'ctrl w2', backspace));
-    ctrl.appendChild(makeKey('Пробел', 'ctrl w4', function () { insert(' '); }));
-    ctrl.appendChild(makeKey('Enter', 'ctrl w2', enter));
+    if (layout === 'en' || layout === 'ru') {
+      ctrl.appendChild(makeKey('123', 'ctrl w2', function () {
+        var b = bar.querySelector('button[data-id="num"]');
+        if (b) b.dispatchEvent(new PointerEvent('pointerdown', { bubbles:true, cancelable:true }));
+      }));
+      ctrl.appendChild(makeKey('☺', 'ctrl w2', function () { insert('☺'); }));
+      ctrl.appendChild(makeKey('Пробел', 'space w5', function () { insert(' '); }));
+      ctrl.appendChild(makeKey('↵', 'enter w2', enter));
+    } else {
+      ctrl.appendChild(makeShift('w2'));
+      ctrl.appendChild(makeBack('w2'));
+      ctrl.appendChild(makeKey('Пробел', 'space w5', function () { insert(' '); }));
+      ctrl.appendChild(makeKey('Enter', 'enter w2', enter));
+    }
     rows.appendChild(ctrl);
-    kb.appendChild(rows);
+    return rows;
   }
+
+  function stagger(rows) {
+    var keys = rows.querySelectorAll('.nz-kb-key');
+    for (var i = 0; i < keys.length; i++) keys[i].style.animationDelay = (0.015 + i * 0.01).toFixed(3) + 's';
+  }
+
+  renderBar();
+  var first = buildRows();
+  wrap.appendChild(first);
+  stagger(first);
+  wrap.style.transition = 'none';
+  wrap.style.height = first.getBoundingClientRect().height + 'px';
+  setTimeout(function () {
+    wrap.style.transition = '';
+    first.classList.add('ready');
+  }, 20);
 
   document.querySelectorAll('input[type="text"], textarea').forEach(function (el) {
     el.setAttribute('inputmode', 'none');
@@ -1485,8 +1643,6 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
   document.addEventListener('keydown', function (ev) {
     if (ev.key === 'Escape' && kb.classList.contains('open')) close();
   });
-
-  render();
 })();
 </script>
 </body>

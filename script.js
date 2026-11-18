@@ -7826,7 +7826,7 @@ function restartLessonsTest() {
         const run = () => {
             if (ran) return;
             ran = true;
-            const paths = ["UI/BG_PIC.webp?v=blob3", "UI/main-frame-v3.webp?v=frame5", "MASKOT/LOGO.webp", "MASKOT/MASKOT_18_cut.webp", "UI/extracted/activ_bottom.webp", "UI/extracted/bottom_trim.webp", "UI/Vipad_osnova.webp", "UI/ICON/MEDAL.webp", "UI/ICON/ZAMOK.webp", "UI/ICON/STAR.webp", "UI/ICON/TARGET.webp", "UI/ICON/FIRE.webp", "UI/ICON/DIAMOND.webp", "UI/ICON/KNIGA_BLUE.webp", "UI/ICON/MOLNIA.webp", "UI/ICON/GROMOFON'.webp", "UI/ICON/KUBOK.webp", "UI/ICON/KOLOKOL.webp", "UI/ICON/DEKA.webp", "UI/ICON/GALKA.webp", "UI/ICON/LAMPA.webp", "UI/ICON/PALEC.webp", "UI/ICON/TRASH.webp", "UI/ICON/RECYCLE.webp", "UI/ICON/PALITRA.webp"];
+            const paths = ["UI/BG_PIC_STR.webp?v=bgstr2", "UI/main-frame-v3.webp?v=frame5", "MASKOT/LOGO.webp", "MASKOT/MASKOT_18_cut.webp", "UI/extracted/activ_bottom.webp", "UI/extracted/bottom_trim.webp", "UI/Vipad_osnova.webp", "UI/ICON/MEDAL.webp", "UI/ICON/ZAMOK.webp", "UI/ICON/STAR.webp", "UI/ICON/TARGET.webp", "UI/ICON/FIRE.webp", "UI/ICON/DIAMOND.webp", "UI/ICON/KNIGA_BLUE.webp", "UI/ICON/MOLNIA.webp", "UI/ICON/GROMOFON'.webp", "UI/ICON/KUBOK.webp", "UI/ICON/KOLOKOL.webp", "UI/ICON/DEKA.webp", "UI/ICON/GALKA.webp", "UI/ICON/LAMPA.webp", "UI/ICON/PALEC.webp", "UI/ICON/TRASH.webp", "UI/ICON/RECYCLE.webp", "UI/ICON/PALITRA.webp"];
             paths.forEach(p => { try { const im = new Image(); im.src = p; } catch (e) {} });
         };
         if (document.readyState === "complete") run();
