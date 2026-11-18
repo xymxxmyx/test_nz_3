@@ -1293,7 +1293,7 @@
 .nz-kb-bar button{height:var(--kb-bar-h,44px)}
 .nz-kb.open{display:block}
 .nz-kb-bar{display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:5px}
-.nz-kb-bar button{flex:1 1 0;max-width:none;min-width:0;height:var(--kb-bar-h,44px);padding:0;border:6px solid transparent;-webkit-border-image:url("UI/klava_key_pink_small.webp") 26 26 26 26 fill / 6px 6px 6px 6px / 0 stretch;border-image:url("UI/klava_key_pink_small.webp") 26 26 26 26 fill / 6px 6px 6px 6px / 0 stretch;background:transparent url("UI/klava_key_pink_small.webp") center/contain no-repeat !important;color:#fff0fa;font:700 11px/1 system-ui,sans-serif;cursor:pointer;text-shadow:0 1px 2px rgba(30,4,50,.85);transform-origin:center;-webkit-tap-highlight-color:transparent}
+.nz-kb-bar button{flex:0 0 76px;max-width:76px;min-width:0;height:var(--kb-bar-h,44px);padding:0;border:6px solid transparent;-webkit-border-image:url("UI/klava_key_pink_small.webp") 26 26 26 26 fill / 6px 6px 6px 6px / 0 stretch;border-image:url("UI/klava_key_pink_small.webp") 26 26 26 26 fill / 6px 6px 6px 6px / 0 stretch;background:transparent url("UI/klava_key_pink_small.webp") center/contain no-repeat !important;color:#fff0fa;font:700 11px/1 system-ui,sans-serif;cursor:pointer;text-shadow:0 1px 2px rgba(30,4,50,.85);transform-origin:center;-webkit-tap-highlight-color:transparent}
 .nz-kb-bar button.on,.nz-kb-bar button.done{-webkit-border-image:url("UI/klava_key_green.webp") 24 24 24 24 fill / 6px 6px 6px 6px / 0 stretch;border-image:url("UI/klava_key_green.webp") 24 24 24 24 fill / 6px 6px 6px 6px / 0 stretch;background:transparent url("UI/klava_key_green.webp") center/contain no-repeat !important;}
 .nz-kb-rows-wrap{position:relative}
 .nz-kb-rows{display:flex;flex-direction:column;gap:4px}
@@ -1650,12 +1650,14 @@ body.nz-kb-open .screen.active{padding-bottom:calc(var(--kb-total-h,240px) + 24p
       var withShift = (layout === 'en' || layout === 'ru') && ri === 2;
       if (withShift) row.appendChild(makeShift('w1'));
       chars.forEach(function (ch) {
-        if (!ch) { row.appendChild(document.createElement('span')); return; }
+        if (!ch) return;
         var k = makeKey(initialChar(ch), '', function () { insert(charFor(k)); });
         if (layout !== 'num') k.setAttribute('data-base', ch);
         row.appendChild(k);
       });
       if (withShift) row.appendChild(makeBack('w1'));
+      // ровно столько колонок, сколько клавиш — без пустых ячеек в конце ряда
+      row.style.gridTemplateColumns = 'repeat(' + row.children.length + ',minmax(0,1fr))';
       rows.appendChild(row);
     });
     var ctrl = document.createElement('div');
