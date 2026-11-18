@@ -1288,7 +1288,9 @@
 
 <!-- === СВОЯ КЛАВИАТУРА (EN / RU / JP / ЦИФРЫ) — только на мобильных === -->
 <style id="nz-kb-css">
-.nz-kb{position:fixed;left:0;right:0;bottom:0;z-index:100000;box-sizing:border-box;padding:5px 5px calc(5px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,rgba(52,22,86,.98),rgba(22,7,38,.99));border-top:2px solid #ff9aa2;display:none;font-family:inherit;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.nz-kb{position:fixed;left:calc(var(--frame-l-px,24px) + 4px);right:calc(var(--frame-r-px,24px) + 4px);bottom:calc(var(--app-stage-yb,0px) + var(--frame-b-px,24px) + 6px);z-index:100000;box-sizing:border-box;padding:5px 5px 5px;background:linear-gradient(180deg,rgba(52,22,86,.98),rgba(22,7,38,.99));border-top:2px solid #ff9aa2;border-radius:12px;display:none;font-family:inherit;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.nz-kb-key{height:var(--kb-key-h,38px)}
+.nz-kb-bar button{height:calc(var(--kb-key-h,38px) * 0.74)}
 .nz-kb.open{display:block;animation:kbIn 0.34s cubic-bezier(0.16,1,0.3,1) both}
 @keyframes kbIn{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
 .nz-kb-bar{display:flex;align-items:center;gap:4px;margin-bottom:5px}
@@ -1455,8 +1457,14 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
     wrap.style.height = rows.getBoundingClientRect().height + 'px';
     setTimeout(function () { wrap.style.transition = ''; }, 20);
   }
+  function fitKeyboard() {
+    var h = window.innerHeight || 700;
+    var kh = Math.max(30, Math.min(38, Math.round((h - 360) / 8)));
+    document.documentElement.style.setProperty('--kb-key-h', kh + 'px');
+  }
   function open(el) {
     active = el;
+    fitKeyboard();
     el.setAttribute('inputmode', 'none');
     var need = expectedLang(el);
     if (need && need !== layout) {
