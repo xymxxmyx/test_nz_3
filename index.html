@@ -1434,6 +1434,7 @@ body.nz-kb-open .screen.active{max-height:calc(var(--app-stage-h,var(--app-vh,10
     kb.classList.remove('open');
     document.body.classList.remove('nz-kb-open');
     active = null;
+    liftPanel(scr, 0);
     if (scr) { try { scr.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {} }
     tgHide();
   }
@@ -1503,18 +1504,26 @@ body.nz-kb-open .screen.active{max-height:calc(var(--app-stage-h,var(--app-vh,10
     } catch (e) {}
   }
 
+  function liftPanel(scr, on) {
+    if (!scr) return;
+    var panel = scr.querySelector('.panel') || scr.firstElementChild;
+    if (!panel) return;
+    panel.style.transition = 'transform 420ms cubic-bezier(0.22,1,0.36,1)';
+    panel.style.transform = on ? ('translateY(' + (-Math.round(on) - 12) + 'px)') : '';
+  }
   function liftForKeyboard(el) {
     try {
       var scr = el.closest ? el.closest('.screen') : null;
       if (!scr) return;
       var kbTop = kb.getBoundingClientRect().top;
       var r = el.getBoundingClientRect();
-      var delta = r.bottom - (kbTop - 16);
-      if (delta > 12) {
-        var max = Math.max(0, scr.scrollHeight - scr.clientHeight);
-        var to = Math.min(max, Math.max(0, scr.scrollTop + delta));
-        if (Math.abs(to - scr.scrollTop) > 1) scr.scrollTo({ top: to, behavior: 'smooth' });
-      }
+      var delta = r.bottom - (kbTop - 24);
+      if (delta <= 4) { liftPanel(scr, 0); return; }
+      // сначала скроллим экран, затем поднимаем сам контент на остаток
+      var max = Math.max(0, scr.scrollHeight - scr.clientHeight);
+      var scrolled = Math.min(max, Math.max(0, delta));
+      if (scrolled > 1) scr.scrollTo({ top: scr.scrollTop + scrolled, behavior: 'smooth' });
+      liftPanel(scr, delta - scrolled);
     } catch (e) {}
   }
 
