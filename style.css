@@ -11545,3 +11545,41 @@ body[data-theme="plush"] #battle-area .player-zone .option-card {
     min-width: 0 !important;
     flex: 0 0 auto !important;
 }
+
+/* /* card_shadow_fix_v2 === Мягкая размытая тень под картой на телефоне ===
+   На тач-устройствах :hover/:active «залипают»: раньше под картой
+   оставалась чёткая тёмная полоса. Заменяем её на широкую размытую
+   тень с низкой непрозрачностью — мягкий след без резких краёв. */
+body.tg-mini-app #battle-area .player-zone .option-card .card-inner,
+body.tg-mini-app #cards-drag-layer .option-card .card-inner {
+    filter: none !important;
+    box-shadow: 0 calc(6px * var(--ui-fit, 1)) calc(24px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.2),
+                inset 0 0 18px rgba(255, 183, 197, 0.1) !important;
+}
+body.tg-mini-app #cards-area .cards-grid .option-card .card-inner {
+    box-shadow: 0 calc(4px * var(--ui-fit, 1)) calc(16px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.18),
+                inset 0 0 18px rgba(255, 183, 197, 0.1) !important;
+}
+/* Состояния карты: та же мягкая тень плюс светлый ореол обратной связи. */
+body.tg-mini-app #battle-area .player-zone .option-card.selected .card-inner,
+body.tg-mini-app #battle-area .player-zone .option-card:hover:not(:disabled) .card-inner {
+    box-shadow: 0 calc(8px * var(--ui-fit, 1)) calc(30px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.22),
+                inset 0 0 30px rgba(255, 154, 162, 0.22),
+                0 0 34px rgba(255, 183, 197, 0.3) !important;
+}
+body.tg-mini-app #battle-area .player-zone .option-card.correct .card-inner {
+    box-shadow: 0 calc(8px * var(--ui-fit, 1)) calc(30px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.22),
+                inset 0 0 30px rgba(74, 222, 128, 0.24),
+                0 0 38px rgba(74, 222, 128, 0.42) !important;
+}
+body.tg-mini-app #battle-area .player-zone .option-card.wrong .card-inner {
+    box-shadow: 0 calc(8px * var(--ui-fit, 1)) calc(30px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.22),
+                inset 0 0 24px rgba(248, 113, 113, 0.18) !important;
+}
+/* Копия карты при обмене: размытая тень вместо чёткой. */
+body.tg-mini-app .cards-drag-ghost {
+    filter: drop-shadow(0 calc(8px * var(--ui-fit, 1)) calc(26px * var(--ui-fit, 1)) rgba(24, 2, 40, 0.22)) !important;
+}
+body.tg-mini-app .cards-drag-ghost.over-target {
+    filter: drop-shadow(0 0 calc(12px * var(--ui-fit, 1)) rgba(255, 255, 255, 0.35)) !important;
+}
