@@ -11513,13 +11513,25 @@ body[data-theme="plush"] #battle-area .player-zone .option-card.drag-origin .car
 /* === Карты игрока = карты бота: та же ширина/высота, без растяжения ===
    Переменные --bot-card-w/--card-w определены только внутри .battle-table
    и здесь НЕ доступны — повторяем ту же формулу целиком. === */
-body[data-theme="plush"] #battle-area .battle-table {
-    --pcard-w: min(calc(140px * var(--ui-fit, 1)), max(calc(126px * var(--ui-fit, 1)), calc(20% - 4px * var(--ui-fit, 1))));
-}
+/* Карты игрока = ТОЧНАЯ копия размеров карты бота:
+   --bot-card-w = min(132*fit, max(120*fit, 20%-4*fit)), карта = 100% этой ширины.
+   У игрока нет обёртки .bot-card-wrap, поэтому задаём ширину напрямую. */
 body[data-theme="plush"] #battle-area .player-zone .option-card {
     flex: 0 0 auto;
-    width: var(--pcard-w, calc(126px * var(--ui-fit, 1)));
-    height: calc(var(--pcard-w, calc(126px * var(--ui-fit, 1))) * 1.26);
+    width: min(calc(132px * var(--ui-fit, 1)), max(calc(120px * var(--ui-fit, 1)), calc(20% - 4px * var(--ui-fit, 1))));
+    height: calc(min(calc(132px * var(--ui-fit, 1)), max(calc(120px * var(--ui-fit, 1)), calc(20% - 4px * var(--ui-fit, 1)))) * 1.27);
     aspect-ratio: auto;
     max-height: none;
+}
+
+
+/* === ФИНАЛЬНЫЙ размер карт игрока = точная формула --bot-card-w карты бота === */
+body[data-theme="plush"] #battle-area .player-zone .option-card {
+    width: min(calc(132px * var(--ui-fit, 1)), max(calc(120px * var(--ui-fit, 1)), calc(20% - 4px * var(--ui-fit, 1)))) !important;
+    height: calc(min(calc(132px * var(--ui-fit, 1)), max(calc(120px * var(--ui-fit, 1)), calc(20% - 4px * var(--ui-fit, 1)))) * 1.27) !important;
+    max-width: none !important;
+    max-height: none !important;
+    min-width: 0 !important;
+    aspect-ratio: auto !important;
+    flex: 0 0 auto !important;
 }
