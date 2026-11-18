@@ -1357,8 +1357,8 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
       ['.',',',':',';','"',"'",'!','?','@','#']
     ]
   };
-  var ORDER = ['en','num','jp','ru'];
-  var NAMES = { en:'EN', ru:'RU', jp:'JP', num:'123' };
+  var ORDER = ['en','ru','jp'];
+  var NAMES = { en:'EN', ru:'RU/123', jp:'JP' };
 
   var kb = document.createElement('div');
   kb.id = 'nz-kb';
@@ -1498,10 +1498,7 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
     if (need && need !== layout) {
       layout = need;
       shift = false;
-      ORDER.forEach(function (id) {
-        var bb = bar.querySelector('button[data-id="' + id + '"]');
-        if (bb) bb.classList.toggle('on', id === layout);
-      });
+      markBar();
       rebuildNow();
     }
     ORDER.forEach(function (id) {
@@ -1564,6 +1561,29 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
     return b;
   }
 
+  // RU и 123 — одна кнопка: переключает русскую раскладку и цифры
+  function markBar() {
+    ORDER.forEach(function (other) {
+      var bb = bar.querySelector('button[data-id="' + other + '"]');
+      if (!bb) return;
+      var active = (other === 'ru')
+        ? (layout === 'ru' || layout === 'num')
+        : (other === layout);
+      bb.classList.toggle('on', active);
+    });
+  }
+  function switchLayout(id) {
+    if (switching || id === layout) return;
+    switching = true;
+    tap();
+    layout = id; shift = false;
+    markBar();
+    var old = wrap.lastChild;
+    if (old) old.remove();
+    wrap.appendChild(buildRows());
+    switching = false;
+  }
+
   function renderBar() {
     bar.innerHTML = '';
     ORDER.forEach(function (id, i) {
@@ -1571,22 +1591,13 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
       b.type = 'button';
       b.textContent = NAMES[id];
       b.setAttribute('data-id', id);
-      if (id === layout) b.className = 'on';
+      if ((id === 'ru' && (layout === 'ru' || layout === 'num')) || id === layout) b.className = 'on';
       b.addEventListener('pointerdown', function (ev) {
         ev.preventDefault(); ev.stopPropagation();
         bounce(b);
-        if (switching || id === layout) return;
-        switching = true;
-        tap();
-        layout = id; shift = false;
-        ORDER.forEach(function (other) {
-          var bb = bar.querySelector('button[data-id="' + other + '"]');
-          if (bb) bb.classList.toggle('on', other === id);
-        });
-        var old = wrap.lastChild;
-        if (old) old.remove();
-        wrap.appendChild(buildRows());
-        switching = false;
+        if (switching) return;
+        if (id === 'ru') switchLayout(layout === 'ru' ? 'num' : 'ru');
+        else switchLayout(id);
       });
       bar.appendChild(b);
     });
@@ -1621,10 +1632,7 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
     var ctrl = document.createElement('div');
     ctrl.className = 'nz-kb-row';
     if (layout === 'en' || layout === 'ru') {
-      ctrl.appendChild(makeKey('123', 'ctrl w2', function () {
-        var b = bar.querySelector('button[data-id="num"]');
-        if (b) b.dispatchEvent(new PointerEvent('pointerdown', { bubbles:true, cancelable:true }));
-      }));
+      ctrl.appendChild(makeKey('123', 'ctrl w2', function () { switchLayout('num'); }));
       ctrl.appendChild(makeKey('Пробел', 'space w7', function () { insert(' '); }));
       ctrl.appendChild(makeKey('↵', 'enter w2', enter));
     } else {
