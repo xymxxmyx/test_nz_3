@@ -1477,15 +1477,15 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
         kb.animate([
           { transform: 'translateY(100%)', opacity: 0 },
           { transform: 'translateY(0)', opacity: 1 }
-        ], { duration: 300, easing: 'cubic-bezier(0.16,1,0.3,1)' });
+        ], { duration: 420, easing: 'cubic-bezier(0.22,1,0.36,1)' });
       }
       var keys = kb.querySelectorAll('.nz-kb-key, .nz-kb-bar button');
       keys.forEach(function (k, i) {
         if (!k.animate) return;
         k.animate([
-          { opacity: 0, transform: 'translateY(8px)' },
+          { opacity: 0, transform: 'translateY(6px)' },
           { opacity: 1, transform: 'translateY(0)' }
-        ], { duration: 260, delay: 60 + i * 7, easing: 'cubic-bezier(0.16,1,0.3,1)', fill: 'backwards' });
+        ], { duration: 380, delay: 50 + i * 6, easing: 'cubic-bezier(0.22,1,0.36,1)', fill: 'backwards' });
       });
     } catch (e) {}
   }
