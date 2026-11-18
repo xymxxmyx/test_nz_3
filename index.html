@@ -1311,7 +1311,8 @@
 .nz-kb-key.w5{grid-column:span 5}
 .nz-kb-key.w7{grid-column:span 7}
 .nz-kb button:hover,.nz-kb button:active,.nz-kb button:focus{outline:none !important;transform:none;-webkit-tap-highlight-color:transparent !important}
-body.nz-kb-open .screen.active{padding-bottom:calc(var(--kb-total-h,240px) + 24px)}
+.screen.active{transition:max-height 420ms cubic-bezier(0.22,1,0.36,1)}
+body.nz-kb-open .screen.active{max-height:calc(var(--app-stage-h,var(--app-vh,100svh)) - var(--frame-t-px,24px) - var(--topbar-h,36px) - var(--frame-b-px,24px) - 14px - var(--kb-total-h,240px)) !important;padding-bottom:16px;justify-content:flex-start}
 </style>
 <script>
 (function () {
@@ -1429,9 +1430,11 @@ body.nz-kb-open .screen.active{padding-bottom:calc(var(--kb-total-h,240px) + 24p
     fireInput(active);
   }
   function close() {
+    var scr = active && active.closest ? active.closest('.screen') : null;
     kb.classList.remove('open');
     document.body.classList.remove('nz-kb-open');
     active = null;
+    if (scr) { try { scr.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {} }
     tgHide();
   }
   function enter() {
@@ -1500,6 +1503,21 @@ body.nz-kb-open .screen.active{padding-bottom:calc(var(--kb-total-h,240px) + 24p
     } catch (e) {}
   }
 
+  function liftForKeyboard(el) {
+    try {
+      var scr = el.closest ? el.closest('.screen') : null;
+      if (!scr) return;
+      var kbTop = kb.getBoundingClientRect().top;
+      var r = el.getBoundingClientRect();
+      var delta = r.bottom - (kbTop - 16);
+      if (delta > 12) {
+        var max = Math.max(0, scr.scrollHeight - scr.clientHeight);
+        var to = Math.min(max, Math.max(0, scr.scrollTop + delta));
+        if (Math.abs(to - scr.scrollTop) > 1) scr.scrollTo({ top: to, behavior: 'smooth' });
+      }
+    } catch (e) {}
+  }
+
   function open(el) {
     active = el;
     el.setAttribute('inputmode', 'none');
@@ -1523,6 +1541,7 @@ body.nz-kb-open .screen.active{padding-bottom:calc(var(--kb-total-h,240px) + 24p
     document.body.classList.add('nz-kb-open');
     if (!wasOpen) animateOpen();
     updateSwapKey();
+    setTimeout(function () { liftForKeyboard(el); }, 440);
     tgHide();
   }
 
