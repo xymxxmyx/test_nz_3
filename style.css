@@ -1093,7 +1093,7 @@ button:active, .menu-btn:active {
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     column-gap: 4px;
-    margin-top: calc(44px * var(--ui-fit, 1));
+    margin-top: calc(27px * var(--ui-fit, 1));
     text-align: center;
     padding: 4px 0;
 }
@@ -9283,7 +9283,7 @@ body[data-theme="plush"] #battle-area .battle-table {
    РЎвЂ Р ВµР Р…РЎвЂљРЎР‚ Р С‘ Р Р†Р ВµР ВµРЎР‚ Р С—Р С•Р СР ВµРЎвЂ°Р В°Р В»Р С‘РЎРѓРЎРЉ Р В±Р ВµР В· Р С—РЎР‚Р С•Р С”РЎР‚РЎС“РЎвЂљР С”Р С‘. */
 body[data-theme="plush"] #battle-area .battle-table {
     padding-top: calc(46px * var(--ui-fit, 1));
-    padding-bottom: calc(36px * var(--ui-fit, 1));
+    padding-bottom: calc(86px * var(--ui-fit, 1));
     gap: calc(9px * var(--ui-fit, 1));
     --bot-card-w: min(calc(132px * var(--ui-fit, 1)), max(calc(120px * var(--ui-fit, 1)), calc(20% - 4px * var(--ui-fit, 1))));
 }

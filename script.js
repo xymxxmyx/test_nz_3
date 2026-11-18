@@ -3107,11 +3107,9 @@ function createPlasmaDissolve(studio) {
                 gdata[j + 2] = 249;
                 gdata[j + 3] = 105;
             } else {
-                const v = 24 + seed * 22;
-                cdata[j] = v;
-                cdata[j + 1] = Math.round(8 + seed * 9);
-                cdata[j + 2] = Math.round(42 + seed * 30);
-                cdata[j + 3] = 255;
+                /* Тёмная «угольная» заливка (state 1) убрана: на мобильной
+                   ширине она читалась как прямоугольная тень, которая не
+                   исчезает вместе с картой. Оставляем мягкое свечение и искры. */
                 if (tone) {
                     gdata[j] = 150;
                     gdata[j + 1] = 55;
