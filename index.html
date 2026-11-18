@@ -1391,11 +1391,32 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
   var switching = false;
 
   function tgHide() {
+    [0, 80, 260].forEach(function (delay) {
+      setTimeout(function () {
+        try {
+          var W = window.Telegram && window.Telegram.WebApp;
+          if (W && typeof W.hideKeyboard === 'function') {
+            W.hideKeyboard();
+          } else if ((navigator.maxTouchPoints || 0) > 0 || 'ontouchstart' in window) {
+            var a = document.activeElement;
+            if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA')) a.blur();
+          }
+        } catch (e) {}
+      }, delay);
+    });
+  }
+  window.NZ_KB_INFO = function () {
     try {
       var W = window.Telegram && window.Telegram.WebApp;
-      if (W && typeof W.hideKeyboard === 'function') W.hideKeyboard();
-    } catch (e) {}
-  }
+      return {
+        mobile: isMobileDevice(),
+        platform: W && W.platform ? W.platform : null,
+        hasHideKeyboard: !!(W && typeof W.hideKeyboard === 'function'),
+        touch: navigator.maxTouchPoints || 0,
+        innerHeight: window.innerHeight
+      };
+    } catch (e) { return { error: String(e) }; }
+  };
   function tap() {
     try {
       var W = window.Telegram && window.Telegram.WebApp;
@@ -1411,7 +1432,6 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
     var e = active.selectionEnd == null ? s : active.selectionEnd;
     active.setRangeText(text, s, e, 'end');
     fireInput(active);
-    active.focus();
   }
   function backspace() {
     if (!active) return;
@@ -1420,7 +1440,6 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
     if (e > s) active.setRangeText('', s, e, 'start');
     else if (s > 0) active.setRangeText('', s - 1, s, 'start');
     fireInput(active);
-    active.focus();
   }
   function close() {
     kb.classList.remove('open');
