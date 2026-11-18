@@ -1357,8 +1357,8 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
       ['.',',',':',';','"',"'",'!','?','@','#']
     ]
   };
-  var ORDER = ['en','ru','jp'];
-  var NAMES = { en:'EN', ru:'RU/123', jp:'JP' };
+  var ORDER = ['en','jp','ru'];
+  var NAMES = { en:'EN', ru:'RU', jp:'JP' };
 
   var kb = document.createElement('div');
   kb.id = 'nz-kb';
@@ -1563,6 +1563,8 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
 
   // RU и 123 — одна кнопка: переключает русскую раскладку и цифры
   function markBar() {
+    var rb = bar.querySelector('button[data-id="ru"]');
+    if (rb) rb.textContent = (layout === 'num') ? '123' : 'RU';
     ORDER.forEach(function (other) {
       var bb = bar.querySelector('button[data-id="' + other + '"]');
       if (!bb) return;
