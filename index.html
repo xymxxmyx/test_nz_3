@@ -1303,7 +1303,7 @@
 .nz-kb-bar button{opacity:1 !important;visibility:visible !important}
 @keyframes kbKeyIn{from{opacity:0;transform:translateY(12px) scale(0.9)}to{opacity:1;transform:translateY(0) scale(1)}}
 .nz-kb-row{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:4px}
-.nz-kb-key{min-width:0;height:38px;padding:0;border:0;border-radius:0;background:transparent url("UI/klava_key.webp") center/100% 100% no-repeat;color:#fff0fa;font:700 13px/1 system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 2px rgba(30,4,50,.85);position:relative;overflow:visible;transition:transform 0.26s cubic-bezier(0.16,1,0.3,1)}
+.nz-kb-key{min-width:0;height:var(--kb-key-h,38px);padding:0;border:0;border-radius:0;background:transparent url("UI/klava_key_tall.webp") center/100% 100% no-repeat;color:#fff0fa;font:700 13px/1 system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 2px rgba(30,4,50,.85);position:relative;overflow:visible;transition:transform 0.26s cubic-bezier(0.16,1,0.3,1)}
 .nz-kb-key.ctrl{background-image:url("UI/klava_key_pink.webp");font-size:11px}
 .nz-kb-key.space{background-image:url("UI/klava_key_space.webp")}
 .nz-kb-key.enter{background-image:url("UI/klava_key_green.webp")}
@@ -1313,12 +1313,12 @@
 .nz-kb-key.w5{grid-column:span 5}
 .nz-kb-key.w7{grid-column:span 7}
 .nz-kb button:hover,.nz-kb button:active,.nz-kb button:focus{background-color:transparent !important;box-shadow:none !important;border:0 !important;transform:translateY(0);outline:none !important}
-.nz-kb .nz-kb-key:hover{transform:scale(1.06) translateY(-2px);z-index:2}
+.nz-kb .nz-kb-key:hover{filter:brightness(1.12);z-index:2}
 .nz-kb .nz-kb-key:active{opacity:1 !important;z-index:3}
 @keyframes kbBounce{0%{transform:scale(1)}38%{transform:scale(0.955)}70%{transform:scale(1.025)}100%{transform:scale(1)}}
 .nz-kb-bar button:active{opacity:1 !important}
 @keyframes kbBarBounce{0%{transform:scale(1)}45%{transform:scale(0.97)}100%{transform:scale(1)}}
-.nz-kb .nz-kb-key:hover{background-image:url("UI/klava_key.webp") !important}
+.nz-kb .nz-kb-key:hover{background-image:url("UI/klava_key_tall.webp") !important}
 .nz-kb .nz-kb-key.ctrl:hover{background-image:url("UI/klava_key_pink.webp") !important}
 .nz-kb .nz-kb-key.space:hover{background-image:url("UI/klava_key_space.webp") !important}
 .nz-kb .nz-kb-key.enter:hover{background-image:url("UI/klava_key_green.webp") !important}
@@ -1523,10 +1523,9 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
       if (b.animate) {
         b.animate([
           { transform: 'scale(1)' },
-          { transform: 'scale(0.93)', offset: 0.35 },
-          { transform: 'scale(1.05)', offset: 0.7 },
+          { transform: 'scale(0.97)', offset: 0.4 },
           { transform: 'scale(1)' }
-        ], { duration: 220, easing: 'cubic-bezier(0.16,1,0.3,1)' });
+        ], { duration: 180, easing: 'cubic-bezier(0.16,1,0.3,1)' });
       }
       handler(b);
     });
