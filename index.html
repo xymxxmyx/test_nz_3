@@ -1471,7 +1471,8 @@ body.nz-kb-open .screen.active{padding-bottom:calc(var(--kb-total-h,240px) + 24p
     var target = /android/.test(plat) ? 270 : 240;
     target = Math.min(target, Math.round((window.innerHeight || 700) * 0.46));
     var rows = (LAYOUTS[layout] ? LAYOUTS[layout].length : 3) + 1; // + нижний ряд
-    var chrome = 12 + 44 + 5 + (rows - 1) * 4; // поля/рамка, suggestion-бар, отступ, промежутки
+    var noBar = bar && bar.style.display === 'none';
+    var chrome = 12 + (noBar ? 0 : 44 + 5) + (rows - 1) * 4; // поля, suggestion-бар, промежутки
     var kh = Math.max(22, Math.min(52, Math.round((target - chrome) / rows)));
     document.documentElement.style.setProperty('--kb-key-h', kh + 'px');
     document.documentElement.style.setProperty('--kb-bar-h', '44px');
@@ -1501,7 +1502,6 @@ body.nz-kb-open .screen.active{padding-bottom:calc(var(--kb-total-h,240px) + 24p
 
   function open(el) {
     active = el;
-    fitKeyboard();
     el.setAttribute('inputmode', 'none');
     var need = expectedLang(el);
     if (need && need !== layout) {
@@ -1514,6 +1514,10 @@ body.nz-kb-open .screen.active{padding-bottom:calc(var(--kb-total-h,240px) + 24p
       var bb = bar.querySelector('button[data-id="' + id + '"]');
       if (bb) bb.style.display = (!need || id === need) ? '' : 'none';
     });
+    var anyVisible = false;
+    [].slice.call(bar.children).forEach(function (b) { if (b.style.display !== 'none') anyVisible = true; });
+    bar.style.display = anyVisible ? '' : 'none';
+    fitKeyboard();
     var wasOpen = kb.classList.contains('open');
     kb.classList.add('open');
     document.body.classList.add('nz-kb-open');
