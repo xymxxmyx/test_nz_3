@@ -1290,10 +1290,10 @@
 <style id="nz-kb-css">
 .nz-kb{position:fixed;left:calc(var(--frame-l-px,24px) - 2px);right:calc(var(--frame-r-px,24px) - 2px);bottom:calc(var(--app-stage-yb,0px) + var(--app-stage-h,100vh) * 0.0316 - 2px);z-index:100001;box-sizing:border-box;padding:5px 5px 5px;background:linear-gradient(180deg,rgba(52,22,86,.98),rgba(22,7,38,.99));border-top:2px solid #ff9aa2;border-radius:12px;display:none;font-family:inherit;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .nz-kb-key{min-width:0;height:var(--kb-key-h,28px);padding:0;border:6px solid transparent;-webkit-border-image:url("UI/klava_key.webp") 30 30 30 30 fill / 6px 6px 6px 6px / 0 stretch;border-image:url("UI/klava_key.webp") 30 30 30 30 fill / 6px 6px 6px 6px / 0 stretch;background:transparent url("UI/klava_key.webp") center/contain no-repeat !important;color:#fff0fa;font:700 13px/1 system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 2px rgba(30,4,50,.85);position:relative;overflow:hidden;transform-origin:center;-webkit-tap-highlight-color:transparent}
-.nz-kb-bar button{height:calc(var(--kb-key-h,28px) * 0.9)}
+.nz-kb-bar button{height:var(--kb-bar-h,44px)}
 .nz-kb.open{display:block}
 .nz-kb-bar{display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:5px}
-.nz-kb-bar button{flex:0 0 76px;max-width:76px;min-width:0;height:28px;padding:0;border:6px solid transparent;-webkit-border-image:url("UI/klava_key_pink_small.webp") 26 26 26 26 fill / 6px 6px 6px 6px / 0 stretch;border-image:url("UI/klava_key_pink_small.webp") 26 26 26 26 fill / 6px 6px 6px 6px / 0 stretch;background:transparent url("UI/klava_key_pink_small.webp") center/contain no-repeat !important;color:#fff0fa;font:700 11px/1 system-ui,sans-serif;cursor:pointer;text-shadow:0 1px 2px rgba(30,4,50,.85);transform-origin:center;-webkit-tap-highlight-color:transparent}
+.nz-kb-bar button{flex:0 0 76px;max-width:76px;min-width:0;height:var(--kb-bar-h,44px);padding:0;border:6px solid transparent;-webkit-border-image:url("UI/klava_key_pink_small.webp") 26 26 26 26 fill / 6px 6px 6px 6px / 0 stretch;border-image:url("UI/klava_key_pink_small.webp") 26 26 26 26 fill / 6px 6px 6px 6px / 0 stretch;background:transparent url("UI/klava_key_pink_small.webp") center/contain no-repeat !important;color:#fff0fa;font:700 11px/1 system-ui,sans-serif;cursor:pointer;text-shadow:0 1px 2px rgba(30,4,50,.85);transform-origin:center;-webkit-tap-highlight-color:transparent}
 .nz-kb-bar button.on,.nz-kb-bar button.done{-webkit-border-image:url("UI/klava_key_green.webp") 24 24 24 24 fill / 6px 6px 6px 6px / 0 stretch;border-image:url("UI/klava_key_green.webp") 24 24 24 24 fill / 6px 6px 6px 6px / 0 stretch;background:transparent url("UI/klava_key_green.webp") center/contain no-repeat !important;}
 .nz-kb-rows-wrap{position:relative}
 .nz-kb-rows{display:flex;flex-direction:column;gap:4px}
@@ -1311,7 +1311,7 @@
 .nz-kb-key.w5{grid-column:span 5}
 .nz-kb-key.w7{grid-column:span 7}
 .nz-kb button:hover,.nz-kb button:active,.nz-kb button:focus{outline:none !important;transform:none;-webkit-tap-highlight-color:transparent !important}
-body.nz-kb-open .screen.active{padding-bottom:230px}
+body.nz-kb-open .screen.active{padding-bottom:calc(var(--kb-total-h,240px) + 24px)}
 </style>
 <script>
 (function () {
@@ -1460,13 +1460,22 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
     wrap.appendChild(buildRows());
   }
   function fitKeyboard() {
-    var cs = getComputedStyle(document.documentElement);
-    var l = parseFloat(cs.getPropertyValue('--frame-l-px')) || 24;
-    var r = parseFloat(cs.getPropertyValue('--frame-r-px')) || 24;
-    var content = (window.innerWidth || 390) - l - r - 10;
-    var kw = (content - 40) / 11;
-    var kh = Math.max(22, Math.min(34, Math.round(kw)));
+    var W = window.Telegram && window.Telegram.WebApp;
+    var plat = W && W.platform ? String(W.platform).toLowerCase() : '';
+    if (!plat || /web|desktop|tdesktop|macos|unigram|weba|webk/.test(plat)) {
+      var ua = String(navigator.userAgent || '');
+      if (/iphone|ipad|ipod|ios/i.test(ua)) plat = 'ios';
+      else if (/android/i.test(ua)) plat = 'android';
+    }
+    // высота системной клавиатуры: iOS ~240, Android ~270
+    var target = /android/.test(plat) ? 270 : 240;
+    target = Math.min(target, Math.round((window.innerHeight || 700) * 0.46));
+    var rows = (LAYOUTS[layout] ? LAYOUTS[layout].length : 3) + 1; // + нижний ряд
+    var chrome = 12 + 44 + 5 + (rows - 1) * 4; // поля/рамка, suggestion-бар, отступ, промежутки
+    var kh = Math.max(22, Math.min(52, Math.round((target - chrome) / rows)));
     document.documentElement.style.setProperty('--kb-key-h', kh + 'px');
+    document.documentElement.style.setProperty('--kb-bar-h', '44px');
+    document.documentElement.style.setProperty('--kb-total-h', target + 'px');
   }
   // плавное появление: панель выезжает, клавиши проявляются каскадом.
   // БЕЗ scale() — арт не может обрезаться или выйти за границы кнопки.
@@ -1578,6 +1587,7 @@ body.nz-kb-open .screen.active{padding-bottom:230px}
     switching = true;
     tap();
     layout = id; shift = false;
+    fitKeyboard();
     markBar();
     var old = wrap.lastChild;
     if (old) old.remove();
