@@ -11711,5 +11711,5 @@ body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .hearts {
     margin-bottom: 0 !important;
 }
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #game-card {
-    padding-top: calc(16px * var(--ui-fit, 1)) !important;
+    padding-top: calc(10px * var(--ui-fit, 1)) !important;
 }
