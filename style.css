@@ -11709,7 +11709,8 @@ body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .bar-wrap{ma
 /* gap_hearts_card_v1 === Меньше зазор между сердечками и игровым полем === */
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .hearts {
     margin: 0 !important;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
+    height: calc(54px * var(--ui-fit, 1));
     align-items: center;
 }
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #game-card {
