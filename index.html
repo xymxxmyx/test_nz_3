@@ -1506,7 +1506,7 @@ body.nz-kb-open .screen.active{max-height:calc(var(--app-stage-h,var(--app-vh,10
 
   function liftPanel(scr, on) {
     if (!scr) return;
-    var panel = scr.querySelector('#game-card') || scr.querySelector('.panel') || scr.firstElementChild;
+    var panel = scr.querySelector('.panel') || scr.firstElementChild;
     if (!panel) return;
     panel.style.transition = 'transform 420ms cubic-bezier(0.22,1,0.36,1)';
     panel.style.transform = on ? ('translateY(' + (-Math.round(on) - 12) + 'px)') : '';
