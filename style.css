@@ -9956,8 +9956,8 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
 
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-card {
         flex: 0 0 auto;
-        height: calc(100vw * 0.9);
-        max-height: calc(100vw * 0.9);
+        height: calc(100vw * 0.72);
+        max-height: calc(100vw * 0.72);
     }
 
     /* Длинное предложение не помещается в фиксированную высоту стола:
@@ -9965,7 +9965,7 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
        как минимум. Плашка при этом не сжимается (flex: 0 0 auto). */
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)):has(#current-word.sentence) .game-card {
         height: auto;
-        min-height: calc(100vw * 0.9);
+        min-height: calc(100vw * 0.72);
         max-height: none;
     }
 }

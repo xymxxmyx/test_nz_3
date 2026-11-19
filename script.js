@@ -4089,6 +4089,13 @@ function checkAnswer(forced) {
 
     if (state.lives <= 0) {
         setTimeout(() => { if (onGameScreen()) showGameOver(); }, 800);
+    } else {
+        const checkedIndex = state.currentWordIndex;
+        setTimeout(function () {
+            if (!onGameScreen() || !state.inProgress) return;
+            if (state.currentWordIndex !== checkedIndex) return;
+            nextWord();
+        }, 3000);
     }
 }
 
