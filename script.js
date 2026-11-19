@@ -7804,6 +7804,19 @@ function restartLessonsTest() {
                 stopKeys = true;
                 try { v.pause(); } catch (e) {}
                 try { cb(); } catch (e) {}
+                // animation screenIn висит на .screen и успевала отыграть ещё под
+                // заставкой — перезапускаем её на уже показанном экране.
+                try {
+                    const shown = document.querySelector('.screen.active');
+                    if (shown) {
+                        try {
+                            shown.animate([
+                                { opacity: 0, transform: 'translateY(14px) scale(0.996)' },
+                                { opacity: 1, transform: 'translateY(0) scale(1)' }
+                            ], { duration: 500, easing: 'cubic-bezier(0.22,1,0.36,1)' });
+                        } catch (e) {}
+                    }
+                } catch (e) {}
                 // Снимаем «статичный фон» одновременно с boot-экраном:
                 // bgFloat стартует с нулевой фазы уже под меню.
                 const bg = document.getElementById("bg-inset");
