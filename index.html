@@ -1311,10 +1311,10 @@
 .nz-kb-key.w5{grid-column:span 5}
 .nz-kb-key.w7{grid-column:span 7}
 .nz-kb button:hover,.nz-kb button:active,.nz-kb button:focus{outline:none !important;transform:none;-webkit-tap-highlight-color:transparent !important}
-body.nz-kb-open #game-screen.active{overflow:visible !important}
+#game-screen.active{overflow:visible !important}
 #game-screen #check-btn,
 #game-screen #next-btn{display:none !important}
-body.nz-kb-open .screen.active{max-height:calc(var(--app-stage-h,var(--app-vh,100svh)) - var(--frame-t-px,24px) - var(--topbar-h,36px) - var(--frame-b-px,24px) - 14px - var(--kb-total-h,240px)) !important;padding-bottom:16px;justify-content:flex-start}
+#game-screen.active{max-height:calc(var(--app-stage-h,var(--app-vh,100svh)) - var(--frame-t-px,24px) - var(--topbar-h,36px) - var(--frame-b-px,24px) - 14px - var(--kb-total-h,240px)) !important;padding-bottom:16px;justify-content:flex-start}
 </style>
 <script>
 (function () {
@@ -1436,7 +1436,6 @@ body.nz-kb-open .screen.active{max-height:calc(var(--app-stage-h,var(--app-vh,10
     kb.classList.remove('open');
     document.body.classList.remove('nz-kb-open');
     active = null;
-    liftPanel(scr, 0);
     tgHide();
   }
   function enter() {
@@ -1553,7 +1552,6 @@ body.nz-kb-open .screen.active{max-height:calc(var(--app-stage-h,var(--app-vh,10
     document.body.classList.add('nz-kb-open');
     if (!wasOpen) animateOpen();
     updateSwapKey();
-    liftForKeyboard(el);
     tgHide();
   }
 
@@ -1712,6 +1710,32 @@ body.nz-kb-open .screen.active{max-height:calc(var(--app-stage-h,var(--app-vh,10
 
   renderBar();
   wrap.appendChild(buildRows());
+
+  // Поле зафиксировано в верхней позиции с самого показа экрана —
+  // при появлении клавиатуры ничего не двигается.
+  function fixGameField() {
+    try {
+      var scr = document.getElementById('game-screen');
+      if (!scr || scr.classList.contains('hidden')) return;
+      var card = document.getElementById('game-card');
+      if (!card) return;
+      var kcs = getComputedStyle(kb);
+      var kbBottom = parseFloat(kcs.bottom);
+      var kbTop = isFinite(kbBottom) ? (window.innerHeight - kbBottom - kb.offsetHeight) : kb.getBoundingClientRect().top;
+      var delta = card.getBoundingClientRect().bottom - (kbTop - 20);
+      liftPanel(scr, delta > 4 ? delta : 0);
+    } catch (e) {}
+  }
+  var origShowScreen = window.showScreen;
+  if (typeof origShowScreen === 'function') {
+    window.showScreen = function (id) {
+      origShowScreen(id);
+      if (id === 'game-screen') setTimeout(fixGameField, 0);
+    };
+  }
+  if (document.getElementById('game-screen') && !document.getElementById('game-screen').classList.contains('hidden')) {
+    setTimeout(fixGameField, 0);
+  }
 
   document.querySelectorAll('input[type="text"], textarea').forEach(function (el) {
     el.setAttribute('inputmode', 'none');
