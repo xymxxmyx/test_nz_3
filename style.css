@@ -88,7 +88,7 @@ body {
     justify-content: center;
     align-items: center;
     background: radial-gradient(circle at 30% 40%, #2a1b3d, #0f0c1b);
-    padding: calc(var(--frame-t-px, 24px) + var(--topbar-h, 36px) + 2px) calc(var(--frame-l-px, 24px) + var(--gutter)) calc(var(--frame-b-px, 24px) + 8px) calc(var(--frame-r-px, 24px) + var(--gutter));
+    padding: calc(var(--frame-t-px, 24px) + var(--topbar-h, 36px) + 2px) calc(var(--frame-r-px, 24px) + var(--gutter)) calc(var(--frame-b-px, 24px) + 8px) calc(var(--frame-l-px, 24px) + var(--gutter));
     font-family: 'Nihon Zeno Plush', sans-serif;
     overflow: hidden;
     position: relative;
@@ -3725,7 +3725,7 @@ body.tg-mini-app #boot-screen {
 /* Р Р†РІР‚СњР вЂљР Р†РІР‚СњР вЂљ Р В РЎС™Р В РЎвЂўР В Р’В±Р В РЎвЂР В Р’В»Р РЋР Р‰Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р Р†РІР‚В°Р’В¤540px: Р В РЎвЂќР РЋР вЂљР РЋРЎвЂњР В РЎвЂ”Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р РЋРІР‚С™Р В Р’В°Р В РЎвЂ”Р РЋРІР‚в„–, Р В РЎвЂќР В РЎвЂўР В РЎВР В РЎвЂ”Р В Р’В°Р В РЎвЂќР РЋРІР‚С™Р В Р вЂ¦Р РЋРІР‚в„–Р В РІвЂћвЂ“ Р РЋРІР‚С™Р В РЎвЂўР В РЎвЂ”Р В Р’В±Р В Р’В°Р РЋР вЂљ Р Р†РІР‚СњР вЂљР Р†РІР‚СњР вЂљ */
 @media (max-width: 540px) {
     body {
-        padding: calc(var(--frame-t-px, 24px) + var(--topbar-h, 36px) + 2px) calc(var(--frame-l-px, 24px) + 8px) calc(var(--frame-b-px, 24px) + 4px) calc(var(--frame-r-px, 24px) + 8px);
+        padding: calc(var(--frame-t-px, 24px) + var(--topbar-h, 36px) + 2px) calc(var(--frame-r-px, 24px) + 8px) calc(var(--frame-b-px, 24px) + 4px) calc(var(--frame-l-px, 24px) + 8px);
     }
     .panel {
         border-width: 3px;
@@ -3884,7 +3884,7 @@ body.tg-mini-app #boot-screen {
 /* Р Р†РІР‚СњР вЂљР Р†РІР‚СњР вЂљ Р В РЎС™Р В Р’В°Р В Р’В»Р В Р’ВµР В Р вЂ¦Р РЋР Р‰Р В РЎвЂќР В РЎвЂР В Р’Вµ Р РЋРІР‚С™Р В Р’ВµР В Р’В»Р В Р’ВµР РЋРІР‚С›Р В РЎвЂўР В Р вЂ¦Р РЋРІР‚в„– Р Р†РІР‚В°Р’В¤400px (iPhone SE, Р РЋР С“Р РЋРІР‚С™Р В Р’В°Р РЋР вЂљР РЋРІР‚в„–Р В Р’Вµ Android) Р Р†РІР‚СњР вЂљР Р†РІР‚СњР вЂљ */
 @media (max-width: 400px) {
     body {
-        padding: calc(var(--frame-t-px, 24px) + var(--topbar-h, 36px) + 2px) calc(var(--frame-l-px, 24px) + 6px) calc(var(--frame-b-px, 24px) + 2px) calc(var(--frame-r-px, 24px) + 6px);
+        padding: calc(var(--frame-t-px, 24px) + var(--topbar-h, 36px) + 2px) calc(var(--frame-r-px, 24px) + 6px) calc(var(--frame-b-px, 24px) + 2px) calc(var(--frame-l-px, 24px) + 6px);
     }
     .radio-led {
         display: none;
@@ -11716,4 +11716,15 @@ body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .hearts {
 }
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #game-card {
     padding-top: calc(12px * var(--ui-fit, 1)) !important;
+}
+
+/* Центрирование карт игрока в 5 в 1 (дополнительная страховка). */
+#options.options,
+body[data-theme="plush"] #battle-area .player-zone #options.options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-end;
+    width: 100%;
+    box-sizing: border-box;
 }
