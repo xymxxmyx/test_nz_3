@@ -7804,17 +7804,22 @@ function restartLessonsTest() {
                 stopKeys = true;
                 try { v.pause(); } catch (e) {}
                 try { cb(); } catch (e) {}
-                // animation screenIn висит на .screen и успевала отыграть ещё под
-                // заставкой — перезапускаем её на уже показанном экране.
+                // CSS-анимации меню часто успевают отыграть под заставкой, а у
+                // #main-menu.screen.active они вообще отключены (animation:none).
+                // Явно проигрываем волну появления после ухода заставки.
                 try {
                     const shown = document.querySelector('.screen.active');
                     if (shown) {
-                        try {
-                            shown.animate([
-                                { opacity: 0, transform: 'translateY(14px) scale(0.996)' },
-                                { opacity: 1, transform: 'translateY(0) scale(1)' }
-                            ], { duration: 500, easing: 'cubic-bezier(0.22,1,0.36,1)' });
-                        } catch (e) {}
+                        const sel = '.game-header,.logo-img,.greeting,.stats-box,.menu-level-bar,.level-box,.progress-tabs,.menu-btn,.welcome-title,.welcome-sub,#player-name,#start-btn';
+                        const targets = [shown].concat([].slice.call(shown.querySelectorAll(sel))).slice(0, 24);
+                        targets.forEach(function (el, i) {
+                            try {
+                                el.animate([
+                                    { opacity: 0, transform: 'translateY(14px)' },
+                                    { opacity: 1, transform: 'translateY(0)' }
+                                ], { duration: 600, delay: Math.min(i * 35, 350), easing: 'cubic-bezier(0.16,1,0.3,1)', fill: 'backwards' });
+                            } catch (e) {}
+                        });
                     }
                 } catch (e) {}
                 // Снимаем «статичный фон» одновременно с boot-экраном:
@@ -7863,7 +7868,7 @@ function restartLessonsTest() {
             im.onload = im.onerror = () => { if (--criticalLeft <= 0) kick(); };
             im.src = p;
         });
-        setTimeout(kick, 1200);
+        setTimeout(kick, 3500);
     }
 
     // Картинки плашек и первого экрана догружаем ПОСЛЕ старта интерфейса:

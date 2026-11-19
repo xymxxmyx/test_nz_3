@@ -332,10 +332,10 @@ body {
     width: 100%;
     max-width: 980px;
     box-sizing: border-box;
-    animation: screenIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .screen.active {
     display: flex;
+    animation: screenIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
     overflow-y: auto;
     max-height: calc(var(--app-vh, 100svh) - var(--frame-t-px, 24px) - var(--topbar-h, 36px) - var(--frame-b-px, 24px) - 14px);
     padding: 2px 0 var(--screen-pad);
