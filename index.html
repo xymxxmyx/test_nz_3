@@ -15,6 +15,17 @@
       window.NZ_FORCE_MOBILE = true;
       window.__NO_TG__ = false;
       var W = window.Telegram || (window.Telegram = {});
+      window.addEventListener('message', function (e) {
+        if (!e.data || e.data.type !== 'nz-phone-resize') return;
+        window.__nzPhoneCustom = { w: e.data.w, h: e.data.h };
+        var f = document.getElementById('phone-frame');
+        if (f) {
+          f.style.width = e.data.w + 'px';
+          f.style.height = e.data.h + 'px';
+          f.style.left = Math.max(0, Math.round((window.innerWidth - e.data.w) / 2)) + 'px';
+        }
+        document.documentElement.style.setProperty('phone-w', e.data.w + 'px');
+      });
       W.WebApp = {
         platform: 'android',
         version: '8.0',
@@ -175,6 +186,20 @@
           undoBtn.style.cssText = 'padding:5px 8px;border:0;border-radius:7px;background:#444;color:#fff;cursor:pointer;';
           undoBtn.onclick = undo;
           bar.appendChild(undoBtn);
+
+          var sizeBtn = document.createElement('button');
+          sizeBtn.textContent = '📱 Nothing 1';
+          sizeBtn.title = 'Размер экрана Nothing Phone 1 (412×915) ↔ обычный';
+          sizeBtn.style.cssText = 'padding:5px 8px;border:0;border-radius:7px;background:#1b6fa8;color:#fff;cursor:pointer;';
+          var baseH = window.innerHeight, nothingMode = false;
+          sizeBtn.onclick = function () {
+            nothingMode = !nothingMode;
+            var w = nothingMode ? 412 : 420;
+            var h = nothingMode ? 915 : baseH;
+            sizeBtn.textContent = nothingMode ? '📱 Обычный' : '📱 Nothing 1';
+            try { window.parent.postMessage({ type: 'nz-phone-resize', w: w, h: h }, '*'); } catch (e) {}
+          };
+          bar.appendChild(sizeBtn);
           document.body.appendChild(bar);
           window.NZ_ANNOTATE = { canvas: cv, save: store, toggle: toggle };
         }, 400);
@@ -182,7 +207,7 @@
     })();
     </script>
 
-    <link rel="stylesheet" href="style.css?v=20261234">
+    <link rel="stylesheet" href="style.css?v=20261235">
 
     <!-- Критичные арты: теперь грузятся первыми, пока видео ещё не стартовало.
          fetchpriority=high забирает полосу у всего остального на старте. -->
@@ -1363,7 +1388,7 @@
     <script>
     (function () {
         var PHONE_W = 420, MIN_W = 560;
-        if (window.innerWidth <= MIN_W) {
+        if (window.self !== window.top || (window.innerWidth <= MIN_W && !/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash))) {
             document.write('<script src="script.js?v=20261206"><\/script>');
             return;
         }
@@ -1385,8 +1410,9 @@
         var last = true;
         window.addEventListener('resize', function () {
             var wide = window.innerWidth > MIN_W;
-            f.style.left = Math.max(0, Math.round((window.innerWidth - PHONE_W) / 2)) + 'px';
-            f.style.height = window.innerHeight + 'px';
+            f.style.left = Math.max(0, Math.round((window.innerWidth - (window.__nzPhoneCustom ? window.__nzPhoneCustom.w : PHONE_W)) / 2)) + 'px';
+            f.style.width = (window.__nzPhoneCustom ? window.__nzPhoneCustom.w : PHONE_W) + 'px';
+            f.style.height = (window.__nzPhoneCustom ? window.__nzPhoneCustom.h : window.innerHeight) + 'px';
             if (wide !== last) { last = wide; location.replace(location.pathname); }
         });
         f.style.left = Math.max(0, Math.round((window.innerWidth - PHONE_W) / 2)) + 'px';
@@ -1531,6 +1557,7 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
 
   var active = null;
   var layout = 'en';
+  var prevLayout = 'en';
   var shift = false;
   var switching = false;
 
@@ -1768,6 +1795,7 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
     if (switching || id === layout) return;
     switching = true;
     tap();
+    if (layout !== 'num') prevLayout = layout;
     layout = id; shift = false;
     fitKeyboard();
     markBar();
@@ -1805,10 +1833,18 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
   function makeBack(w) {
     return makeKey('⌫', 'ctrl ' + (w || 'w2'), backspace);
   }
-  // в нижнем ряду только кнопка 123 — переключает цифровую раскладку
-  function updateSwapKey() {}
+  // нижняя кнопка: 123 -> язык, который был до цифр, и обратно
+  function numLabel() { return layout === 'num' ? (NAMES[prevLayout] || 'RU') : '123'; }
+  function updateSwapKey() {
+    var k = wrap.querySelector('.nz-kb-key[data-num]');
+    if (k) k.textContent = numLabel();
+  }
   function makeNum(w) {
-    return makeKey('123', 'ctrl ' + (w || 'w2'), function () { switchLayout('num'); });
+    var k = makeKey(numLabel(), 'ctrl ' + (w || 'w2'), function () {
+      switchLayout(layout === 'num' ? prevLayout : 'num');
+    });
+    k.setAttribute('data-num', '1');
+    return k;
   }
 
   function buildRows() {

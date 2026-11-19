@@ -9729,13 +9729,14 @@ body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #current-wor
     width: 100%;
     max-width: 100%;
     height: auto;
+    aspect-ratio: 618 / 168;
     min-height: calc(66px * var(--ui-fit, 1));
     display: flex;
     align-items: center;
     justify-content: center;
     padding: calc(8px * var(--ui-fit, 1)) calc(18px * var(--ui-fit, 1));
     margin: 0 auto calc(10px * var(--ui-fit, 1));
-    background: #4a2473 url("UI/Baner_Slovar_fit.webp") no-repeat center / 100% 100%;
+    background: transparent url("UI/Baner_Slovar_fit.webp") no-repeat center / 100% 100%;
     border: 0;
     border-radius: 0;
     box-shadow: none;
@@ -9752,7 +9753,6 @@ body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #current-wor
 
 /* Предложение длиннее слова: кегль меньше, плашка растёт по контенту. */
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #current-word.sentence:not(.listening-mask) {
-    aspect-ratio: auto;
     min-height: calc(58px * var(--ui-fit, 1));
     padding: calc(10px * var(--ui-fit, 1)) calc(14px * var(--ui-fit, 1));
     font-size: clamp(13px, calc(30px * var(--ui-fit, 1)), 20px);
