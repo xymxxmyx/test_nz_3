@@ -1310,10 +1310,10 @@
 .nz-kb-key.w5{grid-column:span 5}
 .nz-kb-key.w7{grid-column:span 7}
 .nz-kb button:hover,.nz-kb button:active,.nz-kb button:focus{outline:none !important;transform:none;-webkit-tap-highlight-color:transparent !important}
-body.nz-mobile #game-screen.active{overflow:visible !important}
-body.nz-mobile #game-screen #check-btn,
-body.nz-mobile #game-screen #next-btn{display:none !important}
-body.nz-mobile #game-screen.active{max-height:calc(var(--app-stage-h,var(--app-vh,100svh)) - var(--frame-t-px,24px) - var(--topbar-h,36px) - var(--frame-b-px,24px) - 14px - var(--kb-total-h,240px)) !important;padding-bottom:16px;justify-content:flex-start}
+body.nz-mobile #game-screen.active:has(#input-area:not(.hidden)){overflow:visible !important}
+body.nz-mobile #game-screen:has(#input-area:not(.hidden)) #check-btn,
+body.nz-mobile #game-screen:has(#input-area:not(.hidden)) #next-btn{display:none !important}
+body.nz-mobile #game-screen.active:has(#input-area:not(.hidden)){max-height:calc(var(--app-stage-h,var(--app-vh,100svh)) - var(--frame-t-px,24px) - var(--topbar-h,36px) - var(--frame-b-px,24px) - 14px - var(--kb-total-h,240px)) !important;padding-bottom:16px;justify-content:flex-start}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-card{height:calc(100vw * 0.72);max-height:calc(100vw * 0.72)}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)):has(#current-word.sentence) .game-card{min-height:calc(100vw * 0.72)}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #game-card{padding-top:calc(6px * var(--ui-fit, 1)) !important}
@@ -1721,6 +1721,8 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
     try {
       var scr = document.getElementById('game-screen');
       if (!scr || scr.classList.contains('hidden')) return;
+      var ia = document.getElementById('input-area');
+      if (!ia || ia.classList.contains('hidden')) { liftPanel(scr, 0); return; }
       var card = document.getElementById('game-card');
       if (!card) return;
       var kcs = getComputedStyle(kb);
