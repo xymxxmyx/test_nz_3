@@ -4078,7 +4078,7 @@ function checkAnswer(forced) {
 
     if (state.lives <= 0) {
         setTimeout(() => { if (onGameScreen()) showGameOver(); }, 800);
-    } else {
+    } else if (typeof window.NZ_KB_IS_MOBILE === 'function' && window.NZ_KB_IS_MOBILE()) {
         const checkedIndex = state.currentWordIndex;
         setTimeout(function () {
             if (!onGameScreen() || !state.inProgress) return;
