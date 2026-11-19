@@ -8,6 +8,32 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
+    <script>
+    /* Локальный эмулятор телефона/Telegram — включается только через ?tgmock=1.
+       В обычной странице ничего не меняет и на live никак не проявляется. */
+    if (/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash)) {
+      window.NZ_FORCE_MOBILE = true;
+      window.__NO_TG__ = false;
+      var W = window.Telegram || (window.Telegram = {});
+      W.WebApp = {
+        platform: 'android',
+        version: '8.0',
+        isExpanded: true,
+        initData: '',
+        ready: function () {}, expand: function () {}, close: function () {},
+        hideKeyboard: function () {},
+        HapticFeedback: { impactOccurred: function () {}, notificationOccurred: function () {} },
+        onEvent: function () {}, offEvent: function () {},
+        setHeaderColor: function () {}, setBackgroundColor: function () {},
+        requestFullscreen: function () {},
+        isVersionAtLeast: function () { return true; },
+        safeAreaInset: { top: 0, bottom: 0, left: 0, right: 0 },
+        contentSafeAreaInset: { top: 0, bottom: 0, left: 0, right: 0 },
+        viewportHeight: window.innerHeight
+      };
+    }
+    </script>
+
     <style>
     /* Тёмный фон до применения style.css: даже если стили ещё грузятся
        (или не загрузились вовсе), белой вспышки с «сырой» вёрсткой нет. */
@@ -32,6 +58,128 @@
 
         }
 
+    </script>
+
+    <script>
+    /* Локальный слой аннотаций: только при ?tgmock=1. Рисунок сохраняется в
+       localStorage['nz_annotation'], чтобы его можно было прочитать извне. */
+    (function () {
+      if (!/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash)) return;
+      document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(function () {
+          var cv = document.createElement('canvas');
+          cv.id = 'nz-annotate';
+          cv.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:2147483000;touch-action:none;pointer-events:none;';
+          document.body.appendChild(cv);
+          var ctx = cv.getContext('2d');
+          var color = '#ff3b30', drawing = false, last = null, undoStack = [];
+          var dpr = Math.max(1, window.devicePixelRatio || 1);
+          function resize() {
+            var w = window.innerWidth, h = window.innerHeight;
+            cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = 4;
+          }
+          resize();
+          window.addEventListener('resize', resize);
+          function store() {
+            /* рисунок живёт только в памяти страницы — в localStorage ничего не пишем */
+          }
+          try { localStorage.removeItem('nz_annotation'); } catch (e) {}
+          function undo() {
+            if (!undoStack.length) return;
+            try { ctx.putImageData(undoStack.pop(), 0, 0); store(); } catch (e) {}
+          }
+          window.addEventListener('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && String(e.key || '').toLowerCase() === 'z') {
+              if (e.target && e.target.tagName === 'INPUT') return;
+              e.preventDefault();
+              undo();
+            }
+          });
+          function pos(e) { var r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+          var textMode = false;
+          cv.addEventListener('pointerdown', function (e) {
+            if (!drawing) return;
+            cv.setPointerCapture(e.pointerId);
+            last = pos(e);
+            try {
+              undoStack.push(ctx.getImageData(0, 0, cv.width, cv.height));
+              if (undoStack.length > 20) undoStack.shift();
+            } catch (e) {}
+            if (textMode) {
+              var t = inp.value.trim();
+              ctx.font = 'bold 20px system-ui'; ctx.fillStyle = color;
+              ctx.fillText(t, last.x, last.y);
+              inp.value = ''; textMode = false; last = null; store();
+              return;
+            }
+            ctx.strokeStyle = color; ctx.fillStyle = color;
+            ctx.beginPath(); ctx.arc(last.x, last.y, 3, 0, 6.29); ctx.fill();
+          });
+          cv.addEventListener('pointermove', function (e) {
+            if (!drawing || !last) return;
+            var p = pos(e);
+            ctx.strokeStyle = color;
+            ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+            last = p;
+          });
+          cv.addEventListener('pointerup', function () { last = null; store(); });
+
+          var bar = document.createElement('div');
+          bar.id = 'nz-annotate-bar';
+          bar.style.cssText = 'position:fixed;left:8px;top:8px;z-index:2147483001;background:rgba(12,8,24,.88);color:#fff;font:12px/1.2 system-ui,sans-serif;padding:6px;border-radius:10px;display:flex;gap:5px;align-items:center;flex-wrap:wrap;max-width:calc(100% - 16px);box-shadow:0 2px 10px rgba(0,0,0,.5);';
+          var swatches = ['#ff3b30','#7cff4f','#33c9ff','#ffe14f','#ffffff'];
+          swatches.forEach(function (c) {
+            var b = document.createElement('button');
+            b.textContent = '●'; b.style.cssText = 'width:26px;height:26px;border:2px solid ' + (c === color ? '#fff' : 'transparent') + ';border-radius:50%;background:' + c + ';color:transparent;cursor:pointer;';
+            b.onclick = function () {
+              color = c;
+              [].slice.call(bar.querySelectorAll('.sw')).forEach(function (x) { x.style.borderColor = 'transparent'; });
+              b.style.borderColor = '#fff';
+            };
+            b.className = 'sw'; bar.appendChild(b);
+          });
+          var toggle = document.createElement('button');
+          toggle.textContent = '✏️ Рисовать';
+          toggle.style.cssText = 'padding:5px 8px;border:0;border-radius:7px;background:#7b3fe4;color:#fff;cursor:pointer;';
+          toggle.onclick = function () {
+            drawing = !drawing;
+            cv.style.pointerEvents = drawing ? 'auto' : 'none';
+            toggle.textContent = drawing ? '✅ Готово' : '✏️ Рисовать';
+          };
+          bar.appendChild(toggle);
+          var inp = document.createElement('input');
+          inp.placeholder = 'текст'; inp.style.cssText = 'width:70px;padding:4px;border:0;border-radius:6px;font:12px system-ui;';
+          bar.appendChild(inp);
+          var textBtn = document.createElement('button');
+          textBtn.textContent = 'T';
+          textBtn.style.cssText = 'padding:5px 8px;border:0;border-radius:7px;background:#444;color:#fff;cursor:pointer;';
+          textBtn.onclick = function () {
+            if (!inp.value.trim()) return;
+            textMode = true;
+            drawing = true;
+            cv.style.pointerEvents = 'auto';
+            toggle.textContent = '✅ Готово';
+            bar.title = 'Кликни по экрану, чтобы поставить текст';
+          };
+          bar.appendChild(textBtn);
+          var clear = document.createElement('button');
+          clear.textContent = '🗑';
+          clear.style.cssText = 'padding:5px 8px;border:0;border-radius:7px;background:#444;color:#fff;cursor:pointer;';
+          clear.onclick = function () { ctx.clearRect(0, 0, cv.width, cv.height); store(); };
+          bar.appendChild(clear);
+          var undoBtn = document.createElement('button');
+          undoBtn.textContent = '↶';
+          undoBtn.title = 'Откат (Ctrl+Z)';
+          undoBtn.style.cssText = 'padding:5px 8px;border:0;border-radius:7px;background:#444;color:#fff;cursor:pointer;';
+          undoBtn.onclick = undo;
+          bar.appendChild(undoBtn);
+          document.body.appendChild(bar);
+          window.NZ_ANNOTATE = { canvas: cv, save: store, toggle: toggle };
+        }, 400);
+      });
+    })();
     </script>
 
     <link rel="stylesheet" href="style.css?v=20261234">
@@ -1224,7 +1372,8 @@
         f.id = 'phone-frame';
         f.title = 'Nihon & Zeno';
         f.src = location.pathname + '?embed=1&cb=' + Date.now() +
-            (/[?&#]tg=0([&#]|$)/.test(location.search + location.hash) ? '&tg=0' : '');
+            (/[?&#]tg=0([&#]|$)/.test(location.search + location.hash) ? '&tg=0' : '') +
+            (/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash) ? '&tgmock=1' : '');
         f.style.cssText = 'position:fixed;top:0;left:0;width:' + PHONE_W +
             'px;height:100vh;border:0;display:block;background:#0f0c1b;';
         document.body.appendChild(f);
@@ -1322,6 +1471,7 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
 <script>
 (function () {
   function isMobileDevice() {
+    if (window.NZ_FORCE_MOBILE) return true;
     try {
       var W = window.Telegram && window.Telegram.WebApp;
       var plat = W && W.platform ? String(W.platform).toLowerCase() : '';
@@ -1364,8 +1514,8 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
       ['.',',',':',';','"',"'",'!','?','@','#']
     ]
   };
-  var ORDER = ['en','jp'];
-  var NAMES = { en:'EN', jp:'JP' };
+  var ORDER = ['ru','en','jp'];
+  var NAMES = { en:'EN', ru:'RU', jp:'JP' };
 
   var kb = document.createElement('div');
   kb.id = 'nz-kb';
@@ -1608,15 +1758,10 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
     return b;
   }
 
-  // RU и 123 — одна кнопка: переключает русскую раскладку и цифры
   function markBar() {
     ORDER.forEach(function (other) {
       var bb = bar.querySelector('button[data-id="' + other + '"]');
-      if (!bb) return;
-      var active = (other === 'ru')
-        ? (layout === 'ru' || layout === 'num')
-        : (other === layout);
-      bb.classList.toggle('on', active);
+      if (bb) bb.classList.toggle('on', other === layout);
     });
   }
   function switchLayout(id) {
@@ -1640,7 +1785,7 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
       b.type = 'button';
       b.textContent = NAMES[id];
       b.setAttribute('data-id', id);
-      if ((id === 'ru' && (layout === 'ru' || layout === 'num')) || id === layout) b.className = 'on';
+      if (id === layout) b.className = 'on';
       b.addEventListener('pointerdown', function (ev) {
         ev.preventDefault(); ev.stopPropagation();
         bounce(b);
@@ -1660,18 +1805,10 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
   function makeBack(w) {
     return makeKey('⌫', 'ctrl ' + (w || 'w2'), backspace);
   }
-  // единая кнопка на месте старой «123» в нижнем ряду: RU <-> 123
-  function swapLabel() { return layout === 'ru' ? '123' : 'RU'; }
-  function updateSwapKey() {
-    var k = wrap.querySelector('.nz-kb-key[data-swap]');
-    if (k) k.textContent = swapLabel();
-  }
-  function makeSwap(w) {
-    var k = makeKey(swapLabel(), 'ctrl ' + (w || 'w2'), function () {
-      switchLayout(layout === 'ru' ? 'num' : 'ru');
-    });
-    k.setAttribute('data-swap', '1');
-    return k;
+  // в нижнем ряду только кнопка 123 — переключает цифровую раскладку
+  function updateSwapKey() {}
+  function makeNum(w) {
+    return makeKey('123', 'ctrl ' + (w || 'w2'), function () { switchLayout('num'); });
   }
 
   function buildRows() {
@@ -1699,10 +1836,10 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
       ctrl.appendChild(makeShift('w2'));
       ctrl.appendChild(makeBack('w2'));
       ctrl.appendChild(makeKey('Пробел', 'space w3', function () { insert(' '); }));
-      ctrl.appendChild(makeSwap('w2'));
+      ctrl.appendChild(makeNum('w2'));
       ctrl.appendChild(makeKey('Enter', 'enter w2', enter));
     } else {
-      ctrl.appendChild(makeSwap('w2'));
+      ctrl.appendChild(makeNum('w2'));
       ctrl.appendChild(makeKey('Пробел', 'space w7', function () { insert(' '); }));
       ctrl.appendChild(makeKey('↵', 'enter w2', enter));
     }
