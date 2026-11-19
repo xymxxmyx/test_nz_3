@@ -11708,8 +11708,9 @@ body[data-theme="plush"] #ach-toasts {
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .bar-wrap{margin-bottom:0 !important}
 /* gap_hearts_card_v1 === Меньше зазор между сердечками и игровым полем === */
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .hearts {
-    margin-top: calc(4px * var(--ui-fit, 1)) !important;
-    margin-bottom: calc(4px * var(--ui-fit, 1)) !important;
+    margin: 0 !important;
+    flex: 1 1 auto;
+    align-items: center;
 }
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #game-card {
     padding-top: calc(12px * var(--ui-fit, 1)) !important;
