@@ -9735,7 +9735,7 @@ body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #current-wor
     justify-content: center;
     padding: calc(8px * var(--ui-fit, 1)) calc(18px * var(--ui-fit, 1));
     margin: 0 auto calc(10px * var(--ui-fit, 1));
-    background: transparent url("UI/Baner_Slovar_fit.webp") no-repeat center / 100% 100%;
+    background: #4a2473 url("UI/Baner_Slovar_fit.webp") no-repeat center / 100% 100%;
     border: 0;
     border-radius: 0;
     box-shadow: none;
@@ -11710,8 +11710,9 @@ body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .bar-wrap{ma
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .hearts {
     margin: 0 !important;
     flex: 0 0 auto;
-    height: calc(54px * var(--ui-fit, 1));
-    align-items: center;
+    height: calc(46px * var(--ui-fit, 1));
+    align-items: flex-start;
+    padding-top: calc(10px * var(--ui-fit, 1));
 }
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #game-card {
     padding-top: calc(12px * var(--ui-fit, 1)) !important;

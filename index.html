@@ -34,7 +34,12 @@
 
     </script>
 
-    <link rel="stylesheet" href="style.css?v=20261232">
+    <link rel="stylesheet" href="style.css?v=20261233">
+
+    <!-- Критичные арты: теперь грузятся первыми, пока видео ещё не стартовало.
+         fetchpriority=high забирает полосу у всего остального на старте. -->
+    <link rel="preload" as="image" href="UI/BG_PIC_STR.webp?v=bgstr2" fetchpriority="high">
+    <link rel="preload" as="image" href="UI/main-frame-v3.webp?v=frame5" fetchpriority="high">
 
     <script>
     /* Режим «только рамка» (?frameonly=1): рисуем одно кольцо по экрану,
@@ -130,13 +135,7 @@
 
     <div id="boot-screen" aria-hidden="true">
 
-        <video id="boot-video" muted playsinline autoplay preload="auto">
-
-            <source src="VID/Intro_alpha.webm?v=20261593" type='video/webm; codecs="vp9"'>
-
-            <source src="VID/Intro.mp4" type="video/mp4">
-
-        </video>
+        <video id="boot-video" muted playsinline preload="none"></video>
 
         <canvas id="boot-canvas" aria-hidden="true"></canvas>
 
@@ -1217,7 +1216,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.innerWidth <= MIN_W) {
-            document.write('<script src="script.js?v=20261199"><\/script>');
+            document.write('<script src="script.js?v=20261202"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');
@@ -1318,7 +1317,7 @@ body.nz-mobile #game-screen.active{max-height:calc(var(--app-stage-h,var(--app-v
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-card{height:calc(100vw * 0.72);max-height:calc(100vw * 0.72)}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)):has(#current-word.sentence) .game-card{min-height:calc(100vw * 0.72)}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #game-card{padding-top:calc(6px * var(--ui-fit, 1)) !important}
-body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .hearts{margin:0 !important;flex:0 0 auto;height:calc(54px * var(--ui-fit, 1)) !important;align-items:center}
+body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .hearts{margin:0 !important;flex:0 0 auto;height:calc(46px * var(--ui-fit, 1)) !important;align-items:flex-start;padding-top:calc(10px * var(--ui-fit, 1))}
 </style>
 <script>
 (function () {

@@ -1799,6 +1799,35 @@ function showScreen(screenId) {
     const screen = document.getElementById(screenId);
     screen.classList.remove("hidden");
     screen.classList.add("active");
+    if (screenId === "game-screen") nzWarmGameAssets();
+}
+
+// Если картинка не пришла с первого раза — повторяем один раз с другим URL.
+window.addEventListener('error', function (e) {
+    const el = e.target;
+    if (!el || el.tagName !== 'IMG' || el.dataset.nzRetried) return;
+    const src = el.getAttribute('src');
+    if (!src || src.indexOf('nzretry=') >= 0) return;
+    el.dataset.nzRetried = '1';
+    el.src = src + (src.indexOf('?') >= 0 ? '&' : '?') + 'nzretry=1';
+}, true);
+
+function nzWarmGameAssets() {
+    const paths = [
+        "UI/Baner_Slovar_fit.webp",
+        "UI/Baner_Slovar_fit-!.webp?v=slov1",
+        "UI/Vipad_osnova.webp",
+        "UI/Pole.webp"
+    ];
+    paths.forEach(function (p) {
+        const im = new Image();
+        im.onerror = function () {
+            if (im.dataset.nzRetried) return;
+            im.dataset.nzRetried = '1';
+            im.src = p + (p.indexOf('?') >= 0 ? '&' : '?') + 'nzwarm=1';
+        };
+        im.src = p;
+    });
 }
 
 function startGame() {
@@ -7794,22 +7823,34 @@ function restartLessonsTest() {
         v.addEventListener("ended", finish, { once: true });
         v.addEventListener("error", finish, { once: true });
         bs.addEventListener("pointerdown", finish, { once: true });
-        // Автоплей без звука всегда разрешён — играем тихо сразу, без тапа.
-        v.muted = true;
-        // Фон главного меню (обои + рамка) под интро — с первого кадра.
-        try { if (window.__bootBackdrop) window.__bootBackdrop(); } catch (e) {}
-        // Непрозрачный логотип поверх обоев: альфа-ключ по яркости.
-        // Если canvas недоступен — остаётся fallback: видео с mix-blend-mode: screen.
-        const cv = document.getElementById("boot-canvas");
-        try { if (cv) startBootKeying(v, cv, () => stopKeys); } catch (e) {}
-        const p = v.play();
-        if (p && p.catch) p.catch(() => {});
-        // Видео не стартовало за 3 с — не держим заглушку, входим сразу
-        // Быстрый выход: видео не буферизовалось за 1.2 с — не держим UI.
-        setTimeout(() => { if (!done && v.readyState < 2) finish(); }, 1200);
-        // Страховка: ролик длится 5 с, даём запас на случай потерянного ended
-        // Жёсткий лимит заставки: первая загрузка не ждёт 9-секундный ролик.
-        setTimeout(finish, 2500);
+        // Сначала фон и рамка, и только потом тяжёлое видео (12 МБ MP4 на iOS).
+        const startVideo = () => {
+            if (done) return;
+            let src = 'VID/Intro_small.mp4';
+            try {
+                const probe = document.createElement('video');
+                const webm = probe.canPlayType('video/webm; codecs="vp9"');
+                if (webm === 'probably' || webm === 'maybe') src = 'VID/Intro_alpha.webm?v=20261593';
+            } catch (e) {}
+            v.src = src;
+            v.load();
+            v.muted = true;
+            try { if (window.__bootBackdrop) window.__bootBackdrop(); } catch (e) {}
+            const cv = document.getElementById("boot-canvas");
+            try { if (cv) startBootKeying(v, cv, () => stopKeys); } catch (e) {}
+            const p = v.play();
+            if (p && p.catch) p.catch(() => {});
+            setTimeout(() => { if (!done && v.readyState < 2) finish(); }, 1200);
+            setTimeout(finish, 2500);
+        };
+        let criticalLeft = 2, videoStarted = false;
+        const kick = () => { if (videoStarted) return; videoStarted = true; startVideo(); };
+        ["UI/BG_PIC_STR.webp?v=bgstr2", "UI/main-frame-v3.webp?v=frame5"].forEach((p) => {
+            const im = new Image();
+            im.onload = im.onerror = () => { if (--criticalLeft <= 0) kick(); };
+            im.src = p;
+        });
+        setTimeout(kick, 1200);
     }
 
     // Картинки плашек и первого экрана догружаем ПОСЛЕ старта интерфейса:
@@ -7822,12 +7863,19 @@ function restartLessonsTest() {
         const run = () => {
             if (ran) return;
             ran = true;
-            const paths = ["UI/BG_PIC_STR.webp?v=bgstr2", "UI/main-frame-v3.webp?v=frame5", "MASKOT/LOGO.webp", "MASKOT/MASKOT_18_cut.webp", "UI/extracted/activ_bottom.webp", "UI/extracted/bottom_trim.webp", "UI/Vipad_osnova.webp", "UI/ICON/MEDAL.webp", "UI/ICON/ZAMOK.webp", "UI/ICON/STAR.webp", "UI/ICON/TARGET.webp", "UI/ICON/FIRE.webp", "UI/ICON/DIAMOND.webp", "UI/ICON/KNIGA_BLUE.webp", "UI/ICON/MOLNIA.webp", "UI/ICON/GROMOFON'.webp", "UI/ICON/KUBOK.webp", "UI/ICON/KOLOKOL.webp", "UI/ICON/DEKA.webp", "UI/ICON/GALKA.webp", "UI/ICON/LAMPA.webp", "UI/ICON/PALEC.webp", "UI/ICON/TRASH.webp", "UI/ICON/RECYCLE.webp", "UI/ICON/PALITRA.webp"];
+            const paths = ["MASKOT/LOGO.webp", "MASKOT/MASKOT_18_cut.webp", "UI/extracted/activ_bottom.webp", "UI/extracted/bottom_trim.webp", "UI/Vipad_osnova.webp", "UI/ICON/MEDAL.webp", "UI/ICON/ZAMOK.webp", "UI/ICON/STAR.webp", "UI/ICON/TARGET.webp", "UI/ICON/FIRE.webp", "UI/ICON/DIAMOND.webp", "UI/ICON/KNIGA_BLUE.webp", "UI/ICON/MOLNIA.webp", "UI/ICON/GROMOFON'.webp", "UI/ICON/KUBOK.webp", "UI/ICON/KOLOKOL.webp", "UI/ICON/DEKA.webp", "UI/ICON/GALKA.webp", "UI/ICON/LAMPA.webp", "UI/ICON/PALEC.webp", "UI/ICON/TRASH.webp", "UI/ICON/RECYCLE.webp", "UI/ICON/PALITRA.webp"];
             paths.forEach(p => { try { const im = new Image(); im.src = p; } catch (e) {} });
         };
         if (document.readyState === "complete") run();
         else { window.addEventListener("load", run, { once: true }); setTimeout(run, 2500); }
     }
+
+    // Кеш картинок — прогрессивное улучшение: если SW недоступен, всё работает как раньше.
+    try {
+        if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+        }
+    } catch (e) {}
 
     document.addEventListener("DOMContentLoaded", () => {
         const hasData = loadData();
