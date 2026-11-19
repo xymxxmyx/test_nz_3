@@ -1932,19 +1932,8 @@ const TG = (() => {
                 const app = window.Telegram.WebApp;
                 app.ready();
                 app.expand();
-                // Полноэкранный режим (Mini Apps 2.0, Bot API 8.0+): прячет
-                // шапку Telegram с именем бота, отдаёт весь экран. На старых
-                // клиентах метода нет — тихо пропускаем.
-                try {
-                    // parseFloat(version) >= 8: фулскрин появился в Bot API 8.0.
-                    // Мок SDK в обычных браузерах («6.0») и старые клиенты —
-                    // без вызова, без шума в консоли.
-                    var plat = String(app.platform || "");
-                    var desktop = /tdesktop|macos|weba|webk|unigram/i.test(plat) || window.innerWidth > 900;
-                    if (!desktop && typeof app.requestFullscreen === "function" && !app.isFullscreen && parseFloat(app.version) >= 8) {
-                        app.requestFullscreen();
-                    }
-                } catch (e) {}
+                // Автовход в фуллскрин отключён: он перестраивал вьюпорт
+                // после загрузки и дёргал геометрию главного меню.
                 // Оверлеи фулскрина: плавающие кнопки Telegram («Закрыть»,
                 // «∨ ⋮») и системные полосы. Сцена строится в оставшемся
                 // проёме — рамка начинается ниже кнопок, а не под ними.
