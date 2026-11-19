@@ -11707,8 +11707,8 @@ body[data-theme="plush"] #ach-toasts {
 
 /* gap_hearts_card_v1 === Меньше зазор между сердечками и игровым полем === */
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .hearts {
-    margin-top: calc(2px * var(--ui-fit, 1)) !important;
-    margin-bottom: 0 !important;
+    margin-top: calc(8px * var(--ui-fit, 1)) !important;
+    margin-bottom: calc(8px * var(--ui-fit, 1)) !important;
 }
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #game-card {
     padding-top: calc(16px * var(--ui-fit, 1)) !important;
