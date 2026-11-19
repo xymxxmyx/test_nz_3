@@ -209,10 +209,12 @@
 
     <link rel="stylesheet" href="style.css?v=20261235">
 
-    <!-- Критичные арты: теперь грузятся первыми, пока видео ещё не стартовало.
-         fetchpriority=high забирает полосу у всего остального на старте. -->
-    <link rel="preload" as="image" href="UI/BG_PIC_STR.webp?v=bgstr2" fetchpriority="high">
-    <link rel="preload" as="image" href="UI/main-frame-v3.webp?v=frame5" fetchpriority="high">
+    <!-- Шрифты с высоким приоритетом: иначе текст мигает системным шрифтом. -->
+    <link rel="preload" as="font" type="font/ttf" href="UI/NihonZenoPlush-Regular.ttf" crossorigin fetchpriority="high">
+    <link rel="preload" as="font" type="font/ttf" href="UI/NihonZenoPlush-ExtraBold.ttf" crossorigin fetchpriority="high">
+    <!-- Критичные арты — обычный приоритет, чтобы не отбирать полосу у шрифта. -->
+    <link rel="preload" as="image" href="UI/BG_PIC_STR.webp?v=bgstr2">
+    <link rel="preload" as="image" href="UI/main-frame-v3.webp?v=frame5">
 
     <script>
     /* Режим «только рамка» (?frameonly=1): рисуем одно кольцо по экрану,
@@ -1407,7 +1409,7 @@
         document.body.innerHTML = '';
         document.body.style.cssText = 'margin:0;background:#0f0c1b;overflow:hidden;';
         document.body.appendChild(f);
-        var last = true;
+        var last = window.innerWidth > MIN_W;
         window.addEventListener('resize', function () {
             var wide = window.innerWidth > MIN_W;
             f.style.left = Math.max(0, Math.round((window.innerWidth - (window.__nzPhoneCustom ? window.__nzPhoneCustom.w : PHONE_W)) / 2)) + 'px';
@@ -1488,7 +1490,7 @@
 body.nz-mobile #game-screen.active:has(#input-area:not(.hidden)){overflow:visible !important}
 body.nz-mobile #game-screen:has(#input-area:not(.hidden)) #check-btn,
 body.nz-mobile #game-screen:has(#input-area:not(.hidden)) #next-btn{display:none !important}
-body.nz-mobile #game-screen.active:has(#input-area:not(.hidden)){max-height:calc(var(--app-stage-h,var(--app-vh,100svh)) - var(--frame-t-px,24px) - var(--topbar-h,36px) - var(--frame-b-px,24px) - 14px - var(--kb-total-h,240px)) !important;padding-bottom:16px;justify-content:flex-start}
+body.nz-mobile #game-screen.active:has(#input-area:not(.hidden)){justify-content:flex-start;max-height:calc(var(--app-stage-h,var(--app-vh,100svh)) - var(--frame-t-px,24px) - var(--topbar-h,36px) - var(--frame-b-px,24px) - 14px - var(--kb-total-h,240px)) !important;padding-bottom:16px}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-card{height:calc(100vw * 0.72);max-height:calc(100vw * 0.72)}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)):has(#current-word.sentence) .game-card{min-height:calc(100vw * 0.72)}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #game-card{padding-top:calc(6px * var(--ui-fit, 1)) !important}

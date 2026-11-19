@@ -7810,6 +7810,9 @@ function restartLessonsTest() {
                 try {
                     const shown = document.querySelector('.screen.active');
                     if (shown) {
+                        shown.classList.remove('active');
+                        void shown.offsetWidth;
+                        shown.classList.add('active');
                         const sel = '.game-header,.logo-img,.greeting,.stats-box,.menu-level-bar,.level-box,.progress-tabs,.menu-btn,.welcome-title,.welcome-sub,#player-name,#start-btn';
                         const targets = [shown].concat([].slice.call(shown.querySelectorAll(sel))).slice(0, 24);
                         targets.forEach(function (el, i) {
