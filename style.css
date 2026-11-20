@@ -11796,11 +11796,11 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden))
     margin-bottom: calc(8px * var(--ui-fit-base, var(--ui-fit, 1)));
 }
 body.tg-mini-app[data-theme="plush"] #battle-area .battle-header {
-    margin-bottom: calc(46px * var(--ui-fit, 1));
+    margin-bottom: calc(76px * var(--ui-fit, 1));
 }
 body.tg-mini-app[data-theme="plush"] #battle-area .battle-table {
-    padding-top: calc(64px * var(--ui-fit, 1));
-    padding-bottom: calc(20px * var(--ui-fit, 1));
+    padding-top: calc(68px * var(--ui-fit, 1));
+    padding-bottom: calc(64px * var(--ui-fit, 1));
 }
 /* Карта бота и колода («смена») стоят ВНУТРИ игрового поля: верхний
    отступ задаётся padding'ом стола, а не сдвигом самой карты. */
@@ -11821,8 +11821,8 @@ body.tg-mini-app[data-theme="plush"] #battle-area .player-zone .options.plasma-d
 @media (max-height: 820px) {
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) .battle-table {
         margin-top: calc(4px * var(--ui-fit, 1));
-        padding-top: calc(64px * var(--ui-fit, 1));
-        padding-bottom: calc(20px * var(--ui-fit, 1));
+        padding-top: calc(68px * var(--ui-fit, 1));
+        padding-bottom: calc(64px * var(--ui-fit, 1));
         gap: calc(3px * var(--ui-fit, 1));
     }
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) .battle-center {
