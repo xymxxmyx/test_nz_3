@@ -11898,3 +11898,25 @@ body.tg-mini-app[data-theme="plush"] #battle-area .player-zone .options.plasma-d
         gap: calc(2px * var(--ui-fit, 1));
     }
 }
+
+/* Крупные иконки звука, микрофона и избранного на всех игровых экранах. */
+body.tg-mini-app[data-theme="plush"] .tts-btn,
+body.tg-mini-app[data-theme="plush"] .mic-btn,
+body.tg-mini-app[data-theme="plush"] .fav-btn {
+    width: max(30px, calc(44px * var(--ui-fit, 1))) !important;
+    height: max(30px, calc(44px * var(--ui-fit, 1))) !important;
+}
+body.tg-mini-app[data-theme="plush"] .mic-btn .mic-svg {
+    width: max(16px, calc(22px * var(--ui-fit, 1))) !important;
+    height: max(16px, calc(22px * var(--ui-fit, 1))) !important;
+}
+/* Текст слова на игровом поле крупнее. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #current-word:not(.listening-mask) {
+    font-size: clamp(22px, calc(32px * var(--ui-fit, 1)), 32px) !important;
+}
+body.tg-mini-app[data-theme="plush"] #battle-area .center-label {
+    font-size: max(14px, calc(19px * var(--ui-fit, 1))) !important;
+}
+body.tg-mini-app[data-theme="plush"] #battle-area .player-zone .zone-label {
+    font-size: max(13px, calc(17px * var(--ui-fit, 1))) !important;
+}
