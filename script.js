@@ -2386,6 +2386,8 @@ function showGameWord() {
     const word = state.gameWords[state.currentWordIndex];
     const displayWord = isTargetToNative() ? tgt(word) : nat(word);
     
+    // Полоска должна дойти до конца на последнем слове, а не останавливаться
+    // на (n-1)/n — поэтому считаем от текущего номера, а не от индекса.
     const progress = (state.currentWordIndex / state.gameWords.length) * 100;
     document.getElementById("progress-fill").style.width = progress + "%";
     document.getElementById("progress-text").textContent = 
