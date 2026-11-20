@@ -1390,26 +1390,19 @@
     <script>
     (function () {
         var PHONE_W = 420, MIN_W = 560;
-        var qs = location.search + location.hash;
-        var mW = parseInt((qs.match(/[?&#]phoneW=(\d+)/) || [])[1], 10);
-        var mH = parseInt((qs.match(/[?&#]phoneH=(\d+)/) || [])[1], 10);
-        if (mW > 200 && mH > 300) window.__nzPhoneCustom = { w: mW, h: mH };
-        var baseW = window.__nzPhoneCustom ? window.__nzPhoneCustom.w : PHONE_W;
-        var baseH = window.__nzPhoneCustom ? window.__nzPhoneCustom.h : window.innerHeight;
-        if (window.self !== window.top || (window.innerWidth <= MIN_W && !/[?&#]tgmock=1([&#]|$)/.test(qs))) {
+        if (window.self !== window.top || (window.innerWidth <= MIN_W && !/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash))) {
             document.write('<script src="script.js?v=20261207"><\/script>');
             return;
         }
-        document.documentElement.style.setProperty('phone-w', baseW + 'px');
+        document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');
         var f = document.createElement('iframe');
         f.id = 'phone-frame';
         f.title = 'Nihon & Zeno';
         f.src = location.pathname + '?embed=1&cb=' + Date.now() +
             (/[?&#]tg=0([&#]|$)/.test(location.search + location.hash) ? '&tg=0' : '') +
-            (/[?&#]tgmock=1([&#]|$)/.test(qs) ? '&tgmock=1' : '') +
-            (/[?&#]nzdbg=1([&#]|$)/.test(qs) ? '&nzdbg=1' : '');
-        f.style.cssText = 'position:fixed;top:0;left:0;width:' + baseW +
-            'px;height:' + baseH + 'px;border:0;display:block;background:#0f0c1b;';
+            (/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash) ? '&tgmock=1' : '');
+        f.style.cssText = 'position:fixed;top:0;left:0;width:' + PHONE_W +
+            'px;height:100vh;border:0;display:block;background:#0f0c1b;';
         document.body.appendChild(f);
         // Родительская страница больше не нужна: убираем её содержимое
         // (иначе собственный #boot-screen висит поверх фрейма)
@@ -1424,8 +1417,8 @@
             f.style.height = (window.__nzPhoneCustom ? window.__nzPhoneCustom.h : window.innerHeight) + 'px';
             if (wide !== last) { last = wide; location.replace(location.pathname); }
         });
-        f.style.left = Math.max(0, Math.round((window.innerWidth - baseW) / 2)) + 'px';
-        f.style.height = baseH + 'px';
+        f.style.left = Math.max(0, Math.round((window.innerWidth - PHONE_W) / 2)) + 'px';
+        f.style.height = window.innerHeight + 'px';
     })();
     </script>
 
@@ -1950,50 +1943,6 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
     if (ev.key === 'Escape' && kb.classList.contains('open')) close();
   });
 })();
-</script>
-
-<script>
-/* Диагностика мобильной вёрстки: добавить ?nzdbg=1 к любому адресу.
-   Панель не мешает игре (pointer-events:none) и видна и на ПК, и на телефоне. */
-if (/[?&#]nzdbg=1([&#]|$)/.test(location.search + location.hash)) {
-(function () {
-  var box = document.createElement('div');
-  box.style.cssText = 'position:fixed;z-index:2147483647;left:4px;top:4px;max-width:min(96vw,430px);padding:6px 8px;border-radius:8px;background:rgba(6,3,14,.88);color:#bff;font:11px/1.35 monospace;white-space:pre-wrap;pointer-events:none;border:1px solid #5aa;box-shadow:0 4px 14px #000;';
-  document.body.appendChild(box);
-  function rootStyle() { return getComputedStyle(document.documentElement); }
-  function rect(el) { return el ? el.getBoundingClientRect() : null; }
-  function tick() {
-    var gsEl = document.getElementById('game-screen');
-    var hdrEl = document.querySelector('#battle-area .battle-header');
-    var heartsEl = document.getElementById('hearts');
-    var tblEl = document.getElementById('battle-table');
-    var cntEl = document.getElementById('progress-text');
-    var hdr = rect(hdrEl), hearts = rect(heartsEl), tbl = rect(tblEl), cnt = rect(cntEl);
-    var cssLink = document.querySelector('link[href*="style.css"]');
-    var jsEl = document.querySelector('script[src*="script.js"]');
-    var rs = rootStyle();
-    var lines = [
-      'nzdbg  CSS ' + (cssLink ? (cssLink.getAttribute('href').split('v=')[1] || '?') : '?') +
-        '  JS ' + (jsEl ? (jsEl.src.split('v=')[1] || '?') : '?'),
-      'body: ' + document.body.className,
-      'view ' + innerWidth + 'x' + innerHeight + ' dpr ' + devicePixelRatio +
-        '  stage ' + rs.getPropertyValue('--app-stage-w').trim() + 'x' + rs.getPropertyValue('--app-stage-h').trim(),
-      'fit ' + rs.getPropertyValue('--ui-fit').trim() + '  base ' + rs.getPropertyValue('--ui-fit-base').trim(),
-      'screen ' + (gsEl ? Math.round(gsEl.getBoundingClientRect().height) : '-') +
-        ' client ' + (gsEl ? gsEl.clientHeight : '-') +
-        ' scroll ' + (gsEl ? gsEl.scrollHeight : '-') +
-        ' ovf ' + (gsEl ? getComputedStyle(gsEl).overflowY : '-'),
-      'header→hearts ' + (hdr && hearts ? Math.round(hearts.top - hdr.bottom) : '-') +
-        '  hearts→table ' + (hearts && tbl ? Math.round(tbl.top - hearts.bottom) : '-'),
-      'counter→header ' + (cnt && hdr ? Math.round(hdr.top - cnt.bottom) : '-') +
-        '  heart ' + (hearts ? Math.round(hearts.height) : '-') + 'px'
-    ];
-    box.textContent = lines.join('\n');
-  }
-  setInterval(tick, 400);
-  tick();
-})();
-}
 </script>
 </body>
 
