@@ -1597,8 +1597,12 @@ let dictBuildToken = 0;
         // гнал fit к 0.55 — карточки становились мелкими. Кнопка «Назад»
         // там от ужимания не зависит (считается от --ui-fit-base).
         const shrinkable = screenId !== "progress-screen" && screenId !== "lessons-screen" && screenId !== "lesson-screen" && screenId !== "settings-screen" && screenId !== "dictionary-screen" && screenId !== "user-words-screen";
-        while (shrinkable && guard++ < 14 && sc.scrollHeight > sc.clientHeight + 2 && fit > 0.55) {
-            fit = Math.max(0.55, fit - 0.04);
+        // «5 в 1»: без скролла поле должно влезать даже на коротких
+        // телефонах, поэтому разрешаем стражу ужимать масштаб до 0.42.
+        const battleArea = document.getElementById("battle-area");
+        const minFit = (screenId === "game-screen" && battleArea && !battleArea.classList.contains("hidden")) ? 0.42 : 0.55;
+        while (shrinkable && guard++ < 14 && sc.scrollHeight > sc.clientHeight + 2 && fit > minFit) {
+            fit = Math.max(minFit, fit - 0.04);
             applyFit(fit);
         }
         fitCache = { w: iw, h: ih, screen: screenId, fit: fit };
