@@ -9662,11 +9662,9 @@ body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-header
 }
 /* Отступ верхних кнопок от белой кромки рамки (особенно на iPhone с клавиатурой). */
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-header {
-    /* Сдвигаем кнопки визуально вниз от белой кромки рамки, не увеличивая
-       высоту контента (иначе на iPhone появляется скролл). */
-    position: relative;
-    top: 10px;
-    margin-bottom: 5px;
+    /* Реальные отступы: сверху от белой кромки рамки, снизу от прогресс-бара. */
+    margin-top: 10px;
+    margin-bottom: 18px;
 }
 
 /* Категория должна быть визуально идентична «Назад»: тот же размер текста,
@@ -9684,6 +9682,9 @@ body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-header
 /* Pole.png занимает 1155 из 1235 px по ширине (по 40 px прозрачных полей
    слева и справа), а Progres_podloj.png — всю ширину. Сужаем бар до 93.52%
    и центрируем, чтобы кремовые канты бара и игрового стола совпали. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .bar-wrap {
+    margin-top: 8px !important;
+}
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .bar-wrap {
     position: relative;
     width: 93.52%;
@@ -9978,7 +9979,7 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
         align-self: center;
         margin-top: 0;
         height: auto;
-        max-height: calc(var(--app-vh, 100svh) - var(--frame-t-px, 24px) - var(--topbar-h, 36px) - var(--frame-b-px, 24px) - 14px);
+        max-height: calc(var(--app-vh, 100svh) - var(--frame-t-px, 24px) - var(--topbar-h, 36px) - var(--frame-b-px, 24px) + 22px);
         padding-top: 0;
         padding-bottom: 0;
     }
@@ -9989,8 +9990,8 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
 
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-card {
         flex: 0 0 auto;
-        height: calc(100vw * 0.86);
-        max-height: calc(100vw * 0.86);
+        height: calc(100vw * 0.54);
+        max-height: calc(100vw * 0.54);
     }
 
     /* Длинное предложение не помещается в фиксированную высоту стола:
@@ -9998,7 +9999,7 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
        как минимум. Плашка при этом не сжимается (flex: 0 0 auto). */
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)):has(#current-word.sentence) .game-card {
         height: auto;
-        min-height: calc(100vw * 0.86);
+        min-height: calc(100vw * 0.54);
         max-height: none;
     }
 }
