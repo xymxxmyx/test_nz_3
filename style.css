@@ -11790,22 +11790,25 @@ body.tg-mini-app[data-theme="plush"] #battle-area .hearts .heart {
     height: calc(20px * var(--ui-fit-base, var(--ui-fit, 1)));
 }
 
+/* Зазор между полосой VS и сердечками. Раньше в коротком экране он
+   схлопывался до 6px*fit — сердечки наезжали на плашку VS. */
+body.tg-mini-app[data-theme="plush"] #battle-area .battle-header {
+    margin-bottom: calc(50px * var(--ui-fit, 1));
+}
+
 /* Короткие телефоны: уплотняем стол «5 в 1», чтобы без скролла
    вмещались шапка, карта бота, подпись и веер из пяти карт. */
 @media (max-height: 820px) {
-    body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) .battle-header {
-        margin-bottom: calc(6px * var(--ui-fit, 1));
-    }
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) .battle-table {
-        margin-top: calc(20px * var(--ui-fit, 1));
-        padding-top: calc(30px * var(--ui-fit, 1));
-        padding-bottom: calc(38px * var(--ui-fit, 1));
+        margin-top: calc(4px * var(--ui-fit, 1));
+        padding-top: calc(20px * var(--ui-fit, 1));
+        padding-bottom: calc(20px * var(--ui-fit, 1));
         gap: calc(5px * var(--ui-fit, 1));
     }
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) .battle-center {
-        margin-top: calc(12px * var(--ui-fit, 1));
+        margin-top: calc(8px * var(--ui-fit, 1));
     }
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) #battle-feedback {
-        min-height: calc(16px * var(--ui-fit, 1));
+        min-height: calc(12px * var(--ui-fit, 1));
     }
 }
