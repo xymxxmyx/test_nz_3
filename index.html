@@ -207,7 +207,7 @@
     })();
     </script>
 
-    <link rel="stylesheet" href="style.css?v=20261263">
+    <link rel="stylesheet" href="style.css?v=20261264">
 
     <!-- Шрифты с высоким приоритетом: иначе текст мигает системным шрифтом. -->
     <link rel="preload" as="font" type="font/ttf" href="UI/NihonZenoPlush-Regular.ttf" crossorigin fetchpriority="high">
@@ -675,7 +675,10 @@
                         <button class="mic-btn" id="answer-mic" title="Голосовой ввод" aria-label="Голосовой ввод"></button>
                     </div>
 
-                    <button class="check-btn" id="check-btn" onclick="checkAnswer()"><img class="ico-png" src="UI/ICON/GALKA.webp" alt=""> Проверить</button>
+                    <div class="answer-actions">
+                        <button class="check-btn" id="check-btn" onclick="checkAnswer()"><img class="ico-png" src="UI/ICON/GALKA.webp" alt=""> Проверить</button>
+                        <button class="skip-btn" id="skip-btn" onclick="skipWord()">Не знаю</button>
+                    </div>
                     <p class="feedback" id="feedback"></p>
 
                     <button class="next-btn hidden" id="next-btn" onclick="nextWord()">Далее <img class="ico-png" src="UI/ICON/STRELA_PRAVO.webp" alt=""></button>
@@ -1391,7 +1394,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.self !== window.top || (window.innerWidth <= MIN_W && !/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash))) {
-            document.write('<script src="script.js?v=20261210"><\/script>');
+            document.write('<script src="script.js?v=20261212"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');

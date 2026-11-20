@@ -4538,6 +4538,7 @@ body[data-theme="plush"] .menu-btn.back-to-menu {
 /* Р РЃР С‘РЎР‚Р С•Р С”Р С‘Р Вµ РЎвЂљР ВµР С”РЎРѓРЎвЂљР С•Р Р†РЎвЂ№Р Вµ Р С”Р Р…Р С•Р С—Р С”Р С‘ Р Р† Р С—Р В°Р Р…Р ВµР В»РЎРЏРЎвЂ¦: Р С—Р В»Р В°РЎв‚¬Р С”Р В° + hover/press Р С”Р В°Р С” РЎС“ .menu-btn */
 body[data-theme="plush"] .check-btn,
 body[data-theme="plush"] .next-btn,
+body[data-theme="plush"] .skip-btn,
 body[data-theme="plush"] .danger-btn,
 body[data-theme="plush"] .cards-reset-btn,
 body[data-theme="plush"] .audio-toggle,
@@ -6679,6 +6680,18 @@ input[type="text"] {
 }
 .check-btn {
     padding: calc(10px * var(--ui-fit, 1)) calc(12px * var(--ui-fit, 1));
+}
+/* «Проверить» и «Не знаю» — в одну строку, без переполнения. */
+.answer-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(8px * var(--ui-fit, 1));
+}
+.skip-btn {
+    padding: calc(10px * var(--ui-fit, 1)) calc(12px * var(--ui-fit, 1));
+    font-size: calc(13px * var(--ui-fit, 1));
+    opacity: 0.88;
 }
 .feedback {
     font-size: calc(13px * var(--ui-fit, 1));
@@ -9636,6 +9649,14 @@ body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-header
     padding-left: 3.239%;
     padding-right: 3.239%;
 }
+/* Отступ верхних кнопок от белой кромки рамки (особенно на iPhone с клавиатурой). */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-header {
+    /* Сдвигаем кнопки визуально вниз от белой кромки рамки, не увеличивая
+       высоту контента (иначе на iPhone появляется скролл). */
+    position: relative;
+    top: 10px;
+    margin-bottom: 11px;
+}
 
 /* Категория должна быть визуально идентична «Назад»: тот же размер текста,
    та же высота строки и без свечения. */
@@ -9844,6 +9865,7 @@ body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .mic-btn.rec
 }
 
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn,
+body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #skip-btn,
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #next-btn,
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn:hover,
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #next-btn:hover {
@@ -9956,8 +9978,8 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
 
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-card {
         flex: 0 0 auto;
-        height: calc(100vw * 0.9);
-        max-height: calc(100vw * 0.9);
+        height: calc(100vw * 0.86);
+        max-height: calc(100vw * 0.86);
     }
 
     /* Длинное предложение не помещается в фиксированную высоту стола:
@@ -9965,7 +9987,7 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
        как минимум. Плашка при этом не сжимается (flex: 0 0 auto). */
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)):has(#current-word.sentence) .game-card {
         height: auto;
-        min-height: calc(100vw * 0.9);
+        min-height: calc(100vw * 0.86);
         max-height: none;
     }
 }

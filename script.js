@@ -4149,6 +4149,63 @@ function nextWord() {
     showGameWord();
 }
 
+// «Не знаю»: показываем верный ответ в поле ввода, снимаем одно сердечко
+// и жмём «Далее» (или авто-переход на мобильном) — как при неверном ответе.
+function skipWord() {
+    if (!onGameScreen()) return;
+    const input = document.getElementById("answer-input");
+    if (input && input.disabled) return; // ответ уже показан — есть «Далее»
+    const word = state.gameWords[state.currentWordIndex];
+    if (!word) return;
+    const correctAnswer = isTargetToNative() ? nat(word) : tgt(word);
+    MIC.stop();
+    Sound.wrong();
+    state.streak = 0;
+    markWrong(word);
+    recordAnswer(false, false);
+    comboReset();
+    loseLife();
+    if (input) {
+        input.value = correctAnswer;
+        input.disabled = true;
+        input.blur();
+    }
+    const kb = document.getElementById("nz-kb");
+    if (kb) kb.classList.remove("open");
+    document.body.classList.remove("nz-kb-open");
+    const feedback = document.getElementById("feedback");
+    if (feedback) {
+        feedback.textContent = `НЕВЕРНО ! Правильно: ${correctAnswer}`;
+        feedback.className = "feedback incorrect";
+    }
+    document.getElementById("check-btn").classList.add("hidden");
+    document.getElementById("next-btn").classList.remove("hidden");
+    saveData();
+    if (state.lives <= 0) {
+        setTimeout(() => { if (onGameScreen()) showGameOver(); }, 800);
+    } else if (typeof window.NZ_KB_IS_MOBILE === "function" && window.NZ_KB_IS_MOBILE()) {
+        const checkedIndex = state.currentWordIndex;
+        setTimeout(function () {
+            if (!onGameScreen() || !state.inProgress) return;
+            if (state.currentWordIndex !== checkedIndex) return;
+            nextWord();
+        }, 3000);
+    }
+}
+
+// Тап по игровому полю после проверки ответа = кнопка «Далее».
+document.addEventListener("DOMContentLoaded", function () {
+    const screen = document.getElementById("game-screen");
+    if (!screen) return;
+    screen.addEventListener("click", function (e) {
+        const next = document.getElementById("next-btn");
+        if (!next || next.classList.contains("hidden")) return;
+        if (e.target && e.target.closest && e.target.closest("button, input, a, .nz-kb")) return;
+        if (!onGameScreen()) return;
+        nextWord();
+    });
+});
+
 // ===== КАРТЫ: собери предложение из карточек, которые раздаёт бот =====
 const CARDS = {
     sentence: null,
