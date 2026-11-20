@@ -11778,10 +11778,11 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden))
 }
 
 /* Сердечки в «5 в 1»: размер берём от --ui-fit-base (масштаб ДО ужимания
-   стражем), чтобы они не мельчали вместе с полем. Старый отрицательный
-   margin-bottom втягивал их в верхнюю кромку стола и полосу VS. */
+   стражем), чтобы они не мельчали вместе с полем. Позиция — ровно по центру
+   просвета между плашкой VS и игровым полем: отступ снизу = отступ сверху =
+   половина свободного места (76px*fit — высота сердечек). */
 body.tg-mini-app[data-theme="plush"] #battle-area .hearts {
-    bottom: calc(100% + 3px * var(--ui-fit-base, var(--ui-fit, 1)));
+    bottom: calc(100% + (76px * var(--ui-fit, 1) - 20px * var(--ui-fit-base, var(--ui-fit, 1))) / 2);
     margin: 0;
     gap: calc(8px * var(--ui-fit-base, var(--ui-fit, 1)));
 }
