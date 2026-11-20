@@ -6708,7 +6708,7 @@ input[type="text"] {
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #skip-btn {
     font-size: max(14px, calc(18px * var(--ui-fit, 1))) !important;
     padding: 0 calc(24px * var(--ui-fit, 1)) !important;
-    margin-top: 16px;
+    margin-top: 10px;
 }
 
 /* Р вЂР С‘РЎвЂљР Р†Р В° (5 Р С” 1 / Р Р€РЎРѓР В»РЎвЂ№РЎв‚¬РЎРЉ РЎРѓР В»Р С•Р Р†Р С•): РЎР‚Р В°Р В·Р СР ВµРЎР‚ Р С”Р В°РЎР‚РЎвЂљ Р С‘ Р С•РЎвЂљРЎРѓРЎвЂљРЎС“Р С—РЎвЂ№ */
@@ -11817,7 +11817,7 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden))
    просвета между плашкой VS и игровым полем: отступ снизу = отступ сверху =
    половина свободного места (76px*fit — высота сердечек). */
 body.tg-mini-app[data-theme="plush"] #battle-area .hearts {
-    bottom: calc(100% - 6px);
+    bottom: calc(100% + 10px);
     margin: 0;
     gap: calc(8px * var(--ui-fit-base, var(--ui-fit, 1)));
 }
@@ -11829,7 +11829,7 @@ body.tg-mini-app[data-theme="plush"] #battle-area .hearts .heart {
 /* В «5 в 1» плашка VS и счётчики колод убраны: кнопки «Назад»/категория
    стоят над сердечками, а сердечки — над игровым полем. */
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) .game-header {
-    margin-bottom: calc(64px * var(--ui-fit, 1));
+    margin-bottom: calc(100px * var(--ui-fit, 1));
 }
 body.tg-mini-app[data-theme="plush"] #battle-area .battle-header {
     display: none !important;
@@ -11905,8 +11905,8 @@ body.tg-mini-app[data-theme="plush"] #battle-area .player-zone .options.plasma-d
 body.tg-mini-app[data-theme="plush"] .tts-btn,
 body.tg-mini-app[data-theme="plush"] .mic-btn,
 body.tg-mini-app[data-theme="plush"] .fav-btn {
-    width: max(30px, calc(44px * var(--ui-fit, 1))) !important;
-    height: max(30px, calc(44px * var(--ui-fit, 1))) !important;
+    width: max(40px, calc(44px * var(--ui-fit, 1))) !important;
+    height: max(40px, calc(44px * var(--ui-fit, 1))) !important;
 }
 body.tg-mini-app[data-theme="plush"] .mic-btn .mic-svg {
     width: max(16px, calc(22px * var(--ui-fit, 1))) !important;
@@ -11944,4 +11944,9 @@ body.tg-mini-app[data-theme="plush"] #battle-area .battle-table {
     width: 72vw !important;
     margin-left: auto !important;
     margin-right: auto !important;
+}
+
+/* Зазоры между элементами — как в «Собери предложение». */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .hearts {
+    margin-bottom: 10px !important;
 }
