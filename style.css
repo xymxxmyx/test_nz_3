@@ -11818,16 +11818,15 @@ body.tg-mini-app[data-theme="plush"] #battle-area .bot-deal-area {
     0% { transform: translateY(calc(var(--fan-y, 0px) + calc(8px * var(--ui-fit, 1)))) rotate(var(--fan-rot, 0deg)) scale(0.95); }
     100% { transform: translateY(var(--fan-y, 0px)) rotate(var(--fan-rot, 0deg)) scale(1); }
 }
-/* Текст на картах «5 в 1»: крупнее и без обрезки длинных слов. */
+/* Текст на картах «5 в 1»: крупный базовый размер, но без принудительного
+   переноса — fitTextOneLine сам ужимает шрифт, чтобы слово оставалось в одну строку. */
 body.tg-mini-app[data-theme="plush"] #battle-area .player-zone .option-card .opt-text {
-    font-size: clamp(10px, calc(16px * var(--ui-fit, 1)), 15px) !important;
-    white-space: normal !important;
-    overflow-wrap: anywhere !important;
+    font-size: 16px;
+    letter-spacing: -0.2px;
 }
 body.tg-mini-app[data-theme="plush"] #battle-area .card-word {
-    font-size: 17px !important;
-    white-space: normal !important;
-    overflow-wrap: anywhere !important;
+    font-size: 17px;
+    letter-spacing: -0.2px;
 }
 body.tg-mini-app[data-theme="plush"] #battle-area .player-zone .options.plasma-deal .option-card:not(.card-flying) {
     animation-name: fanPlasmaDealMobile;

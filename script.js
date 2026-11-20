@@ -2725,8 +2725,10 @@ function optInnerAvail(ci) {
         - (parseFloat(cs.paddingRight) || 0);
 }
 
-// Подгоняет шрифт элемента так, чтобы текст влезал в одну строку;
-// если при минимальном читаемом размере не помещается — возвращает перенос.
+// Подгоняет шрифт элемента так, чтобы текст влезал в одну строку.
+// На мобильном (tg-mini-app) слово НИКОГДА не рвётся по буквам: если не
+// помещается, шрифт ужимается дальше обычного минимума (до 4px). На ПК
+// поведение прежнее — при очень длинном слове разрешаем перенос.
 function fitTextOneLine(el, maxW, minPx, minOneLinePx) {
     if (!el || !maxW) return;
     el.style.whiteSpace = "nowrap";
@@ -2736,17 +2738,20 @@ function fitTextOneLine(el, maxW, minPx, minOneLinePx) {
     const w = el.scrollWidth;
     if (w > maxW) {
         const cur = parseFloat(getComputedStyle(el).fontSize) || 12;
-        let fs = Math.floor((cur * maxW / w) * 10) / 10;
-        // Для карточек в поле разрешаем чуть мельче обычного минимума, если
-        // это спасает слово от переноса по буквам («заниматься» на 373px).
-        const oneLineMin = minOneLinePx || minPx;
-        if (fs < oneLineMin) {
-            el.style.whiteSpace = "normal";
-            el.style.overflowWrap = "anywhere";
-            el.style.wordBreak = "break-word";
-            el.style.fontSize = minPx + "px";
+        const fs = Math.floor((cur * maxW / w) * 10) / 10;
+        const mobile = document.body.classList.contains("tg-mini-app") || document.body.classList.contains("nz-mobile");
+        if (mobile) {
+            el.style.fontSize = Math.max(4, fs) + "px";
         } else {
-            el.style.fontSize = fs + "px";
+            const oneLineMin = minOneLinePx || minPx;
+            if (fs < oneLineMin) {
+                el.style.whiteSpace = "normal";
+                el.style.overflowWrap = "anywhere";
+                el.style.wordBreak = "break-word";
+                el.style.fontSize = minPx + "px";
+            } else {
+                el.style.fontSize = fs + "px";
+            }
         }
     }
 }
