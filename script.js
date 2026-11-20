@@ -4160,8 +4160,12 @@ const CARDS = {
 function cardsDirBoxVisible() {
     const box = document.getElementById("cards-dir-box");
     if (!box) return;
-    box.classList.toggle("hidden", !isCardsMode());
-    if (isCardsMode()) cardsDirRefresh();
+    // Направление ввода показываем во всех режимах с ручным вводом/сборкой:
+    // «Ввод слов» (слова и предложения) и «Собери предложение».
+    // «5 к 1» оставляем как есть; «Услышь слово» всегда работает на языке цели.
+    const show = state.playMode === "input" || isCardsMode();
+    box.classList.toggle("hidden", !show);
+    if (show) cardsDirRefresh();
 }
 
 function setCardsDirection(dir) {
