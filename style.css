@@ -11808,14 +11808,20 @@ body.tg-mini-app[data-theme="plush"] #battle-area .battle-table {
 @media (max-height: 820px) {
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) .battle-table {
         margin-top: calc(4px * var(--ui-fit, 1));
-        padding-top: calc(8px * var(--ui-fit, 1));
-        padding-bottom: calc(0px * var(--ui-fit, 1));
+        padding-top: calc(0px * var(--ui-fit, 1));
+        padding-bottom: calc(32px * var(--ui-fit, 1));
         gap: calc(3px * var(--ui-fit, 1));
     }
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) .battle-center {
-        margin-top: calc(4px * var(--ui-fit, 1));
+        margin-top: calc(2px * var(--ui-fit, 1));
     }
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) #battle-feedback {
-        min-height: calc(8px * var(--ui-fit, 1));
+        min-height: calc(4px * var(--ui-fit, 1));
+    }
+    body.tg-mini-app[data-theme="plush"] #battle-area .bot-zone {
+        padding-top: calc(8px * var(--ui-fit, 1));
+    }
+    body.tg-mini-app[data-theme="plush"] #battle-area .player-zone {
+        gap: calc(4px * var(--ui-fit, 1));
     }
 }
