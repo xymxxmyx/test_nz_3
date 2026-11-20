@@ -1917,7 +1917,7 @@ body[data-theme="plush"] .uw-search-box input[type="text"]::placeholder {
 /* === Р В РЎвЂ™Р В РўвЂР В Р’В°Р В РЎвЂ”Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ Р В РЎвЂ”Р В Р’В°Р В Р вЂ¦Р В Р’ВµР В Р’В»Р В РЎвЂ Р В РЎвЂ“Р В Р’В»Р В Р’В°Р В Р вЂ Р В Р вЂ¦Р В РЎвЂўР В РЎвЂ“Р В РЎвЂў Р В РЎВР В Р’ВµР В Р вЂ¦Р РЋР вЂ№ Р В РЎвЂ”Р В РЎвЂўР В РўвЂ Р РЋР вЂљР В Р’В°Р В Р’В·Р В РЎВР В Р’ВµР РЋР вЂљР РЋРІР‚в„– Р В РЎвЂўР В РЎвЂќР В Р вЂ¦Р В Р’В° === */
 .menu-panel {
     max-width: 620px;
-    width: 96%;
+    width: 90%;
 }
 .menu-panel .stats-box {
     margin-bottom: 10px;
@@ -5924,7 +5924,7 @@ body #main-menu .menu-level-track {
     position: relative;
     flex: 1 1 auto;
     height: auto;
-    aspect-ratio: 1935 / 251;
+    aspect-ratio: 1935 / 210;
     background: transparent url("UI/Progres_podloj.webp") no-repeat center / 100% 100%;
     border: 0;
     border-radius: 0;
@@ -6147,7 +6147,7 @@ body #progress-screen .level-bar {
     border-radius: 0;
     box-shadow: none;
     height: auto;
-    aspect-ratio: 1935 / 251;
+    aspect-ratio: 1935 / 210;
     padding: 0;
     overflow: hidden;
     filter: drop-shadow(0 calc(10px * var(--ui-fit, 1)) calc(20px * var(--ui-fit, 1)) rgba(25, 4, 42, 0.85));
@@ -8508,7 +8508,7 @@ body[data-theme="plush"] #lesson-screen .game-header > h2 {
 body[data-theme="plush"] #lesson-test-screen .test-bar {
     position: relative;
     height: auto;
-    aspect-ratio: 1935 / 251;
+    aspect-ratio: 1935 / 210;
     margin-top: calc(10px * var(--ui-fit, 1));
     margin-bottom: calc(8px * var(--ui-fit, 1));
     padding: 0;
@@ -9690,7 +9690,7 @@ body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .bar-wrap {
     position: relative;
     width: 93.52%;
     height: auto;
-    aspect-ratio: 1935 / 251;
+    aspect-ratio: 1935 / 210;
     margin: 0 auto calc(1px * var(--ui-fit, 1));
     background: transparent url("UI/Progres_podloj.webp") no-repeat center / 100% 100%;
     border: 0;
@@ -9816,7 +9816,7 @@ body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .answer-row 
    растягивалась по горизонтали. Микрофон вынесен в ряд иконок, поэтому
    правый отступ под него больше не нужен. */
 body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #answer-input {
-    width: 90%;
+    width: 96%;
     height: min(calc(49px * var(--ui-fit, 1)), 44px);
     margin: 0 auto;
     padding: 0 calc(14px * var(--ui-fit, 1));
@@ -11915,6 +11915,11 @@ body.tg-mini-app[data-theme="plush"] .mic-btn .mic-svg {
 /* Текст слова на игровом поле крупнее. */
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #current-word:not(.listening-mask) {
     font-size: clamp(22px, calc(32px * var(--ui-fit, 1)), 32px) !important;
+}
+/* Верхние кнопки — в одну линию: категория не переносится. */
+body.tg-mini-app[data-theme="plush"] #game-screen .category-tag {
+    white-space: nowrap !important;
+    font-size: max(10px, calc(12px * var(--ui-fit, 1))) !important;
 }
 body.tg-mini-app[data-theme="plush"] #battle-area .center-label {
     font-size: max(14px, calc(19px * var(--ui-fit, 1))) !important;

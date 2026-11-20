@@ -207,7 +207,7 @@
     })();
     </script>
 
-    <link rel="stylesheet" href="style.css?v=20261270">
+    <link rel="stylesheet" href="style.css?v=20261271">
 
     <!-- Шрифты с высоким приоритетом: иначе текст мигает системным шрифтом. -->
     <link rel="preload" as="font" type="font/ttf" href="UI/NihonZenoPlush-Regular.ttf" crossorigin fetchpriority="high">
@@ -1467,7 +1467,7 @@
 
 <!-- === СВОЯ КЛАВИАТУРА (EN / RU / JP / ЦИФРЫ) — только на мобильных === -->
 <style id="nz-kb-css">
-.nz-kb{position:fixed;left:calc(var(--frame-l-px,24px) - 2px);right:calc(var(--frame-r-px,24px) - 2px);bottom:calc(var(--app-stage-yb,0px) + var(--app-stage-h,100vh) * 0.0316 - 2px);z-index:100001;box-sizing:border-box;padding:5px 5px 5px;background:linear-gradient(180deg,rgba(52,22,86,.98),rgba(22,7,38,.99));border-top:2px solid #ff9aa2;border-radius:12px;display:none;font-family:inherit;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.nz-kb{position:fixed;left:var(--frame-l-px,24px);right:var(--frame-r-px,24px);bottom:calc(var(--app-stage-yb,0px) + var(--app-stage-h,100vh) * 0.0316 - 2px);z-index:100001;box-sizing:border-box;padding:5px 5px 5px;background:linear-gradient(180deg,rgba(52,22,86,.98),rgba(22,7,38,.99));border-top:2px solid #ff9aa2;border-radius:12px;display:none;font-family:inherit;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .nz-kb-key{min-width:0;height:var(--kb-key-h,28px);padding:0;border:6px solid transparent;-webkit-border-image:url("UI/klava_key.webp") 30 30 30 30 fill / 6px 6px 6px 6px / 0 stretch;border-image:url("UI/klava_key.webp") 30 30 30 30 fill / 6px 6px 6px 6px / 0 stretch;background:transparent url("UI/klava_key.webp") center/contain no-repeat !important;color:#fff0fa;font:700 13px/1 system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 2px rgba(30,4,50,.85);position:relative;overflow:hidden;transform-origin:center;-webkit-tap-highlight-color:transparent}
 .nz-kb-bar button{height:var(--kb-bar-h,44px)}
 .nz-kb.open{display:block}
@@ -1494,8 +1494,8 @@ body.nz-mobile #game-screen.active:has(#input-area:not(.hidden)){overflow:visibl
 body.nz-mobile #game-screen:has(#input-area:not(.hidden)) #check-btn,
 body.nz-mobile #game-screen:has(#input-area:not(.hidden)) #next-btn{display:none !important}
 body.nz-mobile #game-screen.active:has(#input-area:not(.hidden)){justify-content:flex-start;max-height:calc(var(--app-stage-h,var(--app-vh,100svh)) - var(--frame-t-px,24px) - var(--topbar-h,36px) - var(--frame-b-px,24px) - 14px - var(--kb-total-h,240px)) !important;padding-bottom:16px}
-body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-card{height:calc(100vw * 0.72);max-height:calc(100vw * 0.72)}
-body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)):has(#current-word.sentence) .game-card{min-height:calc(100vw * 0.72)}
+body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-card{height:calc(100vw * 0.68);max-height:calc(100vw * 0.68)}
+body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)):has(#current-word.sentence) .game-card{min-height:calc(100vw * 0.68)}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #game-card{padding-top:calc(6px * var(--ui-fit, 1)) !important}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .hearts{margin:0 !important;flex:0 0 auto;height:calc(46px * var(--ui-fit, 1)) !important;align-items:flex-start;padding-top:calc(10px * var(--ui-fit, 1))}
 </style>
