@@ -207,7 +207,7 @@
     })();
     </script>
 
-    <link rel="stylesheet" href="style.css?v=20261272">
+    <link rel="stylesheet" href="style.css?v=20261275">
 
     <!-- Шрифты с высоким приоритетом: иначе текст мигает системным шрифтом. -->
     <link rel="preload" as="font" type="font/ttf" href="UI/NihonZenoPlush-Regular.ttf" crossorigin fetchpriority="high">
@@ -1634,14 +1634,20 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
   }
   function expectedLang(el) {
     try {
+      var id = el && el.id;
+      var ja = (typeof isJa === 'function' && isJa());
+      // «Мои слова» и словарь: раскладка привязана к языку из главного меню,
+      // поэтому переключатель над клавиатурой не нужен.
+      if (id === 'uw-en') return ja ? 'jp' : 'en';
+      if (id === 'uw-ru') return 'ru';
+      if (id === 'dict-search' || id === 'uw-search') return ja ? 'jp' : 'en';
+      if (id === 'uw-note') return null;
       if (typeof state === 'undefined' || !state || !state.playMode) return null;
       var gs = document.getElementById('game-screen');
       if (!gs || gs.classList.contains('hidden')) return null;
-      var id = el && el.id;
-      if (id === 'uw-en' || id === 'uw-ru' || id === 'uw-note' || id === 'dict-search' || id === 'uw-search') return null;
-      if (state.playMode === 'listening') return (typeof isJa === 'function' && isJa()) ? 'jp' : 'en';
+      if (state.playMode === 'listening') return ja ? 'jp' : 'en';
       if (typeof isTargetToNative === 'function' && isTargetToNative()) return 'ru';
-      return (typeof isJa === 'function' && isJa()) ? 'jp' : 'en';
+      return ja ? 'jp' : 'en';
     } catch (e) { return null; }
   }
   function rebuildNow() {

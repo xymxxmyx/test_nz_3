@@ -11817,7 +11817,7 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden))
    просвета между плашкой VS и игровым полем: отступ снизу = отступ сверху =
    половина свободного места (76px*fit — высота сердечек). */
 body.tg-mini-app[data-theme="plush"] #battle-area .hearts {
-    bottom: calc(100% + (64px * var(--ui-fit, 1) - 20px * var(--ui-fit-base, var(--ui-fit, 1))) / 2);
+    bottom: calc(100% - 6px);
     margin: 0;
     gap: calc(8px * var(--ui-fit-base, var(--ui-fit, 1)));
 }
@@ -11826,13 +11826,13 @@ body.tg-mini-app[data-theme="plush"] #battle-area .hearts .heart {
     height: calc(20px * var(--ui-fit-base, var(--ui-fit, 1)));
 }
 
-/* Зазор между полосой VS и сердечками. Поднимаем плашку выше и
-   одновременно увеличиваем отступ до сердечек. */
+/* В «5 в 1» плашка VS и счётчики колод убраны: кнопки «Назад»/категория
+   стоят над сердечками, а сердечки — над игровым полем. */
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) .game-header {
-    margin-bottom: calc(8px * var(--ui-fit-base, var(--ui-fit, 1)));
+    margin-bottom: calc(64px * var(--ui-fit, 1));
 }
 body.tg-mini-app[data-theme="plush"] #battle-area .battle-header {
-    margin-bottom: calc(64px * var(--ui-fit, 1));
+    display: none !important;
 }
 body.tg-mini-app[data-theme="plush"] #battle-area .battle-table {
     padding-top: calc(40px * var(--ui-fit, 1));
