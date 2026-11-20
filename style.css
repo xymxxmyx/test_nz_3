@@ -9306,7 +9306,7 @@ body[data-theme="plush"] #battle-area .battle-table {
 /* Р вЂР В°Р В»Р В°Р Р…РЎРѓ Р В±Р С•Р ВµР Р†Р С•Р С–Р С• РЎРЊР С”РЎР‚Р В°Р Р…Р В°: Р С”Р С•Р СР С—Р В°Р С”РЎвЂљР Р…Р ВµР Вµ Р С—Р С• Р Р†Р ВµРЎР‚РЎвЂљР С‘Р С”Р В°Р В»Р С‘, РЎвЂЎРЎвЂљР С•Р В±РЎвЂ№ Р С”Р В°РЎР‚РЎвЂљР В° Р В±Р С•РЎвЂљР В°,
    РЎвЂ Р ВµР Р…РЎвЂљРЎР‚ Р С‘ Р Р†Р ВµР ВµРЎР‚ Р С—Р С•Р СР ВµРЎвЂ°Р В°Р В»Р С‘РЎРѓРЎРЉ Р В±Р ВµР В· Р С—РЎР‚Р С•Р С”РЎР‚РЎС“РЎвЂљР С”Р С‘. */
 body[data-theme="plush"] #battle-area .battle-table {
-    padding-top: calc(46px * var(--ui-fit, 1));
+    padding-top: calc(40px * var(--ui-fit, 1));
     padding-bottom: calc(86px * var(--ui-fit, 1));
     gap: calc(9px * var(--ui-fit, 1));
     --bot-card-w: min(calc(168px * var(--ui-fit, 1)), max(calc(156px * var(--ui-fit, 1)), calc(20% - 4px * var(--ui-fit, 1))));
@@ -11815,7 +11815,7 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden))
    просвета между плашкой VS и игровым полем: отступ снизу = отступ сверху =
    половина свободного места (76px*fit — высота сердечек). */
 body.tg-mini-app[data-theme="plush"] #battle-area .hearts {
-    bottom: calc(100% + (76px * var(--ui-fit, 1) - 20px * var(--ui-fit-base, var(--ui-fit, 1))) / 2);
+    bottom: calc(100% + (64px * var(--ui-fit, 1) - 20px * var(--ui-fit-base, var(--ui-fit, 1))) / 2);
     margin: 0;
     gap: calc(8px * var(--ui-fit-base, var(--ui-fit, 1)));
 }
@@ -11830,11 +11830,22 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden))
     margin-bottom: calc(8px * var(--ui-fit-base, var(--ui-fit, 1)));
 }
 body.tg-mini-app[data-theme="plush"] #battle-area .battle-header {
-    margin-bottom: calc(76px * var(--ui-fit, 1));
+    margin-bottom: calc(64px * var(--ui-fit, 1));
 }
 body.tg-mini-app[data-theme="plush"] #battle-area .battle-table {
-    padding-top: calc(46px * var(--ui-fit, 1));
-    padding-bottom: calc(40px * var(--ui-fit, 1));
+    padding-top: calc(40px * var(--ui-fit, 1));
+    padding-bottom: calc(34px * var(--ui-fit, 1));
+}
+/* Подписи и кнопка звука на игровом поле «5 в 1» — крупнее. */
+body.tg-mini-app[data-theme="plush"] #battle-area .center-label {
+    font-size: max(13px, calc(18px * var(--ui-fit, 1)));
+}
+body.tg-mini-app[data-theme="plush"] #battle-area .player-zone .zone-label {
+    font-size: max(12px, calc(16px * var(--ui-fit, 1)));
+}
+body.tg-mini-app[data-theme="plush"] #battle-area .battle-center > .tts-btn {
+    width: max(26px, calc(44px * var(--ui-fit, 1)));
+    height: max(26px, calc(44px * var(--ui-fit, 1)));
 }
 /* Карта бота и колода («смена») стоят ВНУТРИ игрового поля: верхний
    отступ задаётся padding'ом стола, а не сдвигом самой карты. */
@@ -11870,8 +11881,8 @@ body.tg-mini-app[data-theme="plush"] #battle-area .player-zone .options.plasma-d
 @media (max-height: 820px) {
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) .battle-table {
         margin-top: calc(4px * var(--ui-fit, 1));
-        padding-top: calc(46px * var(--ui-fit, 1));
-        padding-bottom: calc(40px * var(--ui-fit, 1));
+        padding-top: calc(40px * var(--ui-fit, 1));
+        padding-bottom: calc(34px * var(--ui-fit, 1));
         gap: calc(3px * var(--ui-fit, 1));
     }
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) .battle-center {
