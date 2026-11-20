@@ -5937,7 +5937,7 @@ body #main-menu .menu-level-track-fill {
     left: 12%;
     top: 23%;
     height: 57%;
-    max-width: 84%;
+    max-width: 88%;
     z-index: 1;
     border-radius: 999px;
     overflow: hidden;
@@ -6157,7 +6157,7 @@ body #progress-screen .level-bar-fill {
     left: 12%;
     top: 23%;
     height: 57%;
-    max-width: 84%;
+    max-width: 88%;
     z-index: 1;
     border-radius: 999px;
     overflow: hidden;
@@ -8524,7 +8524,7 @@ body[data-theme="plush"] #lesson-test-screen .test-bar .progress-fill {
     left: 12%;
     top: 23%;
     height: 57%;
-    max-width: 84%;
+    max-width: 88%;
     border-radius: 999px;
     overflow: hidden;
     background: url("UI/progress_polosa_fit.webp") no-repeat left center / auto 100%;
@@ -9704,7 +9704,7 @@ body[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .progress-fi
     left: 12%;
     top: 23%;
     height: 57%;
-    max-width: 84%;
+    max-width: 88%;
     margin: 0;
     border-radius: 999px;
     overflow: hidden;
@@ -11926,4 +11926,22 @@ body.tg-mini-app[data-theme="plush"] #battle-area .center-label {
 }
 body.tg-mini-app[data-theme="plush"] #battle-area .player-zone .zone-label {
     font-size: max(13px, calc(17px * var(--ui-fit, 1))) !important;
+}
+/* === Игровые области: ориентир — «Собери предложение». ===
+   Ввод и «5 в 1» занимают тот же проём рамки и ту же ширину поля. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)),
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) {
+    align-self: flex-start;
+    margin-top: calc(var(--frame-t-px, 24px) + var(--topbar-h, 36px) + 8px);
+    height: calc(var(--app-vh, 100svh) - var(--frame-t-px, 24px) - var(--topbar-h, 36px) - var(--frame-b-px, 24px) - 14px);
+    max-height: calc(var(--app-vh, 100svh) - var(--frame-t-px, 24px) - var(--topbar-h, 36px) - var(--frame-b-px, 24px) - 14px);
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+
+body.tg-mini-app[data-theme="plush"] #battle-area .battle-table {
+    width: 72vw !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
