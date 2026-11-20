@@ -207,7 +207,7 @@
     })();
     </script>
 
-    <link rel="stylesheet" href="style.css?v=20261271">
+    <link rel="stylesheet" href="style.css?v=20261272">
 
     <!-- Шрифты с высоким приоритетом: иначе текст мигает системным шрифтом. -->
     <link rel="preload" as="font" type="font/ttf" href="UI/NihonZenoPlush-Regular.ttf" crossorigin fetchpriority="high">
@@ -1471,7 +1471,7 @@
 .nz-kb-key{min-width:0;height:var(--kb-key-h,28px);padding:0;border:6px solid transparent;-webkit-border-image:url("UI/klava_key.webp") 30 30 30 30 fill / 6px 6px 6px 6px / 0 stretch;border-image:url("UI/klava_key.webp") 30 30 30 30 fill / 6px 6px 6px 6px / 0 stretch;background:transparent url("UI/klava_key.webp") center/contain no-repeat !important;color:#fff0fa;font:700 13px/1 system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 2px rgba(30,4,50,.85);position:relative;overflow:hidden;transform-origin:center;-webkit-tap-highlight-color:transparent}
 .nz-kb-bar button{height:var(--kb-bar-h,44px)}
 .nz-kb.open{display:block}
-.nz-kb-bar{display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:5px}
+.nz-kb-bar{display:none !important}
 .nz-kb-bar button{flex:0 0 76px;max-width:76px;min-width:0;height:var(--kb-bar-h,44px);padding:0;border:6px solid transparent;-webkit-border-image:url("UI/klava_key_pink_small.webp") 26 26 26 26 fill / 6px 6px 6px 6px / 0 stretch;border-image:url("UI/klava_key_pink_small.webp") 26 26 26 26 fill / 6px 6px 6px 6px / 0 stretch;background:transparent url("UI/klava_key_pink_small.webp") center/contain no-repeat !important;color:#fff0fa;font:700 11px/1 system-ui,sans-serif;cursor:pointer;text-shadow:0 1px 2px rgba(30,4,50,.85);transform-origin:center;-webkit-tap-highlight-color:transparent}
 .nz-kb-bar button.on,.nz-kb-bar button.done{-webkit-border-image:url("UI/klava_key_green.webp") 24 24 24 24 fill / 6px 6px 6px 6px / 0 stretch;border-image:url("UI/klava_key_green.webp") 24 24 24 24 fill / 6px 6px 6px 6px / 0 stretch;background:transparent url("UI/klava_key_green.webp") center/contain no-repeat !important;}
 .nz-kb-rows-wrap{position:relative}
@@ -1658,10 +1658,10 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
       else if (/android/i.test(ua)) plat = 'android';
     }
     // высота системной клавиатуры: iOS ~240, Android ~270
-    var target = /android/.test(plat) ? 270 : 240;
+    var target = /android/.test(plat) ? 225 : 200;
     target = Math.min(target, Math.round((window.innerHeight || 700) * 0.46));
     var rows = (LAYOUTS[layout] ? LAYOUTS[layout].length : 3) + 1; // + нижний ряд
-    var noBar = bar && bar.style.display === 'none';
+    var noBar = !bar || bar.style.display === 'none' || getComputedStyle(bar).display === 'none';
     var chrome = 12 + (noBar ? 0 : 44 + 5) + (rows - 1) * 4; // поля, suggestion-бар, промежутки
     var kh = Math.max(22, Math.min(52, Math.round((target - chrome) / rows)));
     document.documentElement.style.setProperty('--kb-key-h', kh + 'px');
