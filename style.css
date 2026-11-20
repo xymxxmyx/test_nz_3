@@ -915,8 +915,8 @@ button:active, .menu-btn:active {
     animation: dealOut 0.75s cubic-bezier(0.22, 1, 0.36, 1);
 }
 @keyframes dealOut {
-    0% { opacity: 0; transform: translateX(-130px) rotateZ(-10deg) scale(0.88); }
-    70% { opacity: 1; transform: translateX(3px) rotateZ(1deg) scale(1.005); }
+    0% { opacity: 0; transform: translateX(calc(-28px * var(--ui-fit, 1))) rotateZ(-6deg) scale(0.92); }
+    70% { opacity: 1; transform: translateX(2px) rotateZ(0.5deg) scale(1.003); }
     100% { opacity: 1; transform: translateX(0) rotateZ(0) scale(1); }
 }
 .battle-card {
