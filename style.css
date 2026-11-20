@@ -11777,6 +11777,19 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden))
     overflow: hidden;
 }
 
+/* Сердечки в «5 в 1»: размер берём от --ui-fit-base (масштаб ДО ужимания
+   стражем), чтобы они не мельчали вместе с полем. Старый отрицательный
+   margin-bottom втягивал их в верхнюю кромку стола и полосу VS. */
+body.tg-mini-app[data-theme="plush"] #battle-area .hearts {
+    bottom: calc(100% + 3px * var(--ui-fit-base, var(--ui-fit, 1)));
+    margin: 0;
+    gap: calc(8px * var(--ui-fit-base, var(--ui-fit, 1)));
+}
+body.tg-mini-app[data-theme="plush"] #battle-area .hearts .heart {
+    width: calc(25px * var(--ui-fit-base, var(--ui-fit, 1)));
+    height: calc(22px * var(--ui-fit-base, var(--ui-fit, 1)));
+}
+
 /* Короткие телефоны: уплотняем стол «5 в 1», чтобы без скролла
    вмещались шапка, карта бота, подпись и веер из пяти карт. */
 @media (max-height: 820px) {
@@ -11793,5 +11806,15 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden))
     }
     body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) #battle-feedback {
         min-height: calc(16px * var(--ui-fit, 1));
+    }
+    /* На коротком экране зазор над столом меньше — сердечки масштабируем
+       вместе с полем, иначе они наезжают на полосу VS. */
+    body.tg-mini-app[data-theme="plush"] #battle-area .hearts {
+        bottom: calc(100% + 2px * var(--ui-fit, 1));
+        gap: calc(6px * var(--ui-fit, 1));
+    }
+    body.tg-mini-app[data-theme="plush"] #battle-area .hearts .heart {
+        width: calc(25px * var(--ui-fit, 1));
+        height: calc(22px * var(--ui-fit, 1));
     }
 }
