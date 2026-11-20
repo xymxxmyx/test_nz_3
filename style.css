@@ -6708,6 +6708,7 @@ input[type="text"] {
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #skip-btn {
     font-size: max(14px, calc(18px * var(--ui-fit, 1))) !important;
     padding: 0 calc(24px * var(--ui-fit, 1)) !important;
+    margin-top: 16px;
 }
 
 /* Р вЂР С‘РЎвЂљР Р†Р В° (5 Р С” 1 / Р Р€РЎРѓР В»РЎвЂ№РЎв‚¬РЎРЉ РЎРѓР В»Р С•Р Р†Р С•): РЎР‚Р В°Р В·Р СР ВµРЎР‚ Р С”Р В°РЎР‚РЎвЂљ Р С‘ Р С•РЎвЂљРЎРѓРЎвЂљРЎС“Р С—РЎвЂ№ */
