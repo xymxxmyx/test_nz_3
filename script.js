@@ -4175,8 +4175,8 @@ function skipWord() {
     document.body.classList.remove("nz-kb-open");
     const feedback = document.getElementById("feedback");
     if (feedback) {
-        feedback.textContent = `НЕВЕРНО ! Правильно: ${correctAnswer}`;
-        feedback.className = "feedback incorrect";
+        feedback.textContent = `Запомни!: ${correctAnswer}`;
+        feedback.className = "feedback remember";
     }
     document.getElementById("check-btn").classList.add("hidden");
     document.getElementById("next-btn").classList.remove("hidden");

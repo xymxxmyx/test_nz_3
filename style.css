@@ -6689,14 +6689,25 @@ input[type="text"] {
     gap: calc(8px * var(--ui-fit, 1));
 }
 .skip-btn {
-    padding: calc(10px * var(--ui-fit, 1)) calc(12px * var(--ui-fit, 1));
-    font-size: calc(13px * var(--ui-fit, 1));
+    padding: calc(10px * var(--ui-fit, 1)) calc(18px * var(--ui-fit, 1));
+    font-size: max(13px, calc(17px * var(--ui-fit, 1)));
     opacity: 0.88;
 }
 .feedback {
-    font-size: calc(13px * var(--ui-fit, 1));
+    font-size: max(15px, calc(20px * var(--ui-fit, 1)));
     margin-top: calc(12px * var(--ui-fit, 1));
     min-height: calc(26px * var(--ui-fit, 1));
+}
+.feedback.remember {
+    color: #ffd166;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(255, 209, 102, 0.6);
+    animation: pop 0.3s ease;
+}
+/* «Не знаю» крупнее остальных кнопок ответа. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #skip-btn {
+    font-size: max(14px, calc(18px * var(--ui-fit, 1))) !important;
+    padding: 0 calc(24px * var(--ui-fit, 1)) !important;
 }
 
 /* Р вЂР С‘РЎвЂљР Р†Р В° (5 Р С” 1 / Р Р€РЎРѓР В»РЎвЂ№РЎв‚¬РЎРЉ РЎРѓР В»Р С•Р Р†Р С•): РЎР‚Р В°Р В·Р СР ВµРЎР‚ Р С”Р В°РЎР‚РЎвЂљ Р С‘ Р С•РЎвЂљРЎРѓРЎвЂљРЎС“Р С—РЎвЂ№ */
@@ -9655,7 +9666,7 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
        высоту контента (иначе на iPhone появляется скролл). */
     position: relative;
     top: 10px;
-    margin-bottom: 11px;
+    margin-bottom: 5px;
 }
 
 /* Категория должна быть визуально идентична «Назад»: тот же размер текста,
