@@ -2246,7 +2246,7 @@ function updateCategoryTag() {
     document.getElementById("current-category").textContent =
         state.playMode === "listening" ? getLevelLabel() + " · На слух"
         : usesSentences()
-        ? getLevelLabel() + " · Предложения"
+        ? (document.body.classList.contains("nz-mobile") || document.body.classList.contains("tg-mini-app") ? getLevelLabel() : getLevelLabel() + " · Предложения")
         : getLevelLabel() + " · " + getCategoryLabel();
 }
 

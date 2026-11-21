@@ -11950,3 +11950,58 @@ body.tg-mini-app[data-theme="plush"] #battle-area .battle-table {
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .hearts {
     margin-bottom: 10px !important;
 }
+
+/* === ЕДИНАЯ ШАПКА ИГРОВЫХ ЭКРАНОВ (эталон — «Собери предложение») ===
+   Все режимы занимают один и тот же проём рамки, панель прижата к его
+   верхнему канту, а «Назад»/уровень опущены на одинаковую высоту.
+   Счётчик и категория не зависят от --ui-fit конкретной игры, поэтому
+   в «5 в 1» они не мельчают вместе с полем.
+   Селекторы с :has() нужны, чтобы перебить старые режимные правила. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) {
+    align-items: flex-start !important;
+}
+
+/* У «5 в 1» панель шире сверху (border-top 21px), у остальных — 4px,
+   поэтому опускаем хедер разными значениями до одной и той же строки. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) > .panel > .game-header,
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) > .panel > .game-header {
+    margin-top: 0 !important;
+    top: calc(10px * var(--ui-fit-base, 1)) !important;
+    /* Счётчик «1/10» висит под хедером, сердечки идут следующим рядом. */
+    margin-bottom: calc(120px * var(--ui-fit, 1)) !important;
+}
+
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#cards-area:not(.hidden)) > .panel > .game-header {
+    top: calc(28px * var(--ui-fit-base, 1)) !important;
+}
+
+body.tg-mini-app[data-theme="plush"] #game-screen .game-header > .progress-text {
+    font-size: clamp(9px, calc(12px * var(--ui-fit-base, 1)), 12px) !important;
+    line-height: 1.1;
+    min-height: calc(13px * var(--ui-fit-base, 1));
+    padding: 0;
+}
+
+body.tg-mini-app[data-theme="plush"] #game-screen .game-header > .category-tag {
+    font-size: clamp(10px, calc(12px * var(--ui-fit-base, 1)), 12px) !important;
+    line-height: 1;
+}
+
+/* Кнопки действий ввода — той же высоты и кегля, что «Сброс/Проверить»
+   в эталоне; встают в одну строку по ширине поля. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .answer-actions {
+    width: 100%;
+    gap: calc(6px * var(--ui-fit, 1));
+}
+
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn,
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #skip-btn,
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #next-btn {
+    flex: 1 1 0 !important;
+    min-width: 0;
+    height: min(calc(38px * var(--ui-fit, 1)), 35px) !important;
+    min-height: min(calc(38px * var(--ui-fit, 1)), 35px) !important;
+    padding: 0 calc(8px * var(--ui-fit, 1)) !important;
+    font-size: clamp(10px, calc(12px * var(--ui-fit-base, 1)), 12px) !important;
+}
+
