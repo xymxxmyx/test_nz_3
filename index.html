@@ -1394,7 +1394,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.self !== window.top || (window.innerWidth <= MIN_W && !/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash))) {
-            document.write('<script src="script.js?v=20261227"><\/script>');
+            document.write('<script src="script.js?v=20261228"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');
@@ -1783,8 +1783,9 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
     } catch (e) {}
   }
 
-  var keyPop = null;
-  function hideKeyPop(){ if(keyPop){ keyPop.remove(); keyPop=null; } }
+  var keyPop = null, keyPopTimer = null;
+  function hideKeyPop(){ if(keyPopTimer){ clearTimeout(keyPopTimer); keyPopTimer=null; } if(keyPop){ keyPop.remove(); keyPop=null; } }
+  function scheduleHideKeyPop(){ if(keyPopTimer) clearTimeout(keyPopTimer); keyPopTimer = setTimeout(hideKeyPop, 1000); }
   function showKeyPop(b){
     hideKeyPop();
     keyPop = document.createElement('div');
@@ -1796,8 +1797,8 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
     var kr = kb.getBoundingClientRect();
     keyPop.style.top = (kr.top - 8) + 'px';
   }
-  document.addEventListener('pointerup', hideKeyPop, true);
-  document.addEventListener('pointercancel', hideKeyPop, true);
+  document.addEventListener('pointerup', scheduleHideKeyPop, true);
+  document.addEventListener('pointercancel', scheduleHideKeyPop, true);
   function makeKey(label, cls, handler) {
     var b = document.createElement('button');
     b.type = 'button';
