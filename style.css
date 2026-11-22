@@ -12247,3 +12247,9 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#cards-area:not(.hidden)) 
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#cards-area:not(.hidden)) > .panel > .game-header {
     top: calc(38px * var(--ui-fit-base, 1)) !important;
 }
+
+/* Итог: нормальное поле; «Назад»/уровень с отступом 15px до промпта. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#cards-area:not(.hidden)) > .panel > .game-header {
+    top: calc(38px * var(--ui-fit-base, 1)) !important;
+    margin-bottom: calc(52px * var(--ui-fit-base, 1)) !important;
+}
