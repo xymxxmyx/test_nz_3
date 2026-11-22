@@ -2565,6 +2565,12 @@ function showBattleRound(word) {
         isTargetToNative() ? tgt(word) : nat(word);
     const botWord = document.getElementById("bot-card-word");
     fitTextOneLine(botWord, botWord.parentElement.clientWidth - 14, 11);
+    // Повторная подгонка после анимации выдачи: на телефоне при первом
+    // измерении карта ещё не успевает принять итоговую ширину.
+    setTimeout(() => {
+        const bw = document.getElementById('bot-card-word');
+        if (bw) fitTextOneLine(bw, bw.parentElement.clientWidth - 14, 8);
+    }, 500);
 
     Sound.deal();
 

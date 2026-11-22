@@ -12083,7 +12083,7 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
 /* «Не знаю» в вводе слов опущена на 20px вниз. */
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #skip-btn {
     position: relative !important;
-    top: 25px !important;
+    top: 15px !important;
 }
 
 /* Поле ввода вплотную к «Не знаю» (зазор 3px) — опускаем его к кнопке. */
@@ -12189,7 +12189,7 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
 /* Заголовок «Игра окончена» — на 15px ниже. */
 body.tg-mini-app[data-theme="plush"] #gameover-screen .gameover-title {
     position: relative !important;
-    top: 25px !important;
+    top: 15px !important;
 }
 
 /* Логотип на экране «Игра окончена» — такого же размера, как в главном меню. */
@@ -12235,4 +12235,10 @@ body.tg-mini-app[data-theme="plush"] #result-screen .logo {
 /* Скрываем сердечки под заголовком «Игра окончена». */
 body.tg-mini-app[data-theme="plush"] #gameover-screen .gameover-hearts {
     display: none !important;
+}
+
+/* Запас между шапкой и промптом в «Собери предложение», чтобы кнопки
+   не наезжали на текст при изменении высоты игрового поля. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#cards-area:not(.hidden)) .game-header {
+    margin-bottom: calc(62px * var(--ui-fit-base, 1)) !important;
 }
