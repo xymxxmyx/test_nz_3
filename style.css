@@ -11914,7 +11914,7 @@ body.tg-mini-app[data-theme="plush"] .mic-btn .mic-svg {
 }
 /* Текст слова на игровом поле крупнее. */
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #current-word:not(.listening-mask) {
-    font-size: clamp(22px, calc(32px * var(--ui-fit, 1)), 32px) !important;
+    font-size: clamp(22px, calc(32px * var(--ui-fit, 1)), 32px);
 }
 /* Верхние кнопки — в одну линию: категория не переносится. */
 body.tg-mini-app[data-theme="plush"] #game-screen .category-tag {
@@ -12005,3 +12005,155 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
     font-size: clamp(10px, calc(12px * var(--ui-fit-base, 1)), 12px) !important;
 }
 
+
+
+/* === FIX после полевого теста: короткий экран + системная клавиатура ===
+   На телефоне с открытой клавиатурой --ui-fit-base падает (~0.65), из-за
+   чего сердечки мельчают, а кнопка «Не знаю» растягивается на всю карточку
+   (flex:1 из предыдущего блока). Фиксируем минимальные размеры и центрируем
+   кнопки. Правила только для мобильной tg-mini-app версии. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .answer-actions {
+    justify-content: center !important;
+    gap: calc(8px * var(--ui-fit-base, 1)) !important;
+}
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn,
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #next-btn {
+    flex: 0 0 auto !important;
+    width: min(150px, 48%) !important;
+}
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #skip-btn {
+    flex: 0 0 auto !important;
+    width: min(170px, 60%) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn,
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #skip-btn,
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #next-btn {
+    height: max(34px, min(calc(38px * var(--ui-fit-base, 1)), 35px)) !important;
+    min-height: max(34px, min(calc(38px * var(--ui-fit-base, 1)), 35px)) !important;
+    font-size: max(11px, min(calc(12px * var(--ui-fit-base, 1)), 12px)) !important;
+}
+
+/* Сердечки не зависят от сжатия экрана под клавиатуру. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .hearts .heart {
+    width: max(32px, calc(38px * var(--ui-fit-base, 1))) !important;
+    height: max(29px, calc(34px * var(--ui-fit-base, 1))) !important;
+}
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .hearts {
+    gap: max(8px, calc(8px * var(--ui-fit-base, 1))) !important;
+}
+
+/* Верхние кнопки ближе к прогресс-бару. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) > .panel > .game-header {
+    margin-bottom: calc(36px * var(--ui-fit-base, 1)) !important;
+}
+
+/* Плашка слова и поле ввода не выходят за кант карточки. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #current-word:not(.listening-mask),
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #answer-input {
+    max-width: calc(100% - 8px) !important;
+}
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #answer-input {
+    width: min(90%, 240px) !important;
+    height: max(40px, min(calc(49px * var(--ui-fit-base, 1)), 44px)) !important;
+}
+
+/* Плашка наушников в «Услышь слово» держится внутри карточки с видимым
+   отступом: кремовый кант плашки не должен совпадать/вылезать за кант поля. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #current-word.listening-mask {
+    width: 92% !important;
+    max-width: calc(100% - 16px) !important;
+    margin: calc(6px * var(--ui-fit-base, 1)) auto calc(10px * var(--ui-fit, 1)) !important;
+}
+
+/* Чуть выше игровое поле ввода (по просьбе): +~11px за счёт нижнего паддинга. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #game-card {
+    height: calc(100vw * 0.66 + 95px) !important;
+    max-height: calc(100vw * 0.66 + 95px) !important;
+    justify-content: flex-start !important;
+    padding-bottom: calc(28px * var(--ui-fit, 1)) !important;
+}
+
+/* «Не знаю» в вводе слов опущена на 20px вниз. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #skip-btn {
+    position: relative !important;
+    top: 25px !important;
+}
+
+/* Поле ввода вплотную к «Не знаю» (зазор 3px) — опускаем его к кнопке. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .answer-row {
+    position: relative !important;
+    top: 34px !important;
+}
+
+/* Иконки слова — на 5px выше поля ввода. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .word-tools {
+    position: relative !important;
+    top: 39px !important;
+}
+
+/* Плашка слова — на 5px выше иконок. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #current-word {
+    position: relative !important;
+    top: 43px !important;
+}
+
+/* Подпись «ПЕРЕВЕДИТЕ» — над карточкой, в игровом поле. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #word-label {
+    position: relative !important;
+    top: 43px !important;
+}
+
+/* Сердечки в вводе слов — такого же размера, как в «Собери предложение». */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #hearts .heart {
+    width: calc(25px * var(--ui-fit, 1)) !important;
+    height: calc(22px * var(--ui-fit, 1)) !important;
+}
+
+/* Сердечки в вводе слов опущены на 30px. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #hearts {
+    position: relative !important;
+    top: 30px !important;
+}
+
+/* Всё над сердечками (шапка, счётчик, полоска) прижато к ним на 10px. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-header,
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .bar-wrap {
+    translate: 0 1px !important;
+}
+
+/* Прогресс-бар (полоска со звездой) — ещё на 5px ниже. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .bar-wrap {
+    translate: 0 26px !important;
+}
+
+/* Блок «Назад / категория / 1/10» — на 20px ниже. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-header {
+    translate: 0 31px !important;
+}
+
+/* Жёлтый текст ответа «Запомни!: …» после «Не знаю» — на 30px ниже. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #feedback {
+    position: relative !important;
+    top: 30px !important;
+}
+
+/* Тени под элементами ввода — как в остальном проекте. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #current-word,
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #answer-input,
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .answer-actions button {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Тень под кнопками шапки: «Назад» и категория. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-header .back-btn,
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-header .category-tag {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Feedback «НЕВЕРНО ! Правильно: …» — мельче и в одну строку. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #feedback {
+    font-size: 14px !important;
+    white-space: nowrap !important;
+}

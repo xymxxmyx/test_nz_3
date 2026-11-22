@@ -2494,6 +2494,20 @@ function showInputRound(displayWord) {
     void wordEl.offsetWidth;
     wordEl.classList.add("swap");
     wordEl.textContent = displayWord;
+        // Слово никогда не переносится: если не влезает, уменьшаем кегль.
+        if ((document.body.classList.contains("tg-mini-app") || document.body.classList.contains("nz-mobile")) && !wordEl.classList.contains("listening-mask")) {
+            try {
+                wordEl.style.whiteSpace = "nowrap";
+                wordEl.style.fontSize = "";
+                let fs = parseFloat(getComputedStyle(wordEl).fontSize) || 24;
+                let guard = 0;
+                while (wordEl.scrollWidth > wordEl.clientWidth && guard++ < 40) {
+                    fs = Math.max(4, fs - 1);
+                    wordEl.style.fontSize = fs + "px";
+                }
+                wordEl.style.fontSize = Math.max(8, fs - 2) + "px";
+            } catch (e) {}
+        }
     
     const favBtn = document.getElementById("current-fav");
     if (favBtn) favBtn.classList.toggle("is-fav", state.favoriteWords.includes(tgt(word)));

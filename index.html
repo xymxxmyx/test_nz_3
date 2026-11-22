@@ -207,7 +207,7 @@
     })();
     </script>
 
-    <link rel="stylesheet" href="style.css?v=20261295">
+    <link rel="stylesheet" href="style.css?v=20261332">
 
     <!-- Шрифты с высоким приоритетом: иначе текст мигает системным шрифтом. -->
     <link rel="preload" as="font" type="font/ttf" href="UI/NihonZenoPlush-Regular.ttf" crossorigin fetchpriority="high">
@@ -1394,7 +1394,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.self !== window.top || (window.innerWidth <= MIN_W && !/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash))) {
-            document.write('<script src="script.js?v=20261218"><\/script>');
+            document.write('<script src="script.js?v=20261223"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');
@@ -1493,7 +1493,7 @@
 body.nz-mobile #game-screen.active:has(#input-area:not(.hidden)){overflow:visible !important}
 body.nz-mobile #game-screen:has(#input-area:not(.hidden)) #check-btn,
 body.nz-mobile #game-screen:has(#input-area:not(.hidden)) #next-btn{display:none !important}
-body.nz-mobile.nz-kb-open #game-screen.active:has(#input-area:not(.hidden)){justify-content:flex-start;max-height:calc(var(--app-stage-h,var(--app-vh,100svh)) - var(--frame-t-px,24px) - var(--topbar-h,36px) - var(--frame-b-px,24px) - 14px - var(--kb-total-h,240px)) !important;padding-bottom:16px}
+body.nz-mobile.kb-open #game-screen.active:has(#input-area:not(.hidden)),body.nz-mobile.nz-kb-open #game-screen.active:has(#input-area:not(.hidden)){justify-content:flex-start;max-height:calc(var(--app-stage-h,var(--app-vh,100svh)) - var(--frame-t-px,24px) - var(--topbar-h,36px) - var(--frame-b-px,24px) - 14px - var(--kb-total-h,240px)) !important;padding-bottom:16px}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-card{height:calc(100vw * 0.66);max-height:calc(100vw * 0.66)}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)):has(#current-word.sentence) .game-card{min-height:calc(100vw * 0.66)}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #game-card{padding-top:calc(6px * var(--ui-fit, 1)) !important}
