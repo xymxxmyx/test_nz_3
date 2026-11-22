@@ -4316,7 +4316,10 @@ function showCardsRound(sentence) {
         `;
         // Слово карточки — через textContent (в предложениях бывают любые символы).
         // Конечную пунктуацию скрываем, чтобы по точке не угадывать последнее слово.
-        card.querySelector(".opt-text").textContent = c.token.replace(/[.!?。！？,;:]+$/, "");
+        // Конечную пунктуацию скрываем, чтобы по точке не угадывать последнее
+        // слово — но если токен состоит только из знака, оставляем его как есть.
+        var shownToken = c.token.replace(/[.!?。！？,;:]+$/, "");
+        card.querySelector(".opt-text").textContent = shownToken || c.token;
         card.addEventListener("click", () => cardsTap(card));
         grid.appendChild(card);
         const ci = card.querySelector(".card-inner");

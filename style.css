@@ -12240,7 +12240,7 @@ body.tg-mini-app[data-theme="plush"] #gameover-screen .gameover-hearts {
 /* Запас между шапкой и промптом в «Собери предложение», чтобы кнопки
    не наезжали на текст при изменении высоты игрового поля. */
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#cards-area:not(.hidden)) .game-header {
-    margin-bottom: calc(62px * var(--ui-fit-base, 1)) !important;
+    margin-bottom: calc(67px * var(--ui-fit-base, 1)) !important;
 }
 
 /* Кнопки «Назад» и уровень в «Собери предложение» — на 10px ниже. */
