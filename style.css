@@ -12160,7 +12160,7 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
 
 /* При открытой клавиатуре карточка поднимается на 20px — «Не знаю» не за ней. */
 body.nz-mobile.nz-kb-open #game-screen:has(#input-area:not(.hidden)) #game-card {
-    translate: 0 -20px !important;
+    translate: 0 -55px !important;
 }
 
 /* При клавиатуре поднимаем сердечки и всё над ними на 25px — карточка идёт
