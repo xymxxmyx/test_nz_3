@@ -1394,7 +1394,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.self !== window.top || (window.innerWidth <= MIN_W && !/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash))) {
-            document.write('<script src="script.js?v=20261224"><\/script>');
+            document.write('<script src="script.js?v=20261227"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');
@@ -1498,6 +1498,8 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .g
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)):has(#current-word.sentence) .game-card{min-height:calc(100vw * 0.66)}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #game-card{padding-top:calc(6px * var(--ui-fit, 1)) !important}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .hearts{margin:0 0 10px !important;flex:0 0 auto;height:calc(46px * var(--ui-fit, 1)) !important;align-items:flex-start;padding-top:calc(10px * var(--ui-fit, 1))}
+@keyframes nzPopUp{0%{opacity:0;transform:translate(-50%,-40%) scale(.5)}55%{opacity:1;transform:translate(-50%,-115%) scale(1.18)}100%{opacity:1;transform:translate(-50%,-100%) scale(1)}}
+.nz-kb-pop{position:fixed;z-index:100010;pointer-events:none;padding:4px 8px;min-width:44px;text-align:center;color:#fff0fa;font:700 34px/1.1 system-ui,sans-serif;text-shadow:0 2px 6px rgba(0,0,0,.85),0 0 12px rgba(20,4,35,.9);transform:translate(-50%,-100%);white-space:nowrap;animation:nzPopUp .22s cubic-bezier(.2,.9,.3,1.4)}
 </style>
 <script>
 (function () {
@@ -1781,6 +1783,21 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
     } catch (e) {}
   }
 
+  var keyPop = null;
+  function hideKeyPop(){ if(keyPop){ keyPop.remove(); keyPop=null; } }
+  function showKeyPop(b){
+    hideKeyPop();
+    keyPop = document.createElement('div');
+    keyPop.className = 'nz-kb-pop';
+    keyPop.textContent = b.textContent;
+    document.body.appendChild(keyPop);
+    var r = b.getBoundingClientRect();
+    keyPop.style.left = (r.left + r.width/2) + 'px';
+    var kr = kb.getBoundingClientRect();
+    keyPop.style.top = (kr.top - 8) + 'px';
+  }
+  document.addEventListener('pointerup', hideKeyPop, true);
+  document.addEventListener('pointercancel', hideKeyPop, true);
   function makeKey(label, cls, handler) {
     var b = document.createElement('button');
     b.type = 'button';
@@ -1791,6 +1808,7 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
       ev.stopPropagation();
       tap();
       bounce(b);
+      showKeyPop(b);
       handler(b);
     });
     return b;
