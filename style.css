@@ -10548,7 +10548,8 @@ body[data-theme="plush"] #game-screen #cards-area .cards-prompt {
    скролл (замер 300×500: scrollHeight 438 против clientHeight 405).
    На штатной высоте (≥661px) геометрия не меняется вовсе.
    ========================================================================= */
-body[data-theme="plush"] #result-screen .result-box {
+body[data-theme="plush"] #result-screen .result-box,
+body[data-theme="plush"] #gameover-screen .result-box {
     background: transparent;
     border: calc(12px * var(--ui-fit, 1)) solid transparent;
     border-image: url("UI/Plashka_uroki_fit.webp?v=uroki1") 44 fill / calc(12px * var(--ui-fit, 1)) stretch;
@@ -10556,11 +10557,13 @@ body[data-theme="plush"] #result-screen .result-box {
     box-shadow: none;
     filter: drop-shadow(0 calc(3px * var(--ui-fit, 1)) calc(8px * var(--ui-fit, 1)) rgba(20, 2, 36, 0.6));
 }
-body[data-theme="plush"] #result-screen .result-box p {
+body[data-theme="plush"] #result-screen .result-box p,
+body[data-theme="plush"] #gameover-screen .result-box p {
     color: #fff;
     text-shadow: 0 1px 2px rgba(80, 30, 0, 0.45);
 }
-body[data-theme="plush"] #result-screen .result-box span {
+body[data-theme="plush"] #result-screen .result-box span,
+body[data-theme="plush"] #gameover-screen .result-box span {
     color: #fff;
     font-weight: 700;
     text-shadow: 0 1px 2px rgba(80, 30, 0, 0.45);
@@ -10586,11 +10589,13 @@ body[data-theme="plush"] #result-screen .logo {
     body[data-theme="plush"] #result-screen h1 {
         margin-bottom: 4px;
     }
-    body[data-theme="plush"] #result-screen .result-box {
+    body[data-theme="plush"] #result-screen .result-box,
+body[data-theme="plush"] #gameover-screen .result-box {
         padding: 10px 12px;
         margin: 10px 0;
     }
-    body[data-theme="plush"] #result-screen .result-box p {
+    body[data-theme="plush"] #result-screen .result-box p,
+body[data-theme="plush"] #gameover-screen .result-box p {
         font-size: 12px;
         margin-bottom: 6px;
     }
@@ -12177,5 +12182,52 @@ body.nz-mobile.nz-kb-open #game-screen:has(#input-area:not(.hidden)) .game-heade
 
 /* Скрываем прогресс-бар (полоску со звездой) в вводе слов. */
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .bar-wrap {
+    display: none !important;
+}
+
+
+/* Заголовок «Игра окончена» — на 15px ниже. */
+body.tg-mini-app[data-theme="plush"] #gameover-screen .gameover-title {
+    position: relative !important;
+    top: 25px !important;
+}
+
+/* Логотип на экране «Игра окончена» — такого же размера, как в главном меню. */
+body.tg-mini-app[data-theme="plush"] #gameover-screen .logo,
+body.tg-mini-app[data-theme="plush"] #result-screen .logo {
+    width: calc(120px * var(--ui-fit, 1)) !important;
+    height: calc(120px * var(--ui-fit, 1)) !important;
+    margin: 0 auto 14px !important;
+    background-size: contain !important;
+}
+
+/* Плашка итогов — кот с плашкой;Digits внутри плашки, которую держит кот. */
+body.tg-mini-app[data-theme="plush"] #gameover-screen .result-box,
+body.tg-mini-app[data-theme="plush"] #result-screen .result-box {
+    background: transparent url("UI/Kot_s_plashkoi.png") no-repeat center / 100% 100% !important;
+    border: 0 !important;
+    border-image: none !important;
+    box-sizing: border-box !important;
+    height: auto !important;
+    aspect-ratio: 2 / 1 !important;
+    padding: calc(106px * var(--ui-fit, 1)) calc(30px * var(--ui-fit, 1)) calc(8px * var(--ui-fit, 1)) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    box-shadow: none !important;
+    filter: drop-shadow(0 calc(3px * var(--ui-fit, 1)) calc(8px * var(--ui-fit, 1)) rgba(20, 2, 36, 0.6)) !important;
+}
+body.tg-mini-app[data-theme="plush"] #gameover-screen .result-box p,
+body.tg-mini-app[data-theme="plush"] #result-screen .result-box p {
+    margin: 0 0 calc(5px * var(--ui-fit, 1)) !important;
+    font-size: calc(15px * var(--ui-fit, 1)) !important;
+    line-height: 1.2 !important;
+}
+body.tg-mini-app[data-theme="plush"] #gameover-screen .result-box p:last-child,
+body.tg-mini-app[data-theme="plush"] #result-screen .result-box p:last-child { margin-bottom: 0 !important; }
+
+/* Скрываем логотип над заголовком на экране «Игра окончена». */
+body.tg-mini-app[data-theme="plush"] #gameover-screen .logo,
+body.tg-mini-app[data-theme="plush"] #result-screen .logo {
     display: none !important;
 }

@@ -207,7 +207,7 @@
     })();
     </script>
 
-    <link rel="stylesheet" href="style.css?v=20261342">
+    <link rel="stylesheet" href="style.css?v=20261355">
 
     <!-- Шрифты с высоким приоритетом: иначе текст мигает системным шрифтом. -->
     <link rel="preload" as="font" type="font/ttf" href="UI/NihonZenoPlush-Regular.ttf" crossorigin fetchpriority="high">
@@ -1394,7 +1394,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.self !== window.top || (window.innerWidth <= MIN_W && !/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash))) {
-            document.write('<script src="script.js?v=20261230"><\/script>');
+            document.write('<script src="script.js?v=20261231"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');
@@ -1626,6 +1626,15 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
     // В играх с ручным вводом клавиатура зафиксирована и не скрывается.
     var ia0 = document.getElementById('input-area');
     if (scr && scr.id === 'game-screen' && ia0 && !ia0.classList.contains('hidden')) return;
+    kb.classList.remove('open');
+    document.body.classList.remove('nz-kb-open');
+    active = null;
+    tgHide();
+  }
+  function forceClose() {
+    if(keyPopTimer){ clearTimeout(keyPopTimer); keyPopTimer=null; }
+    if(keyPopFadeTimer){ clearTimeout(keyPopFadeTimer); keyPopFadeTimer=null; }
+    if(keyPop){ keyPop.remove(); keyPop=null; }
     kb.classList.remove('open');
     document.body.classList.remove('nz-kb-open');
     active = null;
@@ -1955,6 +1964,7 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
   var origShowScreen = window.showScreen;
   if (typeof origShowScreen === 'function') {
     window.showScreen = function (id) {
+      if (id !== 'game-screen' && kb.classList.contains('open')) forceClose();
       origShowScreen(id);
       if (id === 'game-screen') setTimeout(fixGameField, 0);
     };
