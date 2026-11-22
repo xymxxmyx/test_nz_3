@@ -1394,7 +1394,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.self !== window.top || (window.innerWidth <= MIN_W && !/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash))) {
-            document.write('<script src="script.js?v=20261223"><\/script>');
+            document.write('<script src="script.js?v=20261224"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');
@@ -1698,7 +1698,7 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
 
   function liftPanel(scr, on) {
     if (!scr) return;
-    var panel = scr.querySelector('.panel') || scr.firstElementChild;
+    var panel = scr.querySelector('#game-card') || scr.querySelector('.panel') || scr.firstElementChild;
     if (!panel) return;
     panel.style.transition = 'none';
     panel.style.transform = on ? ('translateY(' + (-Math.round(on) - 12) + 'px)') : '';
@@ -1712,7 +1712,7 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
       var kbTop = isFinite(kbBottom) ? (window.innerHeight - kbBottom - kb.offsetHeight) : kb.getBoundingClientRect().top;
       // мерим перекрытие по всей карточке, а не только по полю ввода,
       // иначе кнопки под полем остаются под клавиатурой
-      var ref = scr.querySelector('#game-card') || el;
+      var ref = scr.querySelector('#feedback') || scr.querySelector('#skip-btn') || document.getElementById('game-card') || el;
       var r = ref.getBoundingClientRect();
       var delta = r.bottom - (kbTop - 20);
       // не скроллим экран: иначе обрезается шапка с прогрессом и сердечками.
@@ -1912,7 +1912,7 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
       var kcs = getComputedStyle(kb);
       var kbBottom = parseFloat(kcs.bottom);
       var kbTop = isFinite(kbBottom) ? (window.innerHeight - kbBottom - kb.offsetHeight) : kb.getBoundingClientRect().top;
-      var delta = card.getBoundingClientRect().bottom - (kbTop - 20);
+      var contentRef = document.getElementById('feedback') || document.getElementById('skip-btn') || card;
       liftPanel(scr, delta > 4 ? delta : 0);
     } catch (e) {}
   }
