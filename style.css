@@ -12204,7 +12204,7 @@ body.tg-mini-app[data-theme="plush"] #result-screen .logo {
 /* Плашка итогов — кот с плашкой;Digits внутри плашки, которую держит кот. */
 body.tg-mini-app[data-theme="plush"] #gameover-screen .result-box,
 body.tg-mini-app[data-theme="plush"] #result-screen .result-box {
-    background: transparent url("UI/Kot_s_plashkoi.png") no-repeat center / 100% 100% !important;
+    background: transparent url("UI/Kot_s_plashkoi.webp") no-repeat center / 100% 100% !important;
     border: 0 !important;
     border-image: none !important;
     box-sizing: border-box !important;
@@ -12229,5 +12229,10 @@ body.tg-mini-app[data-theme="plush"] #result-screen .result-box p:last-child { m
 /* Скрываем логотип над заголовком на экране «Игра окончена». */
 body.tg-mini-app[data-theme="plush"] #gameover-screen .logo,
 body.tg-mini-app[data-theme="plush"] #result-screen .logo {
+    display: none !important;
+}
+
+/* Скрываем сердечки под заголовком «Игра окончена». */
+body.tg-mini-app[data-theme="plush"] #gameover-screen .gameover-hearts {
     display: none !important;
 }
