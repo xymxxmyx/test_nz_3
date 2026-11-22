@@ -12130,7 +12130,7 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
 
 /* Блок «Назад / категория / 1/10» — на 20px ниже. */
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-header {
-    translate: 0 31px !important;
+    translate: 0 49px !important;
 }
 
 /* Жёлтый текст ответа «Запомни!: …» после «Не знаю» — на 30px ниже. */
@@ -12172,5 +12172,10 @@ body.nz-mobile.nz-kb-open #game-screen:has(#input-area:not(.hidden)) .bar-wrap {
     translate: 0 -64px !important;
 }
 body.nz-mobile.nz-kb-open #game-screen:has(#input-area:not(.hidden)) .game-header {
-    translate: 0 -59px !important;
+    translate: 0 -41px !important;
+}
+
+/* Скрываем прогресс-бар (полоску со звездой) в вводе слов. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .bar-wrap {
+    display: none !important;
 }
