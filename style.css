@@ -12157,3 +12157,20 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
     font-size: 14px !important;
     white-space: nowrap !important;
 }
+
+/* При открытой клавиатуре карточка поднимается на 20px — «Не знаю» не за ней. */
+body.nz-mobile.nz-kb-open #game-screen:has(#input-area:not(.hidden)) #game-card {
+    translate: 0 -20px !important;
+}
+
+/* При клавиатуре поднимаем сердечки и всё над ними на 25px — карточка идёт
+   вверх на 20px, поэтому зазор между сердечками и полем сохраняется. */
+body.nz-mobile.nz-kb-open #game-screen:has(#input-area:not(.hidden)) #hearts {
+    top: -15px !important;
+}
+body.nz-mobile.nz-kb-open #game-screen:has(#input-area:not(.hidden)) .bar-wrap {
+    translate: 0 -19px !important;
+}
+body.nz-mobile.nz-kb-open #game-screen:has(#input-area:not(.hidden)) .game-header {
+    translate: 0 -14px !important;
+}
