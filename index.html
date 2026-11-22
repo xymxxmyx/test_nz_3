@@ -1394,7 +1394,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.self !== window.top || (window.innerWidth <= MIN_W && !/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash))) {
-            document.write('<script src="script.js?v=20261228"><\/script>');
+            document.write('<script src="script.js?v=20261229"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');
@@ -1499,6 +1499,8 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)):ha
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #game-card{padding-top:calc(6px * var(--ui-fit, 1)) !important}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .hearts{margin:0 0 10px !important;flex:0 0 auto;height:calc(46px * var(--ui-fit, 1)) !important;align-items:flex-start;padding-top:calc(10px * var(--ui-fit, 1))}
 @keyframes nzPopUp{0%{opacity:0;transform:translate(-50%,-40%) scale(.5)}55%{opacity:1;transform:translate(-50%,-115%) scale(1.18)}100%{opacity:1;transform:translate(-50%,-100%) scale(1)}}
+@keyframes nzPopOut{from{opacity:1;transform:translate(-50%,-100%) scale(1)}to{opacity:0;transform:translate(-50%,-100%) scale(.85)}}
+.nz-kb-pop.out{animation:nzPopOut .26s ease-in forwards}
 .nz-kb-pop{position:fixed;z-index:100010;pointer-events:none;padding:4px 8px;min-width:44px;text-align:center;color:#fff0fa;font:700 34px/1.1 system-ui,sans-serif;text-shadow:0 2px 6px rgba(0,0,0,.85),0 0 12px rgba(20,4,35,.9);transform:translate(-50%,-100%);white-space:nowrap;animation:nzPopUp .22s cubic-bezier(.2,.9,.3,1.4)}
 </style>
 <script>
@@ -1783,8 +1785,16 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
     } catch (e) {}
   }
 
-  var keyPop = null, keyPopTimer = null;
-  function hideKeyPop(){ if(keyPopTimer){ clearTimeout(keyPopTimer); keyPopTimer=null; } if(keyPop){ keyPop.remove(); keyPop=null; } }
+  var keyPop = null, keyPopTimer = null, keyPopFadeTimer = null;
+  function hideKeyPop(){
+    if(keyPopTimer){ clearTimeout(keyPopTimer); keyPopTimer=null; }
+    if(keyPopFadeTimer){ clearTimeout(keyPopFadeTimer); keyPopFadeTimer=null; }
+    if(keyPop){
+      var el = keyPop;
+      el.classList.add('out');
+      keyPopFadeTimer = setTimeout(function(){ el.remove(); if(keyPop===el) keyPop=null; keyPopFadeTimer=null; }, 280);
+    }
+  }
   function scheduleHideKeyPop(){ if(keyPopTimer) clearTimeout(keyPopTimer); keyPopTimer = setTimeout(hideKeyPop, 1000); }
   function showKeyPop(b){
     hideKeyPop();
