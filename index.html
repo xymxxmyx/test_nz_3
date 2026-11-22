@@ -1394,7 +1394,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.self !== window.top || (window.innerWidth <= MIN_W && !/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash))) {
-            document.write('<script src="script.js?v=20261229"><\/script>');
+            document.write('<script src="script.js?v=20261230"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');
@@ -1623,6 +1623,9 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
   }
   function close() {
     var scr = active && active.closest ? active.closest('.screen') : null;
+    // В играх с ручным вводом клавиатура зафиксирована и не скрывается.
+    var ia0 = document.getElementById('input-area');
+    if (scr && scr.id === 'game-screen' && ia0 && !ia0.classList.contains('hidden')) return;
     kb.classList.remove('open');
     document.body.classList.remove('nz-kb-open');
     active = null;
@@ -1938,6 +1941,10 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
       if (!ia || ia.classList.contains('hidden')) { liftPanel(scr, 0); return; }
       var card = document.getElementById('game-card');
       if (!card) return;
+      if (!kb.classList.contains('open')) {
+        var ai = document.getElementById('answer-input');
+        if (ai) setTimeout(function () { open(ai); }, 60);
+      }
       var kcs = getComputedStyle(kb);
       var kbBottom = parseFloat(kcs.bottom);
       var kbTop = isFinite(kbBottom) ? (window.innerHeight - kbBottom - kb.offsetHeight) : kb.getBoundingClientRect().top;
