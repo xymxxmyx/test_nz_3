@@ -12166,11 +12166,11 @@ body.nz-mobile.nz-kb-open #game-screen:has(#input-area:not(.hidden)) #game-card 
 /* При клавиатуре поднимаем сердечки и всё над ними на 25px — карточка идёт
    вверх на 20px, поэтому зазор между сердечками и полем сохраняется. */
 body.nz-mobile.nz-kb-open #game-screen:has(#input-area:not(.hidden)) #hearts {
-    top: -15px !important;
+    top: -30px !important;
 }
 body.nz-mobile.nz-kb-open #game-screen:has(#input-area:not(.hidden)) .bar-wrap {
-    translate: 0 -19px !important;
+    translate: 0 -34px !important;
 }
 body.nz-mobile.nz-kb-open #game-screen:has(#input-area:not(.hidden)) .game-header {
-    translate: 0 -14px !important;
+    translate: 0 -29px !important;
 }
