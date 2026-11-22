@@ -12242,3 +12242,8 @@ body.tg-mini-app[data-theme="plush"] #gameover-screen .gameover-hearts {
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#cards-area:not(.hidden)) .game-header {
     margin-bottom: calc(62px * var(--ui-fit-base, 1)) !important;
 }
+
+/* Кнопки «Назад» и уровень в «Собери предложение» — на 10px ниже. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#cards-area:not(.hidden)) > .panel > .game-header {
+    top: calc(38px * var(--ui-fit-base, 1)) !important;
+}
