@@ -207,7 +207,7 @@
     })();
     </script>
 
-    <link rel="stylesheet" href="style.css?v=20261383">
+    <link rel="stylesheet" href="style.css?v=20261395">
 
     <!-- Шрифты с высоким приоритетом: иначе текст мигает системным шрифтом. -->
     <link rel="preload" as="font" type="font/ttf" href="UI/NihonZenoPlush-Regular.ttf" crossorigin fetchpriority="high">
@@ -1491,7 +1491,6 @@
 .nz-kb-key.w7{grid-column:span 7}
 .nz-kb button:hover,.nz-kb button:active,.nz-kb button:focus{outline:none !important;transform:none;-webkit-tap-highlight-color:transparent !important}
 body.nz-mobile #game-screen.active:has(#input-area:not(.hidden)){overflow:visible !important}
-body.nz-mobile #game-screen:has(#input-area:not(.hidden)) #check-btn,
 body.nz-mobile #game-screen:has(#input-area:not(.hidden)) #next-btn{display:none !important}
 body.nz-mobile.kb-open #game-screen.active:has(#input-area:not(.hidden)),body.nz-mobile.nz-kb-open #game-screen.active:has(#input-area:not(.hidden)){justify-content:flex-start;max-height:calc(var(--app-stage-h,var(--app-vh,100svh)) - var(--frame-t-px,24px) - var(--topbar-h,36px) - var(--frame-b-px,24px) - 14px - var(--kb-total-h,240px)) !important;padding-bottom:16px}
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .game-card{height:calc(100vw * 0.66);max-height:calc(100vw * 0.66)}
@@ -1780,7 +1779,7 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
       k.textContent = charFor(k);
     });
     var b = wrap.querySelector('.nz-kb-key.shift');
-    if (b) b.textContent = layout === 'jp' ? (shift ? 'カナ' : 'かな') : '⇧ Shift';
+    if (b) b.textContent = layout === 'jp' ? (shift ? 'カナ' : 'かな') : '⇧';
   }
   // мягкий баунс: NEVER больше 1 — арт не выходит за границы кнопки
   function bounce(el) {
@@ -1877,7 +1876,7 @@ body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) .h
   }
 
   function makeShift(w) {
-    return makeKey(layout === 'jp' ? (shift ? 'カナ' : 'かな') : '⇧ Shift', 'ctrl ' + (w || 'w2') + ' shift', function () {
+    return makeKey(layout === 'jp' ? (shift ? 'カナ' : 'かな') : '⇧', 'ctrl ' + (w || 'w2') + ' shift', function () {
       shift = !shift;
       applyShift();
     });

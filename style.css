@@ -12080,10 +12080,10 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
     padding-bottom: calc(28px * var(--ui-fit, 1)) !important;
 }
 
-/* «Не знаю» в вводе слов опущена на 20px вниз. */
+/* «Не знаю» в вводе слов опущена на 30px вниз. */
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #skip-btn {
     position: relative !important;
-    top: 15px !important;
+    top: 25px !important;
 }
 
 /* Поле ввода вплотную к «Не знаю» (зазор 3px) — опускаем его к кнопке. */
@@ -12252,4 +12252,39 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#cards-area:not(.hidden)) 
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#cards-area:not(.hidden)) > .panel > .game-header {
     top: calc(38px * var(--ui-fit-base, 1)) !important;
     margin-bottom: calc(52px * var(--ui-fit-base, 1)) !important;
+}
+
+
+/* Наушники в маске аудирования — немного крупнее оригинала (мобильная версия). */
+body.tg-mini-app #current-word.listening-mask img.ico-png,
+body.nz-mobile #current-word.listening-mask img.ico-png {
+    height: 1.25em !important;
+    width: auto !important;
+}
+
+
+/* «Проверить» в мобильном вводе: такая же плюшевая таблетка, как «Не знаю». */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn,
+body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn,
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #skip-btn,
+body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #skip-btn {
+    width: min(112px, 47%) !important;
+    flex: 0 0 auto !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn,
+body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn {
+    top: 25px !important;
+}
+
+
+/* У «Проверить» в мобильном вводе убираем PC-иконку и выравниваем с «Не знаю». */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn img.ico-png,
+body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn img.ico-png {
+    display: none !important;
+}
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn,
+body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn {
+    top: 30px !important;
 }
