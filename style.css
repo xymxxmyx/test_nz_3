@@ -12258,32 +12258,19 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#cards-area:not(.hidden)) 
 /* Наушники в маске аудирования — немного крупнее оригинала (мобильная версия). */
 body.tg-mini-app #current-word.listening-mask img.ico-png,
 body.nz-mobile #current-word.listening-mask img.ico-png {
-    height: 1.25em !important;
+    height: 1.22em !important;
     width: auto !important;
+    position: relative !important;
+    top: -3px !important;
 }
 
 
-/* «Проверить» в мобильном вводе: такая же плюшевая таблетка, как «Не знаю». */
-body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn,
-body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn,
-body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #skip-btn,
-body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #skip-btn {
-    width: min(112px, 47%) !important;
-    flex: 0 0 auto !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-}
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn,
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn {
     top: 25px !important;
 }
 
 
-/* У «Проверить» в мобильном вводе убираем PC-иконку и выравниваем с «Не знаю». */
-body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn img.ico-png,
-body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn img.ico-png {
-    display: none !important;
-}
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn,
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn {
     top: 30px !important;
