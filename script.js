@@ -8900,9 +8900,9 @@ function wsFitRows() {
     const sc = document.getElementById("game-screen");
     const gridEl = document.getElementById("ws-grid");
     if (!sc || !gridEl) return 9;
-    const cellW = Math.max(26, gridEl.clientWidth / WS_COLS);
-    const rows = Math.floor(((window.innerHeight || 844) - 491) / cellW);
-    return Math.max(5, Math.min(12, rows));
+    const cellW = Math.max(26, (gridEl.clientWidth || 270) / WS_COLS);
+    const avail = (window.innerHeight || 844) - 491;
+    return Math.max(6, Math.min(12, Math.floor(avail / cellW)));
 }
 const WS_PER_ROUND = 5;
 let wsGrid = [], wsTargets = [], wsFound = [], wsWordPos = {}, wsFirst = null, wsLast = null;
@@ -8945,11 +8945,14 @@ function wsStartRound() {
     }
     const label = document.getElementById("search-label");
     if (label) label.textContent = "НАЙДИТЕ СЛОВА";
-    wsRows = wsFitRows();
-    if (!wsSwapAnimating) wsSwapAnimating = "in";
-    wsBuildGrid();
-    wsRender();
-    wsSwapAnimating = null;
+    // Строим сетку после того, как экран разложен — иначе clientHeight = 0.
+    requestAnimationFrame(() => {
+        wsRows = wsFitRows();
+        if (!wsSwapAnimating) wsSwapAnimating = "in";
+        wsBuildGrid();
+        wsRender();
+        wsSwapAnimating = null;
+    });
 }
 
 function wsBuildGrid() {
@@ -9005,9 +9008,22 @@ function wsRender() {
         b.textContent = ch;
         b.dataset.r = r;
         b.dataset.c = c;
-        b.onmousedown = (e) => { e.preventDefault(); wsCellDown(r, c); };
-        b.onmouseenter = () => wsCellEnter(r, c);
-        b.onmouseup = () => wsCellUp(r, c);
+        b.onpointerdown = (e) => {
+            e.preventDefault();
+            try { b.setPointerCapture(e.pointerId); } catch (err) {}
+            wsCellDown(r, c);
+        };
+        b.onpointermove = (e) => {
+            if (!wsDrag || !wsDrag.active) return;
+            const t = document.elementFromPoint(e.clientX, e.clientY);
+            if (t && t.classList && t.classList.contains("ws-cell")) {
+                wsCellEnter(+t.dataset.r, +t.dataset.c);
+            }
+        };
+        b.onpointerup = (e) => {
+            if (wsDrag && wsDrag.active && wsLast) wsCellUp(+wsLast.r, +wsLast.c);
+            else wsCellUp(r, c);
+        };
         gridEl.appendChild(b);
     }));
     wordsEl.innerHTML = "";
@@ -9052,7 +9068,7 @@ function wsCellUp(r, c) {
     // Простой клик: оставляем wsFirst для второго клика.
 }
 
-document.addEventListener("mouseup", () => {
+document.addEventListener("pointerup", () => {
     if (wsDrag && wsDrag.active && wsDrag.moved) {
         wsDrag.active = false;
         if (wsLast) wsCommitSelection();
