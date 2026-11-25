@@ -8895,7 +8895,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // ===== ПОИСК СЛОВ СРЕДИ БУКВ (дефолтный дизайн) =====
 const WS_COLS = 7;
-const WS_ROWS = 9;
+let wsRows = 9;
+function wsFitRows() {
+    const sc = document.getElementById("game-screen");
+    const gridEl = document.getElementById("ws-grid");
+    if (!sc || !gridEl) return 9;
+    const cellW = Math.max(26, gridEl.clientWidth / WS_COLS);
+    const rows = Math.floor(((window.innerHeight || 844) - 491) / cellW);
+    return Math.max(5, Math.min(12, rows));
+}
 const WS_PER_ROUND = 5;
 let wsGrid = [], wsTargets = [], wsFound = [], wsWordPos = {}, wsFirst = null, wsLast = null;
 let wsDrag = null, wsDragJustEnded = false, wsAdvanceTimer = null, wsSwapAnimating = null;
@@ -8937,6 +8945,7 @@ function wsStartRound() {
     }
     const label = document.getElementById("search-label");
     if (label) label.textContent = "НАЙДИТЕ СЛОВА";
+    wsRows = wsFitRows();
     if (!wsSwapAnimating) wsSwapAnimating = "in";
     wsBuildGrid();
     wsRender();
@@ -8945,16 +8954,16 @@ function wsStartRound() {
 
 function wsBuildGrid() {
     wsGrid = [];
-    for (let r = 0; r < WS_ROWS; r++) wsGrid.push(new Array(WS_COLS).fill(""));
+    for (let r = 0; r < wsRows; r++) wsGrid.push(new Array(WS_COLS).fill(""));
     const dirs = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]];
     wsTargets.forEach(word => {
         for (let attempt = 0; attempt < 120; attempt++) {
             const d = dirs[Math.floor(Math.random() * dirs.length)];
-            const r = Math.floor(Math.random() * WS_ROWS);
+            const r = Math.floor(Math.random() * wsRows);
             const c = Math.floor(Math.random() * WS_COLS);
             const er = r + d[0] * (word.length - 1);
             const ec = c + d[1] * (word.length - 1);
-            if (er < 0 || ec < 0 || er >= WS_ROWS || ec >= WS_COLS) continue;
+            if (er < 0 || ec < 0 || er >= wsRows || ec >= WS_COLS) continue;
             let ok = true;
             for (let i = 0; i < word.length; i++) {
                 const cur = wsGrid[r + d[0] * i][c + d[1] * i];
@@ -8970,7 +8979,7 @@ function wsBuildGrid() {
             return;
         }
     });
-    for (let r = 0; r < WS_ROWS; r++) {
+    for (let r = 0; r < wsRows; r++) {
         for (let c = 0; c < WS_COLS; c++) {
             if (!wsGrid[r][c]) wsGrid[r][c] = (typeof isJa === "function" && isJa()) ? WS_KANA[Math.floor(Math.random() * WS_KANA.length)] : String.fromCharCode(65 + Math.floor(Math.random() * 26));
         }

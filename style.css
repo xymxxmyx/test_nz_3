@@ -12475,3 +12475,11 @@ body[data-theme="plush"] #search-area .ws-btn { background: #f3e8ff; color: #2b0
     font-size: clamp(13px, calc(17px * var(--ui-fit, 1)), 20px) !important;
     padding: calc(5px * var(--ui-fit, 1)) calc(12px * var(--ui-fit, 1)) !important;
 }
+
+
+/* В «Поиске слов» скролл полностью отключён — поле подстраивается под экран. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#search-area:not(.hidden)) {
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+}
+#search-area { overflow: hidden !important; }
