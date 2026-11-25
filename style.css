@@ -12258,10 +12258,10 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#cards-area:not(.hidden)) 
 /* Наушники в маске аудирования — немного крупнее оригинала (мобильная версия). */
 body.tg-mini-app #current-word.listening-mask img.ico-png,
 body.nz-mobile #current-word.listening-mask img.ico-png {
-    height: 1.22em !important;
+    height: 1.05em !important;
     width: auto !important;
     position: relative !important;
-    top: -3px !important;
+    top: 0 !important;
 }
 
 
