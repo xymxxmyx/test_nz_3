@@ -8895,7 +8895,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // ===== ПОИСК СЛОВ СРЕДИ БУКВ (дефолтный дизайн) =====
 const WS_COLS = 7;
-const WS_ROWS = 10;
+const WS_ROWS = 9;
 const WS_PER_ROUND = 5;
 let wsGrid = [], wsTargets = [], wsFound = [], wsWordPos = {}, wsFirst = null, wsLast = null;
 let wsDrag = null, wsDragJustEnded = false, wsAdvanceTimer = null, wsSwapAnimating = null;
