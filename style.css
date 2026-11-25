@@ -12294,3 +12294,9 @@ body.tg-mini-app[data-theme="plush"] #battle-area .battle-table {
     background-image: url("UI/Pole_Sob_pred.webp?v=sob2") !important;
     background-size: 100% 100% !important;
 }
+
+
+/* Zapas pod slova «otbito / ne otbito» v «5 v 1» — stol ne prygaet. */
+body.tg-mini-app[data-theme="plush"] #battle-area #battle-feedback {
+    min-height: 46px !important;
+}
