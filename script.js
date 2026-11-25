@@ -8894,15 +8894,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // ===== ПОИСК СЛОВ СРЕДИ БУКВ (дефолтный дизайн) =====
-const WS_COLS = 7;
+const WS_COLS = 9;
 let wsRows = 9;
 function wsFitRows() {
-    const sc = document.getElementById("game-screen");
-    const gridEl = document.getElementById("ws-grid");
-    if (!sc || !gridEl) return 9;
-    const cellW = Math.max(26, (gridEl.clientWidth || 270) / WS_COLS);
-    const avail = (window.innerHeight || 844) - 491;
-    return Math.max(6, Math.min(12, Math.floor(avail / cellW)));
+    return 9;
 }
 const WS_PER_ROUND = 5;
 let wsGrid = [], wsTargets = [], wsFound = [], wsWordPos = {}, wsFirst = null, wsLast = null;
