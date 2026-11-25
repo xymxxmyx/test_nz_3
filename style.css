@@ -12542,8 +12542,10 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#search-area:not(.hidden))
     border-radius: calc(16px * var(--ui-fit, 1));
     overflow: hidden;
     text-align: center;
-    border: calc(4px * var(--ui-fit, 1)) solid transparent !important;
-    background-clip: padding-box !important;
+    border: 0 !important;
+    background-clip: border-box !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
     box-shadow: none !important;
     outline: none !important;
 }
