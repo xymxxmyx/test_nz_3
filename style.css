@@ -12275,3 +12275,15 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
 body.nz-mobile[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) #check-btn {
     top: 30px !important;
 }
+
+
+/* Igrovoy stol «5 v 1» — na 15px nizhe za schyot nizhnego paddinga. */
+body.tg-mini-app[data-theme="plush"] #battle-area .battle-table {
+    padding-bottom: calc(67px * var(--ui-fit, 1)) !important;
+}
+
+
+/* «НЕВЕРНО !» в «5 в 1» — такого же размера, что «Запомни!» (14px). */
+body.tg-mini-app[data-theme="plush"] #battle-area #battle-feedback {
+    font-size: 14px !important;
+}
