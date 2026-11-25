@@ -12300,3 +12300,9 @@ body.tg-mini-app[data-theme="plush"] #battle-area .battle-table {
 body.tg-mini-app[data-theme="plush"] #battle-area #battle-feedback {
     min-height: 46px !important;
 }
+
+
+/* Knopki shapki v «5 v 1» — na 5px vyshe. */
+body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) > .panel > .game-header {
+    top: calc(10px * var(--ui-fit-base, 1) - 5px) !important;
+}
