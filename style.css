@@ -12618,3 +12618,39 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#search-area:not(.hidden))
 #pairs-area .pairs-grid.pair-preview .pair-inner {
     transition-delay: calc(var(--i, 0) * 0.03s);
 }
+
+
+/* Пары: сердечки, раунд и кнопка просмотра. */
+#pairs-area .pairs-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+#pairs-area .hearts {
+    display: flex !important;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    justify-content: center;
+    gap: calc(6px * var(--ui-fit, 1));
+    height: calc(26px * var(--ui-fit, 1));
+    margin: 0 !important;
+}
+#pairs-area .heart {
+    width: calc(24px * var(--ui-fit, 1));
+    height: calc(24px * var(--ui-fit, 1));
+    display: inline-block;
+    background: url("UI/Serdce_aktiv.webp") no-repeat center / 100% 100%;
+}
+#pairs-area .heart.lost { background: url("UI/Serdce_seroe.webp") no-repeat center / 100% 100%; }
+#pairs-area .pairs-round {
+    font-size: clamp(11px, calc(13px * var(--ui-fit, 1)), 15px);
+    color: #e6d4ff;
+    font-weight: 700;
+}
+#pairs-area #pairs-preview-btn {
+    align-self: center;
+    min-height: calc(36px * var(--ui-fit, 1));
+}

@@ -2253,6 +2253,7 @@ function updateCategoryTag() {
 }
 
 function newGame() {
+    if (state.playMode === "pairs") { pairsResetGame(); state.roundWords = PAIRS_ROUNDS * PAIRS_PER_ROUND; }
     state.roundCorrect = 0;
     state.roundTotal = 0;
     state.lives = MAX_LIVES;
@@ -9198,11 +9199,50 @@ function wsNext() {
 const PAIRS_PER_ROUND = 6;
 let pairsCards = [], pairsFirst = -1, pairsLock = true, pairsMoves = 0, pairsMatched = 0, pairsTimer = null;
 
+const PAIRS_ROUNDS = 3;
+const PAIRS_PREVIEWS = 3;
+let pairsRound = 0, pairsHearts = 3, pairsPreviewLeft = 3, pairsCombo = 0;
+let pairsTimers = [];
+
+function pairsClearTimers() {
+    pairsTimers.forEach(t => clearTimeout(t));
+    pairsTimers = [];
+}
+function pairsLater(fn, ms) {
+    const t = setTimeout(fn, ms);
+    pairsTimers.push(t);
+    return t;
+}
+
+function pairsResetGame() {
+    pairsClearTimers();
+    pairsRound = 0;
+    pairsHearts = MAX_LIVES;
+    pairsPreviewLeft = PAIRS_PREVIEWS;
+    pairsCombo = 0;
+}
+
+function pairsRenderHearts() {
+    const box = document.getElementById("pairs-hearts");
+    if (!box) return;
+    box.innerHTML = "";
+    for (let i = 0; i < MAX_LIVES; i++) {
+        const h = document.createElement("span");
+        h.className = "heart" + (i >= pairsHearts ? " lost" : "");
+        box.appendChild(h);
+    }
+    const r = document.getElementById("pairs-round");
+    if (r) r.textContent = "Раунд " + (pairsRound + 1) + "/" + PAIRS_ROUNDS;
+    const p = document.getElementById("pairs-preview-btn");
+    if (p) p.textContent = "Посмотреть (" + pairsPreviewLeft + ")";
+}
+
 function pairsStartRound() {
-    if (pairsTimer) { clearTimeout(pairsTimer); pairsTimer = null; }
+    pairsClearTimers();
     const area = document.getElementById("pairs-area");
     if (!area) return;
     area.classList.remove("hidden");
+    state.currentWordIndex = pairsRound * PAIRS_PER_ROUND;
     const list = (state.gameWords || []).slice(state.currentWordIndex, state.currentWordIndex + PAIRS_PER_ROUND);
     const cards = [];
     const used = {};
@@ -9228,30 +9268,45 @@ function pairsStartRound() {
     pairsLock = true;
     pairsMoves = 0;
     pairsMatched = 0;
+    pairsCombo = 0;
     const label = document.getElementById("pairs-label");
     if (label) label.textContent = "НАЙДИТЕ ПАРЫ КАРТ";
     const fb = document.getElementById("pairs-feedback");
     if (fb) { fb.textContent = "ЗАПОМНИТЕ КАРТЫ"; fb.className = "feedback"; }
+    pairsRenderHearts();
     pairsRender();
-    // Появление карт, затем анимированный переворот лицом вверх.
-    pairsTimer = setTimeout(() => {
-        pairsTimer = null;
+    pairsLater(() => {
         const grid = document.getElementById("pairs-grid");
         if (grid) grid.classList.add("pair-preview");
         pairsCards.forEach(c => { c.flipped = true; });
         pairsUpdate();
-        Sound.flip();
-        pairsTimer = setTimeout(() => {
-            pairsTimer = null;
-            pairsCards.forEach(c => { c.flipped = false; });
-            pairsUpdate();
-            if (grid) grid.classList.remove("pair-preview");
-            Sound.flip();
-            pairsLock = false;
-            const f = document.getElementById("pairs-feedback");
-            if (f) { f.textContent = ""; f.className = "feedback"; }
-        }, 5000);
+        if (typeof Sound.flip === "function") Sound.flip();
+        pairsLater(() => pairsHidePreview(), 5000);
     }, 500);
+}
+
+function pairsHidePreview() {
+    pairsCards.forEach(c => { c.flipped = false; });
+    pairsUpdate();
+    const grid = document.getElementById("pairs-grid");
+    if (grid) grid.classList.remove("pair-preview");
+    if (typeof Sound.flip === "function") Sound.flip();
+    pairsLock = false;
+    const f = document.getElementById("pairs-feedback");
+    if (f) { f.textContent = ""; f.className = "feedback"; }
+}
+
+function pairsPreview() {
+    if (pairsLock || pairsPreviewLeft <= 0 || !pairsCards.length) return;
+    pairsPreviewLeft--;
+    pairsLock = true;
+    pairsRenderHearts();
+    const grid = document.getElementById("pairs-grid");
+    if (grid) grid.classList.add("pair-preview");
+    pairsCards.forEach(c => { c.flipped = true; });
+    pairsUpdate();
+    if (typeof Sound.flip === "function") Sound.flip();
+    pairsLater(() => pairsHidePreview(), 5000);
 }
 
 function pairsStars() {
@@ -9313,6 +9368,18 @@ function pairsUpdate() {
     if (fd) fd.textContent = "Пары: " + pairsMatched + "/" + (pairsCards.length / 2);
 }
 
+function pairsLoseHeart() {
+    pairsHearts--;
+    state.lives = pairsHearts;
+    pairsRenderHearts();
+    if (pairsHearts <= 0) {
+        pairsLock = true;
+        pairsLater(() => { if (onGameScreen()) showGameOver(); }, 700);
+        return true;
+    }
+    return false;
+}
+
 function pairsClick(i) {
     if (pairsLock) return;
     const c = pairsCards[i];
@@ -9329,33 +9396,55 @@ function pairsClick(i) {
         a.matched = true; c.matched = true;
         Sound.correct();
         pairsMatched++;
-        if (fb) { fb.textContent = "ВЕРНО !"; fb.className = "feedback correct"; }
+        pairsCombo++;
+        if (pairsCombo >= 3) {
+            pairsCombo = 0;
+            if (pairsHearts < MAX_LIVES) {
+                pairsHearts++;
+                state.lives = pairsHearts;
+                pairsRenderHearts();
+                if (fb) { fb.textContent = "КОМБО ! +1 СЕРДЕЧКО"; fb.className = "feedback correct"; }
+            } else if (fb) { fb.textContent = "КОМБО !"; fb.className = "feedback correct"; }
+        } else if (fb) { fb.textContent = "ВЕРНО !"; fb.className = "feedback correct"; }
         pairsUpdate();
         if (pairsMatched * 2 === pairsCards.length) {
-            if (fb) fb.textContent = "ВСЕ ПАРЫ НАЙДЕНЫ !";
+            if (fb) fb.textContent = "РАУНД ЗАВЕРШЁН !";
             pairsLock = true;
-            pairsTimer = setTimeout(() => {
-                pairsTimer = null;
-                if (currentScreen === "game-screen" && state.playMode === "pairs" && state.inProgress) pairsNext();
-            }, 1400);
+            pairsLater(() => pairsNext(), 1400);
         }
     } else {
         Sound.wrong();
-        if (fb) { fb.textContent = "НЕВЕРНО !"; fb.className = "feedback incorrect"; }
-        pairsUpdate();
-        pairsLock = true;
-        pairsTimer = setTimeout(() => {
-            pairsTimer = null;
-            a.flipped = false; c.flipped = false;
-            pairsLock = false;
+        pairsCombo = 0;
+        let dead = false;
+        if (pairsPreviewLeft <= 0) dead = pairsLoseHeart();
+        if (!dead) {
+            if (fb) {
+                fb.textContent = pairsPreviewLeft > 0 ? "НЕВЕРНО !" : "НЕВЕРНО ! -1 СЕРДЕЧКО";
+                fb.className = "feedback incorrect";
+            }
             pairsUpdate();
-        }, 900);
+            pairsLock = true;
+            pairsLater(() => {
+                a.flipped = false; c.flipped = false;
+                pairsLock = false;
+                pairsUpdate();
+            }, 900);
+        } else {
+            if (fb) { fb.textContent = "НЕВЕРНО !"; fb.className = "feedback incorrect"; }
+            pairsUpdate();
+        }
     }
 }
 
 function pairsNext() {
-    state.currentWordIndex += PAIRS_PER_ROUND;
-    state.selectedAnswer = null;
+    pairsRound++;
+    pairsPreviewLeft = PAIRS_PREVIEWS;
+    pairsCombo = 0;
+    if (pairsRound >= PAIRS_ROUNDS) {
+        showResults();
+        return;
+    }
+    state.currentWordIndex = pairsRound * PAIRS_PER_ROUND;
     saveData();
     showGameWord();
 }
