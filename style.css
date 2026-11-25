@@ -12287,3 +12287,10 @@ body.tg-mini-app[data-theme="plush"] #battle-area .battle-table {
 body.tg-mini-app[data-theme="plush"] #battle-area #battle-feedback {
     font-size: 14px !important;
 }
+
+
+/* Probuyem Podlozhku Polya iz «Sobri predlozhenie» v «5 v 1». */
+body.tg-mini-app[data-theme="plush"] #battle-area .battle-table {
+    background-image: url("UI/Pole_Sob_pred.webp?v=sob2") !important;
+    background-size: 100% 100% !important;
+}
