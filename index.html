@@ -207,7 +207,7 @@
     })();
     </script>
 
-    <link rel="stylesheet" href="style.css?v=20261411">
+    <link rel="stylesheet" href="style.css?v=20261437">
 
     <!-- Шрифты с высоким приоритетом: иначе текст мигает системным шрифтом. -->
     <link rel="preload" as="font" type="font/ttf" href="UI/NihonZenoPlush-Regular.ttf" crossorigin fetchpriority="high">
@@ -525,6 +525,7 @@
                 <button class="menu-btn mode-pick" onclick="startNewGame('quiz')" data-lock="quiz"><img class="menu-ic" src="UI/ICON/CIFRI.webp" alt=""> 5 к 1</button>
                 <button class="menu-btn mode-pick" onclick="startNewGame('listening')" data-lock="listening"><img class="menu-ic" src="UI/ICON/NAUSH.webp" alt=""> Услышь слово</button>
                 <button class="menu-btn mode-pick" onclick="startNewGame('cards')" data-lock="cards"><img class="menu-ic" src="UI/ICON/KARTINA.webp" alt=""> Собери предложение</button>
+                <button class="menu-btn mode-pick" onclick="startNewGame('search')"><img class="menu-ic" src="UI/ICON/TARGET.webp" alt=""> Поиск слов</button>
             </div>
             <button class="menu-btn back-to-menu" onclick="backToMenu()"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> Назад</button>
         </div>
@@ -860,6 +861,22 @@
                     <button class="next-btn cards-reset-btn" id="cards-reset" onclick="cardsReset()"><img class="ico-png" src="UI/ICON/REVERS.webp" alt=""> Сброс</button>
                     <button class="check-btn" id="cards-check" onclick="checkCardsAnswer()"><img class="ico-png" src="UI/ICON/GALKA.webp" alt=""> Проверить</button>
                     <button class="next-btn hidden" id="cards-next" onclick="nextWord()">Далее <img class="ico-png" src="UI/ICON/STRELA_PRAVO.webp" alt=""></button>
+                </div>
+            </div>
+
+            <!-- Поиск слов среди букв (дефолтный дизайн) -->
+            <div id="search-area" class="hidden">
+
+                <p class="word-label" id="search-label">НАЙДИТЕ СЛОВА</p>
+
+                <div class="ws-layout">
+                    <div class="ws-grid" id="ws-grid"></div>
+                    <div class="ws-words" id="ws-words"></div>
+                </div>
+
+                <p class="feedback" id="ws-feedback"></p>
+
+                <div class="ws-controls">
                 </div>
             </div>
 
@@ -1394,7 +1411,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.self !== window.top || (window.innerWidth <= MIN_W && !/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash))) {
-            document.write('<script src="script.js?v=20261233"><\/script>');
+            document.write('<script src="script.js?v=20261251"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');

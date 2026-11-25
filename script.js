@@ -2243,6 +2243,7 @@ function timeAdverbSwapMatch(n, nv) {
 }
 
 function updateCategoryTag() {
+    if (state.playMode === "search") { document.getElementById("current-category").textContent = "Поиск слов"; return; }
     document.getElementById("current-category").textContent =
         state.playMode === "listening" ? getLevelLabel() + " · На слух"
         : usesSentences()
@@ -2378,7 +2379,7 @@ function showGameWord() {
         showResults();
         return;
     }
-    ["input-area", "battle-area", "cards-area"].forEach(id => {
+    ["input-area", "battle-area", "cards-area", "search-area"].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add("hidden");
     });
@@ -2399,6 +2400,8 @@ function showGameWord() {
         showCardsRound(word);
     } else if (state.playMode === "listening") {
         showListeningRound();
+    } else if (state.playMode === "search") {
+        wsStartRound();
     } else {
         showInputRound(displayWord);
     }
@@ -8888,3 +8891,248 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 })();
+
+
+// ===== ПОИСК СЛОВ СРЕДИ БУКВ (дефолтный дизайн) =====
+const WS_COLS = 7;
+const WS_ROWS = 10;
+const WS_PER_ROUND = 5;
+let wsGrid = [], wsTargets = [], wsFound = [], wsWordPos = {}, wsFirst = null, wsLast = null;
+let wsDrag = null, wsDragJustEnded = false, wsAdvanceTimer = null, wsSwapAnimating = null;
+
+function wsCleanWord(w) {
+    if (typeof isJa === "function" && isJa()) {
+        const s = (w && (w.kana || w.ja)) || tgt(w) || "";
+        return String(s).replace(/[\s、。「」・！？!?\-]/g, "");
+    }
+    return String(tgt(w) || "").toUpperCase().replace(/[^A-Z]/g, "");
+}
+
+const WS_KANA = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん";
+
+function wsStartRound() {
+    if (wsAdvanceTimer) { clearTimeout(wsAdvanceTimer); wsAdvanceTimer = null; }
+    const area = document.getElementById("search-area");
+    if (!area) return;
+    area.classList.toggle("nz-ja", typeof isJa === "function" && isJa());
+    area.classList.remove("hidden");
+    const list = (state.gameWords || []).slice(
+        state.currentWordIndex, state.currentWordIndex + WS_PER_ROUND
+    );
+    wsTargets = [];
+    list.forEach(w => {
+        const s = wsCleanWord(w);
+        if (s.length >= (typeof isJa === "function" && isJa() ? 2 : 3) && s.length <= 8 && wsTargets.indexOf(s) < 0) wsTargets.push(s);
+    });
+    wsFound = [];
+    wsWordPos = {};
+    wsFirst = null;
+    wsLast = null;
+    const fb = document.getElementById("ws-feedback");
+    if (fb) { fb.textContent = ""; fb.className = "feedback"; }
+    if (!wsTargets.length) {
+        const label = document.getElementById("search-label");
+        if (label) label.textContent = "Для этого уровня нет слов из латинских букв";
+        return;
+    }
+    const label = document.getElementById("search-label");
+    if (label) label.textContent = "НАЙДИТЕ СЛОВА";
+    if (!wsSwapAnimating) wsSwapAnimating = "in";
+    wsBuildGrid();
+    wsRender();
+    wsSwapAnimating = null;
+}
+
+function wsBuildGrid() {
+    wsGrid = [];
+    for (let r = 0; r < WS_ROWS; r++) wsGrid.push(new Array(WS_COLS).fill(""));
+    const dirs = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]];
+    wsTargets.forEach(word => {
+        for (let attempt = 0; attempt < 120; attempt++) {
+            const d = dirs[Math.floor(Math.random() * dirs.length)];
+            const r = Math.floor(Math.random() * WS_ROWS);
+            const c = Math.floor(Math.random() * WS_COLS);
+            const er = r + d[0] * (word.length - 1);
+            const ec = c + d[1] * (word.length - 1);
+            if (er < 0 || ec < 0 || er >= WS_ROWS || ec >= WS_COLS) continue;
+            let ok = true;
+            for (let i = 0; i < word.length; i++) {
+                const cur = wsGrid[r + d[0] * i][c + d[1] * i];
+                if (cur && cur !== word[i]) { ok = false; break; }
+            }
+            if (!ok) continue;
+            const cells = [];
+            for (let i = 0; i < word.length; i++) {
+                wsGrid[r + d[0] * i][c + d[1] * i] = word[i];
+                cells.push({ r: r + d[0] * i, c: c + d[1] * i });
+            }
+            wsWordPos[word] = cells;
+            return;
+        }
+    });
+    for (let r = 0; r < WS_ROWS; r++) {
+        for (let c = 0; c < WS_COLS; c++) {
+            if (!wsGrid[r][c]) wsGrid[r][c] = (typeof isJa === "function" && isJa()) ? WS_KANA[Math.floor(Math.random() * WS_KANA.length)] : String.fromCharCode(65 + Math.floor(Math.random() * 26));
+        }
+    }
+}
+
+function wsRender() {
+    const gridEl = document.getElementById("ws-grid");
+    const wordsEl = document.getElementById("ws-words");
+    if (!gridEl || !wordsEl) return;
+    gridEl.style.gridTemplateColumns = "repeat(" + WS_COLS + ", 1fr)";
+    gridEl.innerHTML = "";
+    const foundCells = new Set();
+    wsFound.forEach(w => (wsWordPos[w] || []).forEach(p => foundCells.add(p.r + ":" + p.c)));
+    wsGrid.forEach((row, r) => row.forEach((ch, c) => {
+        const b = document.createElement("button");
+        b.className = "ws-cell" + (foundCells.has(r + ":" + c) ? " found" : "");
+        if (wsSwapAnimating === "in") {
+            b.classList.add("ws-pop-in");
+            b.style.animationDelay = (r * 0.08) + "s";
+        }
+        b.type = "button";
+        b.textContent = ch;
+        b.dataset.r = r;
+        b.dataset.c = c;
+        b.onmousedown = (e) => { e.preventDefault(); wsCellDown(r, c); };
+        b.onmouseenter = () => wsCellEnter(r, c);
+        b.onmouseup = () => wsCellUp(r, c);
+        gridEl.appendChild(b);
+    }));
+    wordsEl.innerHTML = "";
+    wsTargets.forEach(w => {
+        const d = document.createElement("div");
+        d.className = "ws-word" + (wsFound.indexOf(w) >= 0 ? " found" : "");
+        d.textContent = w;
+        wordsEl.appendChild(d);
+    });
+}
+
+function wsCellDown(r, c) {
+    // Пока идёт отсчёт до свапа, ввод заблокирован.
+    if (wsAdvanceTimer) return;
+    // Второй клик: сразу проверяем линию от первой до этой буквы.
+    if (wsFirst && (!wsDrag || !wsDrag.active)) {
+        wsLast = { r: r, c: c };
+        wsCommitSelection();
+        return;
+    }
+    // Первый клик / начало протяжки.
+    wsFirst = { r: r, c: c };
+    wsLast = null;
+    wsDrag = { active: true, moved: false };
+    wsPaintSelection();
+}
+
+function wsCellEnter(r, c) {
+    if (!wsDrag || !wsDrag.active) return;
+    wsLast = { r: r, c: c };
+    wsDrag.moved = true;
+    wsPaintSelection();
+}
+
+function wsCellUp(r, c) {
+    if (!wsDrag || !wsDrag.active) return;
+    wsDrag.active = false;
+    if (wsDrag.moved) {
+        if (!wsLast) wsLast = { r: r, c: c };
+        wsCommitSelection();
+    }
+    // Простой клик: оставляем wsFirst для второго клика.
+}
+
+document.addEventListener("mouseup", () => {
+    if (wsDrag && wsDrag.active && wsDrag.moved) {
+        wsDrag.active = false;
+        if (wsLast) wsCommitSelection();
+    } else if (wsDrag) {
+        wsDrag.active = false;
+    }
+});
+
+function wsPaintSelection() {
+    document.querySelectorAll("#ws-grid .ws-cell").forEach(b => b.classList.remove("sel"));
+    if (!wsFirst) return;
+    const end = wsLast || wsFirst;
+    const dr = Math.sign(end.r - wsFirst.r), dc = Math.sign(end.c - wsFirst.c);
+    const n = Math.max(Math.abs(end.r - wsFirst.r), Math.abs(end.c - wsFirst.c)) + 1;
+    for (let i = 0; i < n; i++) {
+        const b = document.querySelector('#ws-grid .ws-cell[data-r="' + (wsFirst.r + dr * i) + '"][data-c="' + (wsFirst.c + dc * i) + '"]');
+        if (b) b.classList.add("sel");
+    }
+}
+
+function wsCommitSelection() {
+    const s = wsSelectionString(wsFirst, wsLast);
+    const fb = document.getElementById("ws-feedback");
+    if (!s) {
+        if (fb) { fb.textContent = "НЕВЕРНО !"; fb.className = "feedback incorrect"; }
+        wsFirst = null; wsLast = null;
+        wsRender();
+        return;
+    }
+    const rev = s.split("").reverse().join("");
+    const hit = wsTargets.find(w => wsFound.indexOf(w) < 0 && (w === s || w === rev));
+    if (hit) {
+        Sound.correct();
+        wsFound.push(hit);
+        if (fb) { fb.textContent = "ВЕРНО ! " + hit; fb.className = "feedback correct"; }
+        if (wsFound.length === wsTargets.length) {
+            if (fb) fb.textContent = "ВСЕ СЛОВА НАЙДЕНЫ !";
+            if (wsAdvanceTimer) clearTimeout(wsAdvanceTimer);
+            wsAdvanceTimer = setTimeout(() => {
+                wsAdvanceTimer = null;
+                if (state.playMode === "search" && state.inProgress && currentScreen === "game-screen") wsSwapDeck();
+            }, 1400);
+        }
+    } else {
+        Sound.wrong();
+        if (fb) { fb.textContent = "НЕВЕРНО !"; fb.className = "feedback incorrect"; }
+    }
+    wsFirst = null; wsLast = null;
+    wsRender();
+}
+
+function wsSelectionString(a, b) {
+    const dr = Math.sign(b.r - a.r), dc = Math.sign(b.c - a.c);
+    const vr = Math.abs(b.r - a.r), vc = Math.abs(b.c - a.c);
+    if (vr !== 0 && vc !== 0 && vr !== vc) return null;
+    const n = Math.max(vr, vc) + 1;
+    let s = "";
+    for (let i = 0; i < n; i++) s += wsGrid[a.r + dr * i][a.c + dc * i];
+    return s;
+}
+
+function wsResetSelection() {
+    wsFirst = null; wsLast = null;
+    const fb = document.getElementById("ws-feedback");
+    if (fb) { fb.textContent = ""; fb.className = "feedback"; }
+    wsRender();
+}
+
+function wsSwapDeck() {
+    if (currentScreen !== "game-screen") return;
+    const cells = [...document.querySelectorAll("#ws-grid .ws-cell")];
+    if (!cells.length) { wsNext(); return; }
+    wsSwapAnimating = "out";
+    cells.forEach((el) => {
+        el.style.setProperty("--row", el.dataset.r);
+        el.classList.add("ws-pop-out");
+    });
+    setTimeout(() => {
+        wsSwapAnimating = "in";
+        if (currentScreen === "game-screen" && state.playMode === "search" && state.inProgress) wsNext();
+        wsSwapAnimating = null;
+    }, 380);
+}
+
+function wsNext() {
+    if (wsAdvanceTimer) { clearTimeout(wsAdvanceTimer); wsAdvanceTimer = null; }
+    MIC.stop();
+    state.currentWordIndex += WS_PER_ROUND;
+    state.selectedAnswer = null;
+    saveData();
+    showGameWord();
+}

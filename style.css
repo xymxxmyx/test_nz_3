@@ -6868,7 +6868,9 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#input-area:not(.hidden)) 
 .screen.active .mode-grid .menu-btn:nth-child(4),
 .screen.active .category-grid .menu-btn:nth-child(4) { animation-delay: 0.44s; }
 .screen.active .menu-grid .menu-btn:nth-child(5),
+.screen.active .mode-grid .menu-btn:nth-child(5),
 .screen.active .category-grid .menu-btn:nth-child(5) { animation-delay: 0.54s; }
+.screen.active .mode-grid .menu-btn:nth-child(6) { animation-delay: 0.64s; }
 .screen.active .category-grid .menu-btn:nth-child(6) { animation-delay: 0.64s; }
 .screen.active .category-grid .menu-btn:nth-child(7) { animation-delay: 0.74s; }
 .screen.active .category-grid .menu-btn:nth-child(8) { animation-delay: 0.84s; }
@@ -12305,4 +12307,171 @@ body.tg-mini-app[data-theme="plush"] #battle-area #battle-feedback {
 /* Knopki shapki v «5 v 1» — na 5px vyshe. */
 body.tg-mini-app[data-theme="plush"] #game-screen:has(#battle-area:not(.hidden)) > .panel > .game-header {
     top: calc(10px * var(--ui-fit-base, 1) - 5px) !important;
+}
+
+
+/* ===== Поиск слов среди букв — дефолтный дизайн ===== */
+#search-area:not(.hidden) {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: calc(8px * var(--ui-fit, 1));
+    padding: calc(6px * var(--ui-fit, 1));
+}
+#search-area .word-label {
+    margin: 0 0 calc(4px * var(--ui-fit, 1));
+    text-align: center;
+    font-size: clamp(10px, calc(12px * var(--ui-fit, 1)), 14px);
+    color: #e6d4ff;
+}
+#search-area .ws-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: calc(6px * var(--ui-fit, 1));
+}
+#search-area .ws-grid {
+    display: grid;
+    flex: 1 1 auto;
+    gap: 0;
+}
+#search-area .ws-cell {
+    box-sizing: border-box;
+    width: 100%;
+    aspect-ratio: 1;
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-radius: calc(4px * var(--ui-fit, 1));
+    background:
+        url("UI/Pod_knopki.webp?v=pk2") center / 100% 100% no-repeat,
+        url("UI/WS_cell.webp?v=ws2") center / 100% 100% no-repeat #43128c;
+    color: #fff2ff;
+    font-size: clamp(14px, calc(19px * var(--ui-fit, 1)), 21px);
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: 0 1px 2px rgba(20, 4, 40, 0.85);
+    cursor: pointer;
+    filter: none;
+    box-shadow: 0 2px 6px rgba(12, 2, 28, 0.55), inset 0 0 8px rgba(255, 190, 220, 0.18);
+}
+body[data-theme="plush"] #search-area .ws-cell {
+    background:
+        url("UI/Pod_knopki.webp?v=pk2") center / 100% 100% no-repeat,
+        url("UI/WS_cell.webp?v=ws2") center / 100% 100% no-repeat #43128c !important;
+    border-image: none;
+    box-shadow: none;
+    filter: none;
+}
+body[data-theme="plush"] #search-area .ws-cell.sel,
+#search-area .ws-cell.sel {
+    background:
+        url("UI/Pod_knopki.webp?v=pk2") center / 100% 100% no-repeat,
+        #ffd166 !important;
+    color: #3b2400 !important;
+    text-shadow: none !important;
+}
+body[data-theme="plush"] #search-area .ws-cell.found,
+#search-area .ws-cell.found {
+    background:
+        url("UI/Pod_knopki.webp?v=pk2") center / 100% 100% no-repeat,
+        #8ef0a0 !important;
+    color: #14532d !important;
+    text-shadow: none !important;
+}
+#search-area .ws-words {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: calc(4px * var(--ui-fit, 1));
+    font-size: clamp(12px, calc(14px * var(--ui-fit, 1)), 16px);
+    color: #fff;
+}
+#search-area .ws-word {
+    padding: calc(3px * var(--ui-fit, 1)) calc(10px * var(--ui-fit, 1));
+    border: 0;
+    border-radius: 999px;
+    background: url("UI/extracted/bottom_trim.webp") center / 100% 100% no-repeat #4a1f7a;
+    color: #e6d4ff;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(20, 4, 40, 0.9);
+    box-shadow: 0 2px 6px rgba(12, 2, 28, 0.45);
+}
+#search-area .ws-word.found {
+    background:
+        linear-gradient(rgba(142, 240, 160, 0.35), rgba(142, 240, 160, 0.35)),
+        url("UI/extracted/bottom_trim.webp") center / 100% 100% no-repeat #2f6b45;
+    color: #b7ffcf;
+    text-decoration: line-through;
+}
+#search-area #ws-feedback {
+    min-height: calc(26px * var(--ui-fit, 1));
+    margin: 0;
+    text-align: center;
+    font-size: clamp(12px, calc(14px * var(--ui-fit, 1)), 16px);
+}
+#search-area .ws-controls {
+    display: flex;
+    gap: calc(8px * var(--ui-fit, 1));
+    justify-content: center;
+}
+
+body[data-theme="plush"] #search-area .ws-btn { background: #f3e8ff; color: #2b0b45; border: 1px solid #b892d8; border-image: none; box-shadow: none; filter: none; }
+
+/* Кнопки «Сброс»/«Далее» в поиске слов — в общем стиле приложения. */
+#search-area .ws-controls .check-btn {
+    min-width: calc(110px * var(--ui-fit, 1)) !important;
+}
+
+
+/* Мигающие звёзды на буквах — как на картах, через CSS. */
+#search-area .ws-cell { position: relative; }
+#search-area .ws-cell::before,
+#search-area .ws-cell::after {
+    content: "";
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.65);
+    animation: starTwinkle var(--dur, 5s) ease-in-out infinite;
+    animation-delay: calc(var(--d, 0) * -1s);
+    pointer-events: none;
+    z-index: 1;
+}
+#search-area .ws-cell::before { left: 26%; top: 26%; --d: 0; }
+#search-area .ws-cell::after  { right: 26%; top: 26%; --d: 1.3; }
+#search-area .ws-cell:nth-child(3n)   { --dur: 4.4s; }
+#search-area .ws-cell:nth-child(3n+1) { --dur: 6.1s; }
+#search-area .ws-cell:nth-child(3n+2) { --dur: 7.3s; }
+
+
+/* Свап колоды как в главном меню — по строкам, с плавным появлением. */
+@keyframes wsCardPopOut {
+    to { opacity: 0; transform: translateY(-12px) scale(0.96); }
+}
+@keyframes wsCardPopIn {
+    0%   { opacity: 0; transform: translateY(18px) scale(0.96); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+#search-area .ws-cell.ws-pop-out {
+    animation: wsCardPopOut 0.22s ease forwards;
+    animation-delay: calc(var(--row, 0) * 0.035s);
+}
+#search-area .ws-cell.ws-pop-in {
+    animation: wsCardPopIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    backface-visibility: hidden;
+}
+
+
+/* Японская раскладка: ячейки шире, нужен меньший кегль. */
+#search-area.nz-ja .ws-cell {
+    font-size: clamp(11px, calc(15px * var(--ui-fit, 1)), 18px) !important;
+}
+#search-area.nz-ja .ws-word {
+    font-size: clamp(13px, calc(17px * var(--ui-fit, 1)), 20px) !important;
+    padding: calc(5px * var(--ui-fit, 1)) calc(12px * var(--ui-fit, 1)) !important;
 }
