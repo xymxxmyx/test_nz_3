@@ -8906,7 +8906,7 @@ function wsFitRows() {
 }
 const WS_PER_ROUND = 5;
 let wsGrid = [], wsTargets = [], wsFound = [], wsWordPos = {}, wsFirst = null, wsLast = null;
-let wsDrag = null, wsDragJustEnded = false, wsAdvanceTimer = null, wsSwapAnimating = null;
+let wsDrag = null, wsDragJustEnded = false, wsAdvanceTimer = null, wsSwapAnimating = null, wsTouchActive = false;
 
 function wsCleanWord(w) {
     if (typeof isJa === "function" && isJa()) {
@@ -8950,7 +8950,7 @@ function wsStartRound() {
     const label = document.getElementById("search-label");
     if (label) label.textContent = "НАЙДИТЕ СЛОВА";
     // Строим сетку после того, как экран разложен — иначе clientHeight = 0.
-    requestAnimationFrame(() => {
+    setTimeout(() => {
         wsRows = wsFitRows();
         if (!wsSwapAnimating) wsSwapAnimating = "in";
         wsBuildGrid();
@@ -9012,22 +9012,47 @@ function wsRender() {
         b.textContent = ch;
         b.dataset.r = r;
         b.dataset.c = c;
-        b.onpointerdown = (e) => {
+        b.addEventListener("touchstart", (e) => {
+            e.preventDefault();
+            wsTouchActive = true;
+            wsCellDown(r, c);
+        }, { passive: false });
+        b.addEventListener("touchmove", (e) => {
+            if (!wsDrag || !wsDrag.active) return;
+            e.preventDefault();
+            const t = e.touches[0];
+            if (!t) return;
+            const el = document.elementFromPoint(t.clientX, t.clientY);
+            if (el && el.classList && el.classList.contains("ws-cell")) {
+                wsCellEnter(+el.dataset.r, +el.dataset.c);
+            }
+        }, { passive: false });
+        b.addEventListener("touchend", (e) => {
+            e.preventDefault();
+            if (wsDrag && wsDrag.active) {
+                if (wsLast) wsCellUp(+wsLast.r, +wsLast.c);
+                else wsCellUp(r, c);
+            }
+            setTimeout(() => { wsTouchActive = false; }, 120);
+        }, { passive: false });
+        b.addEventListener("pointerdown", (e) => {
+            if (wsTouchActive) return;
             e.preventDefault();
             try { b.setPointerCapture(e.pointerId); } catch (err) {}
             wsCellDown(r, c);
-        };
-        b.onpointermove = (e) => {
-            if (!wsDrag || !wsDrag.active) return;
+        });
+        b.addEventListener("pointermove", (e) => {
+            if (wsTouchActive || !wsDrag || !wsDrag.active) return;
             const t = document.elementFromPoint(e.clientX, e.clientY);
             if (t && t.classList && t.classList.contains("ws-cell")) {
                 wsCellEnter(+t.dataset.r, +t.dataset.c);
             }
-        };
-        b.onpointerup = (e) => {
+        });
+        b.addEventListener("pointerup", (e) => {
+            if (wsTouchActive) return;
             if (wsDrag && wsDrag.active && wsLast) wsCellUp(+wsLast.r, +wsLast.c);
             else wsCellUp(r, c);
-        };
+        });
         gridEl.appendChild(b);
     }));
     wordsEl.innerHTML = "";
@@ -9072,7 +9097,11 @@ function wsCellUp(r, c) {
     // Простой клик: оставляем wsFirst для второго клика.
 }
 
+document.addEventListener("touchmove", (e) => {
+    if (wsDrag && wsDrag.active) e.preventDefault();
+}, { passive: false });
 document.addEventListener("pointerup", () => {
+    if (wsTouchActive) return;
     if (wsDrag && wsDrag.active && wsDrag.moved) {
         wsDrag.active = false;
         if (wsLast) wsCommitSelection();

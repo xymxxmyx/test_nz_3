@@ -12483,3 +12483,10 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#search-area:not(.hidden))
     overscroll-behavior: none !important;
 }
 #search-area { overflow: hidden !important; }
+
+
+/* Пальцы должны листать не экран, а выделять буквы. */
+#search-area .ws-grid,
+#search-area .ws-cell {
+    touch-action: none !important;
+}
