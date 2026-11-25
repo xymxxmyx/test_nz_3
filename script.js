@@ -8924,14 +8924,18 @@ function wsStartRound() {
     if (!area) return;
     area.classList.toggle("nz-ja", typeof isJa === "function" && isJa());
     area.classList.remove("hidden");
-    const list = (state.gameWords || []).slice(
-        state.currentWordIndex, state.currentWordIndex + WS_PER_ROUND
-    );
+    const minLen = (typeof isJa === "function" && isJa()) ? 2 : 3;
+    const list = (state.gameWords || []).slice(state.currentWordIndex);
     wsTargets = [];
-    list.forEach(w => {
+    const addWords = (pool) => (pool || []).forEach(w => {
+        if (wsTargets.length >= WS_PER_ROUND) return;
         const s = wsCleanWord(w);
-        if (s.length >= (typeof isJa === "function" && isJa() ? 2 : 3) && s.length <= 8 && wsTargets.indexOf(s) < 0) wsTargets.push(s);
+        if (s.length >= minLen && s.length <= 8 && wsTargets.indexOf(s) < 0) wsTargets.push(s);
     });
+    addWords(list);
+    if (wsTargets.length < WS_PER_ROUND) {
+        addWords(typeof getActiveWords === "function" ? getActiveWords() : (typeof DICTIONARY !== "undefined" ? DICTIONARY : []));
+    }
     wsFound = [];
     wsWordPos = {};
     wsFirst = null;
