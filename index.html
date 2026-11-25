@@ -207,7 +207,7 @@
     })();
     </script>
 
-    <link rel="stylesheet" href="style.css?v=20261440">
+    <link rel="stylesheet" href="style.css?v=20261449">
 
     <!-- Шрифты с высоким приоритетом: иначе текст мигает системным шрифтом. -->
     <link rel="preload" as="font" type="font/ttf" href="UI/NihonZenoPlush-Regular.ttf" crossorigin fetchpriority="high">
@@ -526,6 +526,7 @@
                 <button class="menu-btn mode-pick" onclick="startNewGame('listening')" data-lock="listening"><img class="menu-ic" src="UI/ICON/NAUSH.webp" alt=""> Услышь слово</button>
                 <button class="menu-btn mode-pick" onclick="startNewGame('cards')" data-lock="cards"><img class="menu-ic" src="UI/ICON/KARTINA.webp" alt=""> Собери предложение</button>
                 <button class="menu-btn mode-pick" onclick="startNewGame('search')"><img class="menu-ic" src="UI/ICON/TARGET.webp" alt=""> Поиск слов</button>
+                <button class="menu-btn mode-pick" onclick="startNewGame('pairs')"><img class="menu-ic" src="UI/ICON/KARTINA.webp" alt=""> Пары карт</button>
             </div>
             <button class="menu-btn back-to-menu" onclick="backToMenu()"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> Назад</button>
         </div>
@@ -863,6 +864,21 @@
                     <button class="next-btn hidden" id="cards-next" onclick="nextWord()">Далее <img class="ico-png" src="UI/ICON/STRELA_PRAVO.webp" alt=""></button>
                 </div>
             </div>
+            <!-- Пары карт: оригинал и перевод -->
+            <div id="pairs-area" class="hidden">
+
+                <p class="word-label" id="pairs-label">НАЙДИТЕ ПАРЫ КАРТ</p>
+
+                <div class="pairs-grid" id="pairs-grid"></div>
+
+                <p class="feedback" id="pairs-feedback"></p>
+
+                <div class="pairs-info">
+                    <span id="pairs-moves">Ходы: 0</span>
+                    <span id="pairs-found">Пары: 0/6</span>
+                </div>
+            </div>
+
 
             <!-- Поиск слов среди букв (дефолтный дизайн) -->
             <div id="search-area" class="hidden">
@@ -1411,7 +1427,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.self !== window.top || (window.innerWidth <= MIN_W && !/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash))) {
-            document.write('<script src="script.js?v=20261262"><\/script>');
+            document.write('<script src="script.js?v=20261269"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');
