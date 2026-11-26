@@ -207,7 +207,7 @@
     })();
     </script>
 
-    <link rel="stylesheet" href="style.css?v=20261469">
+    <link rel="stylesheet" href="style.css?v=20261487">
 
     <!-- Шрифты с высоким приоритетом: иначе текст мигает системным шрифтом. -->
     <link rel="preload" as="font" type="font/ttf" href="UI/NihonZenoPlush-Regular.ttf" crossorigin fetchpriority="high">
@@ -526,7 +526,8 @@
                 <button class="menu-btn mode-pick" onclick="startNewGame('listening')" data-lock="listening"><img class="menu-ic" src="UI/ICON/NAUSH.webp" alt=""> Услышь слово</button>
                 <button class="menu-btn mode-pick" onclick="startNewGame('cards')" data-lock="cards"><img class="menu-ic" src="UI/ICON/KARTINA.webp" alt=""> Собери предложение</button>
                 <button class="menu-btn mode-pick" onclick="startNewGame('search')"><img class="menu-ic" src="UI/ICON/TARGET.webp" alt=""> Поиск слов</button>
-                <button class="menu-btn mode-pick" onclick="startNewGame('pairs')"><img class="menu-ic" src="UI/ICON/KARTINA.webp" alt=""> Пары карт</button>
+                <button class="menu-btn mode-pick" onclick="startNewGame('pairs')"><img class="menu-ic" src="UI/ICON/ROMB.webp" alt=""> Пары карт</button>
+                <button class="menu-btn mode-pick" onclick="startNewGame('anagram')"><img class="menu-ic" src="UI/ICON/BUKVAA.webp" alt=""> Анаграмма</button>
             </div>
             <button class="menu-btn back-to-menu" onclick="backToMenu()"><img class="ico-png" src="UI/ICON/STRELA_LEVO.webp" alt=""> Назад</button>
         </div>
@@ -864,6 +865,19 @@
                     <button class="next-btn hidden" id="cards-next" onclick="nextWord()">Далее <img class="ico-png" src="UI/ICON/STRELA_PRAVO.webp" alt=""></button>
                 </div>
             </div>
+            <!-- Анаграмма -->
+            <div id="anagram-area" class="hidden">
+
+                <p class="word-label" id="ag-hint">СОБЕРИТЕ СЛОВО</p>
+
+                <div class="battle-table ag-table" id="ag-table">
+                    <canvas id="ag-appear-fx" class="player-appear-fx" aria-hidden="true"></canvas>
+                    <div class="ag-letters" id="ag-letters"></div>
+                </div>
+
+                <p class="feedback" id="ag-feedback"></p>
+            </div>
+
             <!-- Пары карт: оригинал и перевод -->
             <div id="pairs-area" class="hidden">
 
@@ -1438,7 +1452,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.self !== window.top || (window.innerWidth <= MIN_W && !/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash))) {
-            document.write('<script src="script.js?v=20261278"><\/script>');
+            document.write('<script src="script.js?v=20261301"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');

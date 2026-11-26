@@ -2245,6 +2245,7 @@ function timeAdverbSwapMatch(n, nv) {
 function updateCategoryTag() {
     if (state.playMode === "search") { document.getElementById("current-category").textContent = "Поиск слов"; return; }
     if (state.playMode === "pairs") { document.getElementById("current-category").textContent = "Пары карт"; return; }
+    if (state.playMode === "anagram") { document.getElementById("current-category").textContent = "Анаграмма"; return; }
     document.getElementById("current-category").textContent =
         state.playMode === "listening" ? getLevelLabel() + " · На слух"
         : usesSentences()
@@ -2381,7 +2382,7 @@ function showGameWord() {
         showResults();
         return;
     }
-    ["input-area", "battle-area", "cards-area", "search-area", "pairs-area"].forEach(id => {
+    ["input-area", "battle-area", "cards-area", "search-area", "pairs-area", "anagram-area"].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add("hidden");
     });
@@ -2406,6 +2407,8 @@ function showGameWord() {
         wsStartRound();
     } else if (state.playMode === "pairs") {
         pairsStartRound();
+    } else if (state.playMode === "anagram") {
+        agStartRound();
     } else {
         showInputRound(displayWord);
     }
@@ -2932,8 +2935,10 @@ function createPlasmaDissolve(studio) {
 
     function buildGrid() {
         if (!box || !box.w || !box.h) return false;
-        cols = Math.max(30, Math.min(58, Math.round(box.w / 2.1)));
-        rows = Math.max(38, Math.min(76, Math.round(cols * box.h / box.w)));
+        // Та же сетка, что у PlayerPlasmaAppear, — одинаковая частота
+        // обновления маски и одинаковая стоимость кадра.
+        cols = Math.max(24, Math.min(52, Math.round(box.w / 2.6)));
+        rows = Math.max(32, Math.min(68, Math.round(cols * box.h / box.w)));
         total = cols * rows;
         cellW = box.w / cols;
         cellH = box.h / rows;
@@ -3284,7 +3289,7 @@ function createPlasmaDissolve(studio) {
         lastAt = now;
         if (t < FINISH_AT) {
             const changed = updateStates(t);
-            if (changed && now - lastMaskAt >= 28) {
+            if (changed && now - lastMaskAt >= 26) {
                 applyMask();
                 lastMaskAt = now;
             }
@@ -3872,7 +3877,9 @@ const PlayerPlasmaAppear = (() => {
         const innerEls = cardEls.map((c) => c.querySelector(".card-inner")).filter(Boolean);
         if (innerEls.length !== cardEls.length) return false;
         const tbl = container.closest(".battle-table");
-        const cv = document.getElementById("player-appear-fx");
+        // Ищем canvas внутри самой раздачи — у «5 в 1» и «Анаграммы» свои
+        // canvas, а document.getElementById брал первый (скрытый) из боя.
+        const cv = tbl ? tbl.querySelector(".player-appear-fx") : null;
         if (!tbl || !cv) return false;
         const w = innerEls[0].offsetWidth || innerEls[0].clientWidth;
         const h = innerEls[0].offsetHeight || innerEls[0].clientHeight;
@@ -9458,3 +9465,245 @@ function pairsNext() {
     saveData();
     showGameWord();
 }
+
+// ===== АНАГРАММА: меняем карты местами =====
+let agLetters = [], agTarget = "", agSelected = -1, agLock = false, agTimer = null, agEntering = false, agSwapped = [];
+
+function agStartRound() {
+    if (agTimer) { clearTimeout(agTimer); agTimer = null; }
+    const area = document.getElementById("anagram-area");
+    if (!area) return;
+    area.classList.remove("hidden");
+    const word = state.gameWords[state.currentWordIndex];
+    if (!word) { showResults(); return; }
+    if (typeof isJa === "function" && isJa()) {
+        agTarget = String((word.kana || word.ja) || "").replace(/[\s、。「」・！？]/g, "");
+    } else {
+        agTarget = String(tgt(word) || "").toUpperCase().replace(/[^A-Z]/g, "");
+    }
+    const hint = document.getElementById("ag-hint");
+    if (hint) hint.textContent = nat(word) ? ("Подсказка: " + nat(word)) : "ПОМЕНЯЙТЕ КАРТЫ МЕСТАМИ";
+    // Перемешиваем так, чтобы стартовая раскладка НЕ была уже правильной.
+    // При повторяющихся буквах (DEER, BOOK…) случайная перестановка часто
+    // даёт готовое слово, а проверка шла только после обмена — поэтому
+    // правильность «не регистрировалась».
+    let solvedAtStart = true;
+    for (let attempt = 0; attempt < 40; attempt++) {
+        agLetters = agTarget.split("");
+        for (let i = agLetters.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [agLetters[i], agLetters[j]] = [agLetters[j], agLetters[i]];
+        }
+        if (agLetters.join("") !== agTarget) { solvedAtStart = false; break; }
+    }
+    agSelected = -1;
+    agLock = false;
+    agSwapped = [];
+    agEntering = true;
+    const fb = document.getElementById("ag-feedback");
+    if (fb) { fb.textContent = ""; fb.className = "feedback"; }
+    agRender();
+    if (typeof Sound !== "undefined" && Sound.flip) Sound.flip();
+    // Даём экрану разложиться — иначе offsetWidth карт ещё равен 0.
+    setTimeout(() => {
+        if (state.playMode !== "anagram") return;
+        if (typeof PlayerPlasmaAppear === "undefined") return;
+        if (PlayerPlasmaAppear.prepare(document.getElementById("ag-letters"))) PlayerPlasmaAppear.start();
+    }, 60);
+    // Все буквы одинаковы — перемешать нельзя, засчитываем после появления.
+    if (solvedAtStart) {
+        setTimeout(() => {
+            if (state.playMode === "anagram" && !agLock && agLetters.join("") === agTarget) agCheck();
+        }, 1400);
+    }
+}
+
+function agRender() {
+    const box = document.getElementById("ag-letters");
+    if (!box) return;
+    box.innerHTML = "";
+    agLetters.forEach((ch, i) => {
+        const b = document.createElement("button");
+        b.className = "ag-key option-card" + (agSelected === i ? " selected" : "");
+        b.dataset.index = String(i);
+        b.style.setProperty("--fan-rot", "0deg");
+        b.style.setProperty("--i", i);
+        b.type = "button";
+        b.innerHTML = '<span class="ag-card-inner card-inner">' +
+            '<span class="stars">' + (typeof pairsStars === "function" ? pairsStars() : "") + '</span>' +
+            '<span class="ag-suit"><img class="ico-png" src="UI/ICON/ROMB.webp" alt=""></span>' +
+            '<span class="ag-letter">' + ch + '</span>' +
+            '<span class="ag-suit"><img class="ico-png" src="UI/ICON/ROMB.webp" alt=""></span>' +
+        '</span>';
+        b.disabled = agLock;
+        b.onclick = () => agClick(i);
+        box.appendChild(b);
+    });
+    agEntering = false;
+    agSwapped = [];
+}
+
+// Тот же FLIP-обмен, что в «Собери предложение» (cardsSwap): узлы меняются
+// местами через комментарии-маркеры (работает и для соседних карт), затем
+// каждая карта анимируется со старой позиции на новую.
+function agSwapAnimate(a, b) {
+    const box = document.getElementById("ag-letters");
+    if (!box || !a || !b || a === b) return;
+    if (!box.contains(a) || !box.contains(b)) return;
+    const cards = [...box.querySelectorAll(".ag-key")];
+    const before = new Map();
+    cards.forEach(c => before.set(c, c.getBoundingClientRect()));
+    const aMarker = document.createComment("ag-swap-a");
+    const bMarker = document.createComment("ag-swap-b");
+    a.parentNode.replaceChild(aMarker, a);
+    b.parentNode.replaceChild(bMarker, b);
+    aMarker.parentNode.replaceChild(b, aMarker);
+    bMarker.parentNode.replaceChild(a, bMarker);
+    // После перестановки перепривязываем индексы и обработчики к новым позициям.
+    [...box.querySelectorAll(".ag-key")].forEach((c, i) => {
+        c.dataset.index = String(i);
+        c.style.setProperty("--i", i);
+        c.onclick = () => agClick(i);
+    });
+    if (typeof a.animate !== "function") {
+        // Фолбэк для старых WebView — прежняя CSS-анимация.
+        a.classList.add("ag-swap");
+        b.classList.add("ag-swap");
+        setTimeout(() => {
+            a.classList.remove("ag-swap");
+            b.classList.remove("ag-swap");
+        }, 430);
+        return;
+    }
+    cards.forEach(c => {
+        const old = before.get(c);
+        const now = c.getBoundingClientRect();
+        const dx = old.left - now.left;
+        const dy = old.top - now.top;
+        if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return;
+        c.animate([
+            { transform: `translate(${dx}px, ${dy}px)` },
+            { transform: "translate(0px, 0px)" }
+        ], {
+            duration: 320,
+            easing: "cubic-bezier(0.22, 1, 0.36, 1)"
+        });
+    });
+}
+
+function agClick(i) {
+    if (agLock) return;
+    const keys = [...document.querySelectorAll("#ag-letters .ag-key")];
+    if (agSelected < 0) {
+        agSelected = i;
+        keys.forEach((c, k) => c.classList.toggle("selected", k === i));
+        return;
+    }
+    if (agSelected === i) {
+        agSelected = -1;
+        keys.forEach(c => c.classList.remove("selected"));
+        return;
+    }
+    const j = agSelected;
+    agSelected = -1;
+    [agLetters[j], agLetters[i]] = [agLetters[i], agLetters[j]];
+    agSwapped = [j, i];
+    agSwapAnimate(keys[j], keys[i]);
+    // Проверяем после ЛЮБОГО нажатия, а не только после обмена:
+    // собранное слово с повторяющимися буквами теперь засчитывается всегда.
+    if (agLetters.join("") === agTarget) agCheck();
+}
+
+function agCheck() {
+    const fb = document.getElementById("ag-feedback");
+    agLock = true;
+    if (typeof Sound !== "undefined" && Sound.correct) Sound.correct();
+    if (fb) { fb.textContent = "ВЕРНО !"; fb.className = "feedback correct"; }
+    if (typeof Sound !== "undefined" && Sound.dissolve) Sound.dissolve();
+    // Дословная копия механизма из «5 в 1» (dissolvePlayerCard): отдельный
+    // повёрнутый stage с отступом 54px, canvas поверх него, маска на .card-inner.
+    const cards = [...document.querySelectorAll("#anagram-area .ag-key")];
+    if (!cards.length) { agTimer = setTimeout(() => agNext(), 620); return; }
+    let pending = cards.length;
+    let finished = false;
+    const instances = [];
+    const stages = [];
+    function cleanup() {
+        instances.forEach(inst => inst.reset());
+        stages.forEach(st => { if (st.parentElement) st.remove(); });
+    }
+    function doneOne() {
+        if (--pending <= 0 && !finished) {
+            finished = true;
+            cleanup();
+            agNext();
+        }
+    }
+    cards.forEach(card => {
+        const visual = card.querySelector(".card-inner") || card;
+        const w = visual.offsetWidth;
+        const h = visual.offsetHeight;
+        const src = visual.getBoundingClientRect();
+        if (w < 20 || h < 20 || !src.width) { doneOne(); return; }
+        let angle = 0;
+        const tr = getComputedStyle(card).transform;
+        const m = tr && tr !== "none" ? tr.match(/^matrix\(([^)]+)\)$/) : null;
+        if (m) {
+            const p = m[1].split(",").map(parseFloat);
+            if (p.length >= 2) angle = Math.atan2(p[1], p[0]);
+        }
+        const pad = 54;
+        const stageW = w + pad * 2;
+        const stageH = h + pad * 2;
+        const stage = document.createElement("div");
+        stage.className = "player-dissolve-stage";
+        stage.style.width = stageW + "px";
+        stage.style.height = stageH + "px";
+        stage.style.left = (src.left + src.width / 2 - stageW / 2) + "px";
+        stage.style.top = (src.top + src.height / 2 - stageH / 2) + "px";
+        stage.style.transform = "rotate(" + angle + "rad)";
+        const canvas = document.createElement("canvas");
+        canvas.className = "player-dissolve-fx";
+        stage.appendChild(canvas);
+        document.body.appendChild(stage);
+        stages.push(stage);
+        let syncRaf = 0;
+        let syncAlive = true;
+        function syncStage() {
+            if (!syncAlive || !stage.isConnected) { syncRaf = 0; return; }
+            const r = visual.getBoundingClientRect();
+            stage.style.left = (r.left + r.width / 2 - stageW / 2) + "px";
+            stage.style.top = (r.top + r.height / 2 - stageH / 2) + "px";
+            syncRaf = requestAnimationFrame(syncStage);
+        }
+        syncStage();
+        const inst = createPlasmaDissolve({ cardId: null, wrapSelector: null, frontSelector: null, canvasId: null });
+        instances.push(inst);
+        let started = false;
+        try {
+            started = inst.start(card, function () {
+                syncAlive = false;
+                if (syncRaf) { cancelAnimationFrame(syncRaf); syncRaf = 0; }
+                doneOne();
+            }, { wrap: stage, front: visual, table: stage, canvas: canvas, local: true, pad: pad });
+        } catch (e) {
+            started = false;
+        }
+        if (!started) {
+            syncAlive = false;
+            if (syncRaf) { cancelAnimationFrame(syncRaf); syncRaf = 0; }
+            doneOne();
+        }
+    });
+    agTimer = setTimeout(() => {
+        if (!finished) { finished = true; cleanup(); agNext(); }
+    }, 1900);
+}
+function agNext() {
+    agTimer = null;
+    state.currentWordIndex++;
+    state.selectedAnswer = null;
+    saveData();
+    showGameWord();
+}
+
