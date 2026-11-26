@@ -207,7 +207,7 @@
     })();
     </script>
 
-    <link rel="stylesheet" href="style.css?v=20261453">
+    <link rel="stylesheet" href="style.css?v=20261469">
 
     <!-- Шрифты с высоким приоритетом: иначе текст мигает системным шрифтом. -->
     <link rel="preload" as="font" type="font/ttf" href="UI/NihonZenoPlush-Regular.ttf" crossorigin fetchpriority="high">
@@ -873,7 +873,10 @@
 
                 <p class="word-label" id="pairs-label">НАЙДИТЕ ПАРЫ КАРТ</p>
 
-                <div class="hearts" id="pairs-hearts"></div>
+                <div class="pairs-hearts-row">
+                    <div class="hearts" id="pairs-hearts"></div>
+                    <span class="pairs-free" id="pairs-free">Попытки: 5</span>
+                </div>
 
                 <div class="pairs-grid" id="pairs-grid"></div>
 
@@ -1435,7 +1438,7 @@
     (function () {
         var PHONE_W = 420, MIN_W = 560;
         if (window.self !== window.top || (window.innerWidth <= MIN_W && !/[?&#]tgmock=1([&#]|$)/.test(location.search + location.hash))) {
-            document.write('<script src="script.js?v=20261271"><\/script>');
+            document.write('<script src="script.js?v=20261278"><\/script>');
             return;
         }
         document.documentElement.style.setProperty('phone-w', PHONE_W + 'px');

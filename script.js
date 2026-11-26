@@ -9201,7 +9201,7 @@ let pairsCards = [], pairsFirst = -1, pairsLock = true, pairsMoves = 0, pairsMat
 
 const PAIRS_ROUNDS = 3;
 const PAIRS_PREVIEWS = 3;
-let pairsRound = 0, pairsHearts = 3, pairsPreviewLeft = 3, pairsCombo = 0;
+let pairsRound = 0, pairsHearts = 3, pairsPreviewLeft = 3, pairsFreeLeft = 5, pairsCombo = 0;
 let pairsTimers = [];
 
 function pairsClearTimers() {
@@ -9219,6 +9219,7 @@ function pairsResetGame() {
     pairsRound = 0;
     pairsHearts = MAX_LIVES;
     pairsPreviewLeft = PAIRS_PREVIEWS;
+    pairsFreeLeft = 5;
     pairsCombo = 0;
 }
 
@@ -9235,6 +9236,8 @@ function pairsRenderHearts() {
     if (r) r.textContent = "Раунд " + (pairsRound + 1) + "/" + PAIRS_ROUNDS;
     const p = document.getElementById("pairs-preview-btn");
     if (p) p.textContent = "Посмотреть (" + pairsPreviewLeft + ")";
+    const f = document.getElementById("pairs-free");
+    if (f) f.textContent = "Попытки: " + pairsFreeLeft;
 }
 
 function pairsStartRound() {
@@ -9416,10 +9419,16 @@ function pairsClick(i) {
         Sound.wrong();
         pairsCombo = 0;
         let dead = false;
-        if (pairsPreviewLeft <= 0) dead = pairsLoseHeart();
+        const wasFree = pairsFreeLeft > 0;
+        if (wasFree) {
+            pairsFreeLeft--;
+            pairsRenderHearts();
+        } else {
+            dead = pairsLoseHeart();
+        }
         if (!dead) {
             if (fb) {
-                fb.textContent = pairsPreviewLeft > 0 ? "НЕВЕРНО !" : "НЕВЕРНО ! -1 СЕРДЕЧКО";
+                fb.textContent = wasFree ? "НЕВЕРНО ! Бесплатная ошибка" : "НЕВЕРНО ! -1 СЕРДЕЧКО";
                 fb.className = "feedback incorrect";
             }
             pairsUpdate();
@@ -9439,6 +9448,7 @@ function pairsClick(i) {
 function pairsNext() {
     pairsRound++;
     pairsPreviewLeft = PAIRS_PREVIEWS;
+    pairsFreeLeft = 5;
     pairsCombo = 0;
     if (pairsRound >= PAIRS_ROUNDS) {
         showResults();

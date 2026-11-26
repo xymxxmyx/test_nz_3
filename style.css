@@ -2151,7 +2151,7 @@ body[data-back="b10"] .bot-deck::before { color:#e8c8a8; border-color:#6a4a30; b
 body[data-wordbg="w1"] .battle-card .card-front,     body[data-wordbg="w1"] .player-zone .option-card .card-inner,
 body[data-wordbg="w1"] .game-card {
     background:
-        url("UI/KARTA_obratka.webp") center / 100% 100% no-repeat #2a1550;
+        url("UI/KARTA_obratka_clean.webp") center / 100% 100% no-repeat #2a1550;
 }
 body[data-wordbg="w2"] .battle-card .card-front,     body[data-wordbg="w2"] .player-zone .option-card .card-inner,
 body[data-wordbg="w2"] .game-card {
@@ -3341,7 +3341,7 @@ body[data-wordbg="w11"] .game-card {
 body[data-back="b12"] .card-face.card-back,
 body[data-back="b12"] .bot-deck .deck-card-bg {
     background:
-        url("UI/KARTA.webp") center / 100% 100% no-repeat #1a0a2e;
+        url("UI/KARTA_clean.webp") center / 100% 100% no-repeat #ffaacd;
 }
 body[data-back="b12"] .card-face {
     border-color: #c48aff;
@@ -3358,7 +3358,7 @@ body[data-wordbg="w12"] .battle-card .card-front,
 body[data-wordbg="w12"] .player-zone .option-card .card-inner,
 body[data-wordbg="w12"] .game-card {
     background:
-        url("UI/KARTA_obratka.webp") center / 100% 100% no-repeat #2a1550;
+        url("UI/KARTA_obratka_clean.webp") center / 100% 100% no-repeat #2a1550;
 }
 
 /* =========================================================================
@@ -12496,14 +12496,14 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#search-area:not(.hidden))
 #pairs-area:not(.hidden) {
     display: flex !important;
     flex-direction: column !important;
-    gap: calc(6px * var(--ui-fit, 1));
-    padding: calc(6px * var(--ui-fit, 1));
+    gap: calc(4px * var(--ui-fit, 1));
+    padding: calc(2px * var(--ui-fit, 1));
 }
 #pairs-area .word-label { margin: 0; text-align: center; }
 #pairs-area .pairs-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: calc(6px * var(--ui-fit, 1));
+    gap: calc(2px * var(--ui-fit, 1));
     width: 100%;
 }
 #pairs-area .pair-card {
@@ -12516,9 +12516,9 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#search-area:not(.hidden))
     background: none;
     perspective: 900px;
     cursor: pointer;
-    filter: none;
-    border-radius: calc(16px * var(--ui-fit, 1));
-    box-shadow: 0 calc(6px * var(--ui-fit, 1)) calc(16px * var(--ui-fit, 1)) rgba(0, 0, 0, 0.75), 0 calc(3px * var(--ui-fit, 1)) 0 rgba(15, 4, 28, 0.9);
+    border-radius: calc(6px * var(--ui-fit, 1));
+    box-shadow: none;
+    filter: drop-shadow(0 calc(3px * var(--ui-fit, 1)) calc(6px * var(--ui-fit, 1)) rgba(0, 0, 0, 0.55));
 }
 #pairs-area .pair-inner {
     position: relative;
@@ -12544,13 +12544,13 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#search-area:not(.hidden))
     text-align: center;
     border: 0 !important;
     background-clip: border-box !important;
-    border-radius: 0 !important;
-    overflow: visible !important;
+    border-radius: calc(6px * var(--ui-fit, 1)) !important;
+    overflow: hidden !important;
     box-shadow: none !important;
     outline: none !important;
 }
 #pairs-area .pair-front {
-    background: url("UI/KARTA_obratka.webp") center / 100% 100% no-repeat #1a0a2e;
+    background: url("UI/KARTA_obratka_clean.webp") center / 100% 100% no-repeat #ffaacd;
     transform: rotateY(180deg);
 }
 #pairs-area .pair-front::before {
@@ -12562,7 +12562,7 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#search-area:not(.hidden))
     pointer-events: none;
 }
 #pairs-area .pair-back {
-    background: url("UI/KARTA.webp") center / 100% 100% no-repeat #1a0a2e;
+    background: url("UI/KARTA_clean.webp") center / 100% 100% no-repeat #ffaacd;
 }
 #pairs-area .pair-word {
     position: relative;
@@ -12652,5 +12652,23 @@ body.tg-mini-app[data-theme="plush"] #game-screen:has(#search-area:not(.hidden))
 }
 #pairs-area #pairs-preview-btn {
     align-self: center;
-    min-height: calc(36px * var(--ui-fit, 1));
+    width: auto !important;
+    min-width: calc(110px * var(--ui-fit, 1)) !important;
+    height: calc(28px * var(--ui-fit, 1)) !important;
+    min-height: calc(28px * var(--ui-fit, 1)) !important;
+    padding: 0 calc(10px * var(--ui-fit, 1)) !important;
+    font-size: calc(11px * var(--ui-fit, 1)) !important;
+}
+
+
+#pairs-area .pairs-hearts-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(10px * var(--ui-fit, 1));
+}
+#pairs-area .pairs-free {
+    font-size: clamp(11px, calc(13px * var(--ui-fit, 1)), 15px);
+    color: #ffd166;
+    font-weight: 700;
 }
